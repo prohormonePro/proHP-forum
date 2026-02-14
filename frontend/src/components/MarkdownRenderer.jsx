@@ -19,15 +19,17 @@ function escapeRegExp(str) {
 
 function autoLinkMarkdown(md) {
   if (!md) return md;
-  const chunks = md.split(/(```[\s\S]*?```)/g);
-  return chunks.map((chunk) => {
+  var chunks = md.split(/(```[\s\S]*?```)/g);
+  return chunks.map(function(chunk) {
     if (chunk.startsWith('```')) return chunk;
-    let out = chunk;
-    for (const item of AUTO_LINK) {
-      const href = '/compounds/' + item.slug;
-      for (const rx of item.patterns) {
-        out = out.replace(rx, (match) => {
-          const linkCheck = new RegExp('\\[[^\\]]*' + escapeRegExp(match) + '[^\\]]*\\]\\([^)]*\\)', 'i');
+    var out = chunk;
+    for (var i = 0; i < AUTO_LINK.length; i++) {
+      var item = AUTO_LINK[i];
+      var href = '/compounds/' + item.slug;
+      for (var j = 0; j < item.patterns.length; j++) {
+        var rx = item.patterns[j];
+        out = out.replace(rx, function(match) {
+          var linkCheck = new RegExp('\\[[^\\]]*' + escapeRegExp(match) + '[^\\]]*\\]\\([^)]*\\)', 'i');
           if (linkCheck.test(out)) return match;
           return '[' + match + '](' + href + ')';
         });
@@ -39,7 +41,7 @@ function autoLinkMarkdown(md) {
 
 export default function MarkdownRenderer({ content = '', className = '' }) {
   if (!content) return null;
-  const processed = autoLinkMarkdown(content);
+  var processed = autoLinkMarkdown(content);
   return (
     <div className={('markdown-body ' + className).trim()}>
       <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
