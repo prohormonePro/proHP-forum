@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUp, ArrowDown, MessageSquare, CheckCircle, ChevronLeft, Award, CornerDownRight, Eye } from 'lucide-react';
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 const TIER_LABELS = {
   lab_rat: 'Lab Rat',
@@ -120,7 +121,7 @@ export default function ThreadPage() {
                 {thread.compound_name}
               </Link>
             )}
-            <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap mb-4">{thread.body}</div>
+            <MarkdownRenderer content={thread.body} className="text-sm text-slate-300 leading-relaxed mb-4" />
             <div className="flex items-center gap-3 text-[11px] text-slate-500 border-t border-white/[0.04] pt-3">
               <span className="font-medium text-slate-400">{thread.author_username}</span>
               {thread.author_founding && <span className="tier-badge tier-founding text-[8px] py-0">Founding Member</span>}
@@ -165,7 +166,7 @@ export default function ThreadPage() {
                     <CheckCircle className="w-3.5 h-3.5" /> Verdict
                   </div>
                 )}
-                <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap mb-2">{post.body}</div>
+                <MarkdownRenderer content={post.body} className="text-sm text-slate-300 leading-relaxed mb-2" />
                 <div className="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap">
                   <span className="font-medium text-slate-400">{post.author_username}</span>
                   {post.author_founding && <span className="tier-badge tier-founding text-[8px] py-0">FM</span>}

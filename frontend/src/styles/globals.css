@@ -157,3 +157,13 @@
   @apply text-[11px] font-medium uppercase tracking-wider;
   color: var(--text-muted);
 }
+
+/* === MARKDOWN BODY STYLES === */
+.markdown-body h2 { font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.markdown-body h3 { font-size: 0.95rem; font-weight: 600; color: #cbd5e1; margin-top: 1.25rem; margin-bottom: 0.4rem; }
+.markdown-body p { margin-bottom: 0.75rem; }
+.markdown-body strong { color: #f1f5f9; font-weight: 600; }
+.markdown-body ul, .markdown-body ol { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.markdown-body li { margin-bottom: 0.25rem; }
+.markdown-body a { color: #229DD8; text-decoration: underline; }
+.markdown-body hr { border-color: rgba(255,255,255,0.06); margin: 1rem 0; }
