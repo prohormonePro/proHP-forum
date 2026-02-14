@@ -1,0 +1,30 @@
+{
+  "name": "prohp-forum-backend",
+  "version": "1.0.0",
+  "description": "ProHP Forum API — Proof Over Hype",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "NODE_ENV=production node src/index.js",
+    "migrate": "psql -U prohp -d prohp_forum -f migrations/001_foundation.sql && psql -U prohp -d prohp_forum -f migrations/002_seed.sql",
+    "seed": "psql -U prohp -d prohp_forum -f migrations/002_seed.sql"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
+    "redis": "^4.7.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0",
+    "express-rate-limit": "^7.4.0",
+    "rate-limit-redis": "^4.2.0",
+    "stripe": "^17.0.0",
+    "dotenv": "^16.4.5",
+    "uuid": "^10.0.0",
+    "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
