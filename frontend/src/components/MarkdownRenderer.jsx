@@ -1,9 +1,16 @@
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import rehypeSanitize from 'rehype-sanitize';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { Link } from 'react-router-dom';
 
-const AUTO_LINK = [
+// Allow href on anchor tags (default schema strips some)
+var sanitizeSchema = Object.assign({}, defaultSchema, {
+  attributes: Object.assign({}, defaultSchema.attributes, {
+    a: ['href', 'title', 'className'],
+  }),
+});
+
+var AUTO_LINK = [
   { slug: 'rad-140', patterns: [/RAD[\s-]?140\b/gi, /\bTestolone\b/gi] },
   { slug: 'lgd-4033', patterns: [/LGD[\s-]?4033\b/gi, /\bLigandrol\b/gi] },
   { slug: 'mk-677', patterns: [/MK[\s-]?677\b/gi, /\bIbutamoren\b/gi] },
@@ -74,7 +81,7 @@ export default function MarkdownRenderer({ content = '', className = '', maxAuto
   return (
     <div className={('markdown-body ' + className).trim()}>
       <ReactMarkdown
-        rehypePlugins={[rehypeSanitize]}
+        rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
         components={{
           a: function({ href, children }) {
             if (href && href.startsWith('/compounds/')) {
