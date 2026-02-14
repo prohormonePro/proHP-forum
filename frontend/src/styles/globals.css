@@ -167,3 +167,15 @@
 .markdown-body li { margin-bottom: 0.25rem; }
 .markdown-body a { color: #229DD8; text-decoration: underline; }
 .markdown-body hr { border-color: rgba(255,255,255,0.06); margin: 1rem 0; }
+
+/* === COMPOUND LINKS (SUBTLE) === */
+.markdown-body .markdown-link {
+  color: rgba(226, 232, 240, 0.92);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(34, 157, 216, 0.35);
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.markdown-body .markdown-link:hover {
+  color: rgba(34, 157, 216, 0.95);
+  border-bottom-color: rgba(34, 157, 216, 0.75);
+}
