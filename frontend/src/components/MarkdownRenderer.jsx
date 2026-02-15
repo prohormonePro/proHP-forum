@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import rehypeSanitize from 'rehype-sanitize';
 import { Link } from 'react-router-dom';
 
-const AUTO_LINK = [
+var AUTO_LINK = [
   { slug: 'rad-140', patterns: [/RAD[\s-]?140\b/gi, /\bTestolone\b/gi] },
   { slug: 'lgd-4033', patterns: [/LGD[\s-]?4033\b/gi, /\bLigandrol\b/gi] },
   { slug: 'mk-677', patterns: [/MK[\s-]?677\b/gi, /\bIbutamoren\b/gi] },
@@ -74,10 +73,9 @@ export default function MarkdownRenderer({ content = '', className = '', maxAuto
   return (
     <div className={('markdown-body ' + className).trim()}>
       <ReactMarkdown
-        rehypePlugins={[rehypeSanitize]}
         components={{
           a: function({ href, children }) {
-            if (href && href.startsWith('/compounds/')) {
+            if (href && href.startsWith('/')) {
               return <Link to={href} className="markdown-link">{children}</Link>;
             }
             return <a href={href} target="_blank" rel="noreferrer noopener" className="markdown-link">{children}</a>;
