@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 var AUTO_LINK = [
   { slug: 'rad-140', patterns: [/RAD[\s-]?140\b/gi, /\bTestolone\b/gi] },
@@ -62,7 +62,22 @@ function autoLinkSparse(markdown, maxLinks) {
   return linked.join('');
 }
 
+function safeHref(href) {
+  if (!href) return null;
+  var h = String(href).trim();
+  if (h.startsWith('/')) return h;
+  if (/^https?:\/\//i.test(h)) return h;
+  if (/^mailto:/i.test(h)) return h;
+  return null;
+}
+
+function extractHref(props) {
+  return props.href || props.url || (props.node && props.node.properties && props.node.properties.href) || null;
+}
+
 export default function MarkdownRenderer({ content = '', className = '', maxAutoLinks = 3 }) {
+  var navigate = useNavigate();
+
   var processed = useMemo(function() {
     if (!content) return '';
     return autoLinkSparse(content, maxAutoLinks);
@@ -74,11 +89,23 @@ export default function MarkdownRenderer({ content = '', className = '', maxAuto
     <div className={('markdown-body ' + className).trim()}>
       <ReactMarkdown
         components={{
-          a: function({ href, children }) {
-            if (href && href.startsWith('/')) {
-              return <Link to={href} className="markdown-link">{children}</Link>;
-            }
-            return <a href={href} target="_blank" rel="noreferrer noopener" className="markdown-link">{children}</a>;
+          a: function(props) {
+            var raw = extractHref(props);
+            var clean = safeHref(raw);
+            if (!clean) return React.createElement('span', null, props.children);
+            var isInternal = clean.startsWith('/');
+            return React.createElement('a', {
+              href: clean,
+              className: 'markdown-link',
+              onClick: function(e) {
+                if (isInternal) {
+                  e.preventDefault();
+                  navigate(clean);
+                }
+              },
+              target: isInternal ? undefined : '_blank',
+              rel: isInternal ? undefined : 'noreferrer noopener',
+            }, props.children);
           },
         }}
       >
