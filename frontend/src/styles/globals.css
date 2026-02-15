@@ -179,3 +179,16 @@
   color: rgba(34, 157, 216, 0.95);
   border-bottom-color: rgba(34, 157, 216, 0.75);
 }
+
+/* === MARKDOWN LINK VISIBILITY === */
+.markdown-body a.markdown-link {
+  color: rgba(34, 157, 216, 0.95) !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+  text-decoration-color: rgba(34, 157, 216, 0.45) !important;
+  border-bottom: none !important;
+}
+.markdown-body a.markdown-link:hover {
+  text-decoration-color: rgba(34, 157, 216, 0.95) !important;
+}
