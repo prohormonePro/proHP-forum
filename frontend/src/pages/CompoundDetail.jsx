@@ -1,115 +1,325 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ExternalLink, MessageSquare, Dumbbell } from 'lucide-react';
+import { ChevronLeft, ExternalLink, MessageSquare, Search, X, AlertTriangle, Youtube } from 'lucide-react';
 import { api } from '../hooks/api';
+import MarkdownRenderer from '../components/MarkdownRenderer';
+
+function getSessionInt(key, fallback) {
+  try {
+    var raw = sessionStorage.getItem(key);
+    var v = raw ? parseInt(raw, 10) : fallback;
+    return Number.isFinite(v) ? v : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function setSessionInt(key, value) {
+  try { sessionStorage.setItem(key, String(value)); } catch (e) {}
+}
+
+function Banner({ title, body, actions, onDismiss }) {
+  return (
+    <div className="prohp-card p-4 border border-prohp-400/20 bg-prohp-400/8 relative mt-4">
+      <button onClick={onDismiss} className="absolute top-2 right-2 text-slate-400 hover:text-slate-200" aria-label="Dismiss">
+        <X className="w-4 h-4" />
+      </button>
+      <div className="text-sm font-semibold text-slate-200">{title}</div>
+      <div className="mt-1 text-[13px] leading-relaxed text-slate-400">{body}</div>
+      {actions ? <div className="mt-3 flex gap-2">{actions}</div> : null}
+    </div>
+  );
+}
 
 export default function CompoundDetail() {
-  const { slug } = useParams();
-  const { data, isLoading, error } = useQuery({
+  var { slug } = useParams();
+
+  var { data, isLoading, error } = useQuery({
     queryKey: ['compound', slug],
-    queryFn: () => api.get(`/api/compounds/${slug}`),
+    queryFn: function() { return api.get('/api/compounds/' + slug); },
+    enabled: !!slug,
   });
 
-  if (isLoading) return <div className="animate-pulse max-w-3xl mx-auto"><div className="h-8 bg-slate-800 rounded w-1/3 mb-4" /><div className="h-40 bg-slate-800 rounded" /></div>;
-  if (error) return <div className="text-red-400 text-sm text-center py-12">{error.message}</div>;
+  var compound = data ? data.compound : null;
+  var relatedThreads = data ? (data.related_threads || []) : [];
+  var relatedCycles = data ? (data.related_cycles || []) : [];
 
-  const { compound, related_threads, related_cycles } = data;
+  // Search state
+  var [q, setQ] = useState('');
+  var [searching, setSearching] = useState(false);
+  var [searchErr, setSearchErr] = useState('');
+  var [results, setResults] = useState(null);
+
+  var searchKey = 'compoundSearchCount:' + (slug || 'x');
+  var dismissKey = 'compoundBannerDismissed:' + (slug || 'x');
+
+  var [searchCount, setSearchCountState] = useState(function() { return getSessionInt(searchKey, 0); });
+  var [bannerDismissed, setBannerDismissed] = useState(function() { return getSessionInt(dismissKey, 0) === 1; });
+
+  var abortRef = useRef(null);
+
+  useEffect(function() {
+    setQ('');
+    setResults(null);
+    setSearchErr('');
+    setSearchCountState(getSessionInt(searchKey, 0));
+    setBannerDismissed(getSessionInt(dismissKey, 0) === 1);
+  }, [slug, searchKey, dismissKey]);
+
+  useEffect(function() { setSessionInt(searchKey, searchCount); }, [searchKey, searchCount]);
+  useEffect(function() { setSessionInt(dismissKey, bannerDismissed ? 1 : 0); }, [dismissKey, bannerDismissed]);
+
+  var showBanner5 = !bannerDismissed && searchCount >= 5 && searchCount < 15;
+  var showBanner15 = !bannerDismissed && searchCount >= 15;
+
+  function runSearch(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var query = q.trim();
+    if (!query) return;
+
+    setSearchCountState(function(n) { return n + 1; });
+
+    try { if (abortRef.current) abortRef.current.abort(); } catch (ex) {}
+    var controller = new AbortController();
+    abortRef.current = controller;
+
+    setSearching(true);
+    setSearchErr('');
+    setResults(null);
+
+    api.get('/api/threads/search/query?q=' + encodeURIComponent(query) + '&limit=12&offset=0')
+      .then(function(res) {
+        setResults(res);
+      })
+      .catch(function(err2) {
+        if (err2 && err2.name === 'AbortError') return;
+        setSearchErr(err2 ? (err2.message || 'Search failed') : 'Search failed');
+      })
+      .finally(function() {
+        setSearching(false);
+      });
+  }
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse max-w-3xl mx-auto px-4 py-6">
+        <div className="h-8 bg-slate-800 rounded w-1/3 mb-4" />
+        <div className="h-40 bg-slate-800 rounded" />
+      </div>
+    );
+  }
+
+  if (error) return <div className="text-red-400 text-sm text-center py-12">{error.message}</div>;
+  if (!compound) return <div className="text-slate-400 text-sm text-center py-12">Compound not found.</div>;
+
+  var youtubeUrl = compound.youtube_url || '';
+  var productUrl = compound.product_url || '';
+  var youtubeEmbedUrl = youtubeUrl ? youtubeUrl.replace('watch?v=', 'embed/').split('&')[0] : '';
 
   return (
-    <div className="max-w-3xl mx-auto animate-fade-in">
+    <div className="max-w-3xl mx-auto animate-fade-in px-4 py-6">
       <Link to="/compounds" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-prohp-400 transition-colors mb-4">
         <ChevronLeft className="w-3.5 h-3.5" /> Encyclopedia
       </Link>
 
+      {/* Header card */}
       <div className="prohp-card p-6 mb-4">
         <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
-            <div className="flex items-center gap-2">
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded risk-${compound.risk_tier}`}>
-                Risk: {compound.risk_tier}
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+            {compound.company ? <p className="text-xs text-slate-500 mb-2">{compound.company}</p> : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded risk-' + (compound.risk_tier || 'unknown')}>
+                Risk: {compound.risk_tier || 'unknown'}
               </span>
-              <span className="text-[10px] font-semibold text-slate-500 bg-slate-800/60 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200">
                 {compound.category}
               </span>
-              <span className="text-[10px] font-semibold text-prohp-500/70 bg-prohp-500/10 px-2 py-0.5 rounded">
-                {compound.trust_level}
-              </span>
+              {compound.hair_loss_severity ? (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                  Hair loss: {compound.hair_loss_severity}
+                </span>
+              ) : null}
             </div>
           </div>
-          {compound.youtube_url && (
-            <a href={compound.youtube_url} target="_blank" rel="noopener noreferrer"
-               className="prohp-btn-ghost text-xs flex items-center gap-1.5">
-              Watch Review <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
+
+          <div className="flex gap-2">
+            {youtubeUrl ? (
+              <a href={youtubeUrl} target="_blank" rel="noreferrer noopener" className="prohp-btn-primary inline-flex items-center gap-2 text-xs">
+                <Youtube className="w-4 h-4" /> Watch breakdown
+              </a>
+            ) : null}
+            {productUrl ? (
+              <a href={productUrl} target="_blank" rel="noreferrer noopener" className="prohp-btn-secondary inline-flex items-center gap-2 text-xs">
+                <ExternalLink className="w-4 h-4" /> Product page
+              </a>
+            ) : null}
+          </div>
         </div>
 
-        {compound.summary && (
-          <div className="mb-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Overview</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">{compound.summary}</p>
-          </div>
-        )}
+        {compound.summary ? (
+          <div className="text-sm text-slate-300 leading-relaxed mb-4">{compound.summary}</div>
+        ) : null}
 
-        {compound.mechanism && (
+        {/* YouTube embed */}
+        {youtubeEmbedUrl ? (
           <div className="mb-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">How It Works</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">{compound.mechanism}</p>
+            <div className="aspect-video rounded-lg overflow-hidden bg-black/30">
+              <iframe src={youtubeEmbedUrl} title={compound.name + ' video'} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+            </div>
           </div>
-        )}
+        ) : null}
 
-        {compound.side_effects && (
-          <div className="mb-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-red-400/70 mb-2">What Can Go Wrong</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">{compound.side_effects}</p>
+        {/* Benefits */}
+        {compound.benefits ? (
+          <div className="text-sm text-slate-400 mb-2">
+            <span className="font-semibold text-slate-300">Benefits: </span>{compound.benefits}
           </div>
-        )}
+        ) : null}
+      </div>
 
-        {compound.dosing && (
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Dosing</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">{compound.dosing}</p>
+      {/* Narrative fields */}
+      {compound.mechanism ? (
+        <div className="prohp-card p-6 mb-4">
+          <div className="text-sm font-semibold text-slate-200 mb-2">Mechanism</div>
+          <MarkdownRenderer content={compound.mechanism} />
+        </div>
+      ) : null}
+
+      {compound.dosing ? (
+        <div className="prohp-card p-6 mb-4">
+          <div className="text-sm font-semibold text-slate-200 mb-2">Dosing</div>
+          <MarkdownRenderer content={compound.dosing} />
+        </div>
+      ) : null}
+
+      {compound.side_effects ? (
+        <div className="prohp-card p-6 mb-4">
+          <div className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-1">
+            <AlertTriangle className="w-4 h-4 text-yellow-500" /> Side Effects
           </div>
+          <MarkdownRenderer content={compound.side_effects} />
+        </div>
+      ) : null}
+
+      {compound.hair_loss_explanation ? (
+        <div className="text-xs text-slate-400 italic mb-6 px-1">
+          Hair loss note: {compound.hair_loss_explanation}
+        </div>
+      ) : null}
+
+      {/* Search box */}
+      <div className="prohp-card p-6 mb-4">
+        <div className="text-sm font-semibold text-slate-200">
+          Have a question about {compound.name}? Chances are it has been answered by me or the community.
+        </div>
+
+        <form onSubmit={runSearch} className="mt-3 flex gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input value={q} onChange={function(e) { setQ(e.target.value); }} placeholder={'Search ' + compound.name + '... (PCT, suppression, hair loss, dosing)'} className="prohp-input w-full pl-9" />
+          </div>
+          <button className="prohp-btn-primary text-xs" type="submit" disabled={searching}>
+            {searching ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        {showBanner5 ? (
+          <Banner
+            title={'Haven\'t found what you\'re looking for on ' + compound.name + '?'}
+            body="Try a different phrase. If it is still not showing up, post the question in the Library so the answer gets sealed once and stops repeating."
+            onDismiss={function() { setBannerDismissed(true); }}
+            actions={<Link to="/rooms/library" className="prohp-btn-primary text-xs">Ask in Library</Link>}
+          />
+        ) : null}
+
+        {showBanner15 ? (
+          <Banner
+            title={'Deep dive needed on ' + compound.name + '.'}
+            body="You have searched a lot. Post the question clean in the Library. That turns the answer into a permanent reference."
+            onDismiss={function() { setBannerDismissed(true); }}
+            actions={<Link to="/rooms/library" className="prohp-btn-primary text-xs">Ask in Library</Link>}
+          />
+        ) : null}
+
+        {searchErr ? <div className="mt-3 text-[13px] text-red-300">{searchErr}</div> : null}
+
+        {results ? (
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold text-slate-200">Results</div>
+              <div className="text-xs text-slate-500">{results.results ? results.results.length : 0} found</div>
+            </div>
+
+            {results.results && results.results.length ? (
+              <div className="mt-3 flex flex-col gap-2">
+                {results.results.map(function(t) {
+                  return (
+                    <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
+                      <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
+                      <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
+                        <span>{t.room_name}</span>
+                        <span>{t.reply_count} replies</span>
+                        <span>{t.author_username}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-2 text-[13px] text-slate-400">
+                No matches. Try shorter terms (e.g. "PCT", "ALT", "gyno", "suppression", "hair loss").
+              </div>
+            )}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Related Threads */}
+      <div className="prohp-card p-6 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-slate-400" />
+            <div className="text-sm font-semibold text-slate-200">Related Threads</div>
+          </div>
+          <Link to="/rooms/library" className="text-xs text-slate-500 hover:text-prohp-400 transition-colors">Library</Link>
+        </div>
+        {relatedThreads.length ? (
+          <div className="flex flex-col gap-2">
+            {relatedThreads.map(function(t) {
+              return (
+                <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
+                  <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
+                  <div className="mt-1 text-[11px] text-slate-500">{t.reply_count} replies</div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-sm text-slate-400">No related threads yet.</div>
         )}
       </div>
 
-      {related_threads?.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
-            <MessageSquare className="w-3.5 h-3.5" /> Discussions
-          </h2>
-          <div className="space-y-1.5">
-            {related_threads.map((t) => (
-              <Link key={t.id} to={`/t/${t.id}`} className="prohp-card px-4 py-2.5 block hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold font-mono text-prohp-400 min-w-[24px]">{t.score}</span>
-                  <span className="text-sm text-slate-300 flex-1 truncate">{t.title}</span>
-                  <span className="text-[10px] text-slate-600">{t.reply_count} replies</span>
+      {/* Related Cycles */}
+      {relatedCycles.length ? (
+        <div className="prohp-card p-6">
+          <div className="text-sm font-semibold text-slate-200 mb-3">Related Cycles</div>
+          <div className="flex flex-col gap-2">
+            {relatedCycles.map(function(c) {
+              return (
+                <div key={c.id} className="prohp-card p-3">
+                  <div className="text-[13px] font-semibold text-slate-200">{c.title}</div>
+                  <div className="mt-1 text-[12px] text-slate-400">
+                    {c.status ? 'Status: ' + c.status : ''}
+                    {c.duration_weeks ? ' · ' + c.duration_weeks + ' weeks' : ''}
+                  </div>
                 </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
-      )}
-
-      {related_cycles?.length > 0 && (
-        <div>
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
-            <Dumbbell className="w-3.5 h-3.5" /> Cycle Logs
-          </h2>
-          <div className="space-y-1.5">
-            {related_cycles.map((c) => (
-              <Link key={c.id} to={`/cycles/${c.id}`} className="prohp-card px-4 py-2.5 block hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-300 flex-1 truncate">{c.title}</span>
-                  <span className="text-[10px] text-slate-600">{c.username} · {c.update_count} updates</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
