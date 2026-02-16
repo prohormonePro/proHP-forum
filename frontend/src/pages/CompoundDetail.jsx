@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube } from 'lucide-react';
+import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink } from 'lucide-react';
 import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 
@@ -97,6 +97,95 @@ function Modal({ open, title, onClose, children }) {
   );
 }
 
+function JoinModal({ open, onClose }) {
+  useEffect(function() {
+    if (!open) return;
+    function onKey(e) { if (e.key === 'Escape') onClose(); }
+    document.addEventListener('keydown', onKey);
+    var prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return function() {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md rounded-2xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <div className="text-base font-bold text-slate-100">Join Brothers in Arms</div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-5">
+          <div className="text-sm text-slate-300 leading-relaxed mb-4">
+            Full access to every thread, every search result, and every compound breakdown in The Library and The Lab.
+          </div>
+          <div className="space-y-2 mb-5">
+            <div className="flex items-start gap-2 text-sm text-slate-300">
+              <span className="text-prohp-400 mt-0.5">&#10003;</span>
+              <span>Unlimited search across all threads and compounds</span>
+            </div>
+            <div className="flex items-start gap-2 text-sm text-slate-300">
+              <span className="text-prohp-400 mt-0.5">&#10003;</span>
+              <span>Post threads, log cycles, ask questions</span>
+            </div>
+            <div className="flex items-start gap-2 text-sm text-slate-300">
+              <span className="text-prohp-400 mt-0.5">&#10003;</span>
+              <span>Filter compounds by risk tier, hair loss, benefits</span>
+            </div>
+            <div className="flex items-start gap-2 text-sm text-slate-300">
+              <span className="text-prohp-400 mt-0.5">&#10003;</span>
+              <span>Full ranking list and side-by-side comparisons</span>
+            </div>
+            <div className="flex items-start gap-2 text-sm text-slate-300">
+              <span className="text-prohp-400 mt-0.5">&#10003;</span>
+              <span>Access every compound video breakdown</span>
+            </div>
+          </div>
+          <div className="text-center mb-4">
+            <span className="text-3xl font-extrabold text-slate-100">$19</span>
+            <span className="text-sm text-slate-400 ml-1">/ month</span>
+          </div>
+          <a
+            href="#join-brothers"
+            className="prohp-btn-primary w-full text-center block py-3 text-sm font-bold"
+            onClick={function(e) { e.preventDefault(); alert('Stripe checkout coming soon. You are on the list, brother.'); }}
+          >
+            Join Brothers in Arms
+          </a>
+          <div className="mt-3 text-center text-[11px] text-slate-500">
+            First 1,000 members get a permanent Founding Member badge.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function riskClass(tier) {
+  var t = (tier || '').toLowerCase();
+  if (t === 'low') return 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/40';
+  if (t === 'moderate') return 'bg-yellow-900/60 text-yellow-300 border border-yellow-700/40';
+  if (t === 'high') return 'bg-orange-900/60 text-orange-300 border border-orange-700/40';
+  if (t === 'extreme') return 'bg-red-900/60 text-red-300 border border-red-700/40';
+  return 'bg-slate-800 text-slate-300';
+}
+
+function hairClass(sev) {
+  var s = (sev || '').toLowerCase();
+  if (s === 'none') return 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/40';
+  if (s === 'mild') return 'bg-yellow-900/60 text-yellow-300 border border-yellow-700/40';
+  if (s === 'moderate') return 'bg-orange-900/60 text-orange-300 border border-orange-700/40';
+  if (s === 'severe') return 'bg-red-900/60 text-red-300 border border-red-700/40';
+  return 'bg-slate-800 text-slate-300';
+}
+
 export default function CompoundDetail() {
   var { slug } = useParams();
 
@@ -116,8 +205,8 @@ export default function CompoundDetail() {
   }, [compound]);
 
   var [videoOpen, setVideoOpen] = useState(false);
+  var [joinOpen, setJoinOpen] = useState(false);
 
-  // Search state
   var [q, setQ] = useState('');
   var [searching, setSearching] = useState(false);
   var [searchErr, setSearchErr] = useState('');
@@ -181,27 +270,32 @@ export default function CompoundDetail() {
   if (error) return <div className="text-red-400 text-sm text-center py-12">{error.message}</div>;
   if (!compound) return <div className="text-slate-400 text-sm text-center py-12">Compound not found.</div>;
 
+  var hasRealSummary = compound.summary && !compound.summary.toLowerCase().includes('buy it here');
+
   return (
     <div className="max-w-3xl mx-auto animate-fade-in px-4 py-6">
       <Link to="/compounds" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-prohp-400 transition-colors mb-4">
         <ChevronLeft className="w-3.5 h-3.5" /> Encyclopedia
       </Link>
 
-      {/* Header card */}
       <div className="prohp-card p-6 mb-4">
         <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
             {compound.company ? <p className="text-xs text-slate-500 mb-2">{compound.company}</p> : null}
             <div className="flex flex-wrap items-center gap-2">
-              <span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded risk-' + (compound.risk_tier || 'unknown')}>
-                Risk: {compound.risk_tier || 'unknown'}
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200">
-                {compound.category}
-              </span>
+              {compound.risk_tier ? (
+                <span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>
+                  Risk: {compound.risk_tier}
+                </span>
+              ) : null}
+              {compound.category ? (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">
+                  {compound.category}
+                </span>
+              ) : null}
               {compound.hair_loss_severity ? (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                <span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>
                   Hair loss: {compound.hair_loss_severity}
                 </span>
               ) : null}
@@ -217,11 +311,10 @@ export default function CompoundDetail() {
           </div>
         </div>
 
-        {compound.summary ? (
+        {hasRealSummary ? (
           <div className="text-sm text-slate-300 leading-relaxed mb-4">{compound.summary}</div>
         ) : null}
 
-        {/* Inline YouTube embed */}
         {videoId ? (
           <div className="mb-4">
             <div className="aspect-video rounded-lg overflow-hidden bg-black/30 border border-white/5">
@@ -233,21 +326,35 @@ export default function CompoundDetail() {
           </div>
         ) : null}
 
+        {compound.product_url ? (
+          <div className="mt-3 pt-3 border-t border-white/5">
+            <a
+              href={compound.product_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Get it here to support the encyclopedia. Appreciate you, brother.
+            </a>
+          </div>
+        ) : null}
+
         {compound.benefits ? (
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-slate-400 mt-3">
             <span className="font-semibold text-slate-300">Benefits: </span>{compound.benefits}
           </div>
         ) : null}
       </div>
 
-      {/* Theater mode modal */}
       <Modal open={videoOpen} title={(compound.name || 'Video') + ' — Breakdown'} onClose={function() { setVideoOpen(false); }}>
         <div className="aspect-video rounded-xl overflow-hidden bg-black/40 border border-white/10">
           <YouTubeEmbed videoId={videoId} title={compound.name + ' breakdown'} className="w-full h-full" />
         </div>
       </Modal>
 
-      {/* Narrative fields */}
+      <JoinModal open={joinOpen} onClose={function() { setJoinOpen(false); }} />
+
       {compound.mechanism ? (
         <div className="prohp-card p-6 mb-4">
           <div className="text-sm font-semibold text-slate-200 mb-2">Mechanism</div>
@@ -277,7 +384,6 @@ export default function CompoundDetail() {
         </div>
       ) : null}
 
-      {/* Search box */}
       <div className="prohp-card p-6 mb-4">
         <div className="text-sm font-semibold text-slate-200">
           Have a question about {compound.name}? Chances are it has been answered by me or the community.
@@ -322,17 +428,58 @@ export default function CompoundDetail() {
 
             {results.results && results.results.length ? (
               <div className="mt-3 flex flex-col gap-2">
-                {results.results.map(function(t) {
-                  return (
-                    <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
-                      <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
-                      <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
-                        <span>{t.room_name}</span>
-                        <span>{t.reply_count} replies</span>
-                        <span>{t.author_username}</span>
+                {results.results.map(function(t, idx) {
+                  if (idx === 0) {
+                    return (
+                      <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
+                        <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
+                        <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
+                          <span>{t.room_name}</span>
+                          <span>{t.reply_count} replies</span>
+                          <span>{t.author_username}</span>
+                        </div>
+                      </Link>
+                    );
+                  }
+
+                  if (idx === 1) {
+                    var remaining = results.results.length - 1;
+                    return (
+                      <div key="gated" className="relative">
+                        <div className="select-none pointer-events-none" style={{ filter: 'blur(6px)', opacity: 0.5 }}>
+                          {results.results.slice(1, 4).map(function(bt) {
+                            return (
+                              <div key={bt.id} className="prohp-card p-3 mb-2">
+                                <div className="text-[13px] font-semibold text-slate-200">{bt.title}</div>
+                                <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
+                                  <span>{bt.room_name}</span>
+                                  <span>{bt.reply_count} replies</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/60 backdrop-blur-[2px] rounded-xl">
+                          <Lock className="w-5 h-5 text-prohp-400 mb-2" />
+                          <div className="text-sm font-semibold text-slate-200 mb-1">
+                            {remaining} more result{remaining > 1 ? 's' : ''} available
+                          </div>
+                          <div className="text-xs text-slate-400 mb-3">
+                            Full search access is for Brothers in Arms members.
+                          </div>
+                          <button
+                            type="button"
+                            onClick={function() { setJoinOpen(true); }}
+                            className="prohp-btn-primary text-xs inline-flex items-center gap-1.5"
+                          >
+                            Join Brothers in Arms — $19/mo
+                          </button>
+                        </div>
                       </div>
-                    </Link>
-                  );
+                    );
+                  }
+
+                  return null;
                 })}
               </div>
             ) : (
@@ -344,7 +491,6 @@ export default function CompoundDetail() {
         ) : null}
       </div>
 
-      {/* Related Threads */}
       <div className="prohp-card p-6 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -369,7 +515,6 @@ export default function CompoundDetail() {
         )}
       </div>
 
-      {/* Related Cycles */}
       {relatedCycles.length ? (
         <div className="prohp-card p-6">
           <div className="text-sm font-semibold text-slate-200 mb-3">Related Cycles</div>
