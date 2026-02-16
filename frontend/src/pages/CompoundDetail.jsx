@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ExternalLink, MessageSquare, Search, X, AlertTriangle, Youtube } from 'lucide-react';
+import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube } from 'lucide-react';
 import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 
@@ -19,6 +19,40 @@ function setSessionInt(key, value) {
   try { sessionStorage.setItem(key, String(value)); } catch (e) {}
 }
 
+function extractYouTubeId(input) {
+  if (!input) return '';
+  var s = String(input).trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  try {
+    var u = new URL(s);
+    var host = u.hostname.replace('www.', '');
+    if (host === 'youtu.be') {
+      var id = u.pathname.replace('/', '').trim();
+      return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : '';
+    }
+    var v = u.searchParams.get('v');
+    if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+    var m = u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+    if (m && m[1]) return m[1];
+  } catch (e) {}
+  return '';
+}
+
+function YouTubeEmbed({ videoId, title, className }) {
+  if (!videoId) return null;
+  var src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=0&autoplay=0&playsinline=1';
+  return (
+    <iframe
+      src={src}
+      title={title || 'YouTube video'}
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+      className={className || ''}
+    />
+  );
+}
+
 function Banner({ title, body, actions, onDismiss }) {
   return (
     <div className="prohp-card p-4 border border-prohp-400/20 bg-prohp-400/8 relative mt-4">
@@ -27,7 +61,38 @@ function Banner({ title, body, actions, onDismiss }) {
       </button>
       <div className="text-sm font-semibold text-slate-200">{title}</div>
       <div className="mt-1 text-[13px] leading-relaxed text-slate-400">{body}</div>
-      {actions ? <div className="mt-3 flex gap-2">{actions}</div> : null}
+      {actions ? <div className="mt-3 flex gap-2 flex-wrap">{actions}</div> : null}
+    </div>
+  );
+}
+
+function Modal({ open, title, onClose, children }) {
+  useEffect(function() {
+    if (!open) return;
+    function onKey(e) { if (e.key === 'Escape') onClose(); }
+    document.addEventListener('keydown', onKey);
+    var prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return function() {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-5xl rounded-2xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div className="text-sm font-semibold text-slate-200 truncate">{title}</div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 inline-flex items-center gap-2 text-xs px-2 py-1 rounded-lg hover:bg-white/5">
+            <X className="w-4 h-4" /> Close
+          </button>
+        </div>
+        <div className="p-3">{children}</div>
+      </div>
     </div>
   );
 }
@@ -44,6 +109,13 @@ export default function CompoundDetail() {
   var compound = data ? data.compound : null;
   var relatedThreads = data ? (data.related_threads || []) : [];
   var relatedCycles = data ? (data.related_cycles || []) : [];
+
+  var videoId = useMemo(function() {
+    if (!compound) return '';
+    return extractYouTubeId(compound.youtube_video_id) || extractYouTubeId(compound.youtube_url);
+  }, [compound]);
+
+  var [videoOpen, setVideoOpen] = useState(false);
 
   // Search state
   var [q, setQ] = useState('');
@@ -89,16 +161,12 @@ export default function CompoundDetail() {
     setResults(null);
 
     api.get('/api/threads/search/query?q=' + encodeURIComponent(query) + '&limit=12&offset=0')
-      .then(function(res) {
-        setResults(res);
-      })
+      .then(function(res) { setResults(res); })
       .catch(function(err2) {
         if (err2 && err2.name === 'AbortError') return;
         setSearchErr(err2 ? (err2.message || 'Search failed') : 'Search failed');
       })
-      .finally(function() {
-        setSearching(false);
-      });
+      .finally(function() { setSearching(false); });
   }
 
   if (isLoading) {
@@ -112,10 +180,6 @@ export default function CompoundDetail() {
 
   if (error) return <div className="text-red-400 text-sm text-center py-12">{error.message}</div>;
   if (!compound) return <div className="text-slate-400 text-sm text-center py-12">Compound not found.</div>;
-
-  var youtubeUrl = compound.youtube_url || '';
-  var productUrl = compound.product_url || '';
-  var youtubeEmbedUrl = youtubeUrl ? youtubeUrl.replace('watch?v=', 'embed/').split('&')[0] : '';
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in px-4 py-6">
@@ -145,15 +209,10 @@ export default function CompoundDetail() {
           </div>
 
           <div className="flex gap-2">
-            {youtubeUrl ? (
-              <a href={youtubeUrl} target="_blank" rel="noreferrer noopener" className="prohp-btn-primary inline-flex items-center gap-2 text-xs">
+            {videoId ? (
+              <button type="button" onClick={function() { setVideoOpen(true); }} className="prohp-btn-primary inline-flex items-center gap-2 text-xs">
                 <Youtube className="w-4 h-4" /> Watch breakdown
-              </a>
-            ) : null}
-            {productUrl ? (
-              <a href={productUrl} target="_blank" rel="noreferrer noopener" className="prohp-btn-secondary inline-flex items-center gap-2 text-xs">
-                <ExternalLink className="w-4 h-4" /> Product page
-              </a>
+              </button>
             ) : null}
           </div>
         </div>
@@ -162,22 +221,31 @@ export default function CompoundDetail() {
           <div className="text-sm text-slate-300 leading-relaxed mb-4">{compound.summary}</div>
         ) : null}
 
-        {/* YouTube embed */}
-        {youtubeEmbedUrl ? (
+        {/* Inline YouTube embed */}
+        {videoId ? (
           <div className="mb-4">
-            <div className="aspect-video rounded-lg overflow-hidden bg-black/30">
-              <iframe src={youtubeEmbedUrl} title={compound.name + ' video'} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+            <div className="aspect-video rounded-lg overflow-hidden bg-black/30 border border-white/5">
+              <YouTubeEmbed videoId={videoId} title={compound.name + ' breakdown'} className="w-full h-full" />
+            </div>
+            <div className="mt-2 text-[11px] text-slate-500">
+              Use the player fullscreen icon, or hit <span className="text-slate-300 font-semibold">Watch breakdown</span> for theater mode.
             </div>
           </div>
         ) : null}
 
-        {/* Benefits */}
         {compound.benefits ? (
-          <div className="text-sm text-slate-400 mb-2">
+          <div className="text-sm text-slate-400">
             <span className="font-semibold text-slate-300">Benefits: </span>{compound.benefits}
           </div>
         ) : null}
       </div>
+
+      {/* Theater mode modal */}
+      <Modal open={videoOpen} title={(compound.name || 'Video') + ' — Breakdown'} onClose={function() { setVideoOpen(false); }}>
+        <div className="aspect-video rounded-xl overflow-hidden bg-black/40 border border-white/10">
+          <YouTubeEmbed videoId={videoId} title={compound.name + ' breakdown'} className="w-full h-full" />
+        </div>
+      </Modal>
 
       {/* Narrative fields */}
       {compound.mechanism ? (
@@ -227,7 +295,7 @@ export default function CompoundDetail() {
 
         {showBanner5 ? (
           <Banner
-            title={'Haven\'t found what you\'re looking for on ' + compound.name + '?'}
+            title={"Have not found what you are looking for on " + compound.name + "?"}
             body="Try a different phrase. If it is still not showing up, post the question in the Library so the answer gets sealed once and stops repeating."
             onDismiss={function() { setBannerDismissed(true); }}
             actions={<Link to="/rooms/library" className="prohp-btn-primary text-xs">Ask in Library</Link>}
@@ -236,7 +304,7 @@ export default function CompoundDetail() {
 
         {showBanner15 ? (
           <Banner
-            title={'Deep dive needed on ' + compound.name + '.'}
+            title={"Deep dive needed on " + compound.name + "."}
             body="You have searched a lot. Post the question clean in the Library. That turns the answer into a permanent reference."
             onDismiss={function() { setBannerDismissed(true); }}
             actions={<Link to="/rooms/library" className="prohp-btn-primary text-xs">Ask in Library</Link>}
