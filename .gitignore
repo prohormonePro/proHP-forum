@@ -4,3 +4,6 @@ build/
 .next/
 *.log
 .env
+
+# ignore local backups
+frontend/src/App.jsx.bak_*
