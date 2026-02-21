@@ -24,10 +24,19 @@ export default function GrepGate({ autoQuery = "", title = "" }) {
       setSearched(true);
       fetch("/api/threads/search/query?q=" + encodeURIComponent(autoQuery.trim().slice(0, 100)), { credentials: "include" })
         .then(r => { if (!r.ok) throw new Error("HTTP_" + r.status); return r.json(); })
-        .then(j => {
-          const items = Array.isArray(j.results) ? j.results : Array.isArray(j.threads) ? j.threads : Array.isArray(j.items) ? j.items : [];
-          const total = Number(j.total || j.count || items.length || 0);
-          setData({ total, items });
+        .then(async j => {
+          const threadItems = Array.isArray(j.results) ? j.results : Array.isArray(j.threads) ? j.threads : Array.isArray(j.items) ? j.items : [];
+          let compoundItems = [];
+          try {
+            const cr = await fetch("/api/compounds?search=" + encodeURIComponent(autoQuery.trim().slice(0, 100)), { credentials: "include" });
+            if (cr.ok) {
+              const cj = await cr.json();
+              const raw = Array.isArray(cj) ? cj : Array.isArray(cj.compounds) ? cj.compounds : [];
+              compoundItems = raw.map(c => ({ id: c.id, title: c.name, slug: c.slug, _type: "compound", body: c.summary || "", excerpt: c.summary || "", author_username: c.category || "compound", created_at: null }));
+            }
+          } catch(e) {}
+          const items = [...compoundItems, ...threadItems];
+          setData({ total: items.length, items });
         })
         .catch(() => { setErr("Search failed."); setData({ total: 0, items: [] }); })
         .finally(() => setLoading(false));
@@ -45,17 +54,37 @@ export default function GrepGate({ autoQuery = "", title = "" }) {
     setSearched(true);
 
     try {
-      const url = "/api/threads/search/query?q=" + encodeURIComponent(query);
-      const r = await fetch(url, { credentials: "include" });
-      if (!r.ok) throw new Error("HTTP_" + r.status);
+      const [threadRes, compoundRes] = await Promise.all([
+        fetch("/api/threads/search/query?q=" + encodeURIComponent(query), { credentials: "include" }),
+        fetch("/api/compounds?search=" + encodeURIComponent(query), { credentials: "include" })
+      ]);
 
-      const j = await r.json();
-      const items =
-        Array.isArray(j.results) ? j.results :
-        Array.isArray(j.threads) ? j.threads :
-        Array.isArray(j.items) ? j.items : [];
+      let threadItems = [];
+      if (threadRes.ok) {
+        const j = await threadRes.json();
+        threadItems = Array.isArray(j.results) ? j.results : Array.isArray(j.threads) ? j.threads : Array.isArray(j.items) ? j.items : [];
+      }
 
-      const total = Number(j.total || j.count || items.length || 0);
+      let compoundItems = [];
+      if (compoundRes.ok) {
+        const cj = await compoundRes.json();
+        const raw = Array.isArray(cj) ? cj : Array.isArray(cj.compounds) ? cj.compounds : [];
+        compoundItems = raw.map(c => ({
+          id: c.id,
+          title: c.name,
+          slug: c.slug,
+          _type: "compound",
+          body: c.summary || "",
+          excerpt: c.summary || "",
+          author_username: c.category || "compound",
+          created_at: null,
+          category: c.category,
+          risk_tier: c.risk_tier
+        }));
+      }
+
+      const items = [...compoundItems, ...threadItems];
+      const total = items.length;
       setData({ total, items });
     } catch {
       setErr("Search failed. Try again or check back shortly.");
@@ -120,7 +149,7 @@ export default function GrepGate({ autoQuery = "", title = "" }) {
               key={item.id}
               className="group relative rounded-xl border border-white/5 bg-slate-900 p-5 transition hover:border-white/10"
             >
-              <Link to={`/t/${item.id}`} className="absolute inset-0 z-10" />
+              <Link to={item._type === "compound" ? `/compounds/${item.slug}` : `/t/${item.id}`} className="absolute inset-0 z-10" />
               <div>
                 <h3 className="text-lg font-semibold text-[#229DD8] group-hover:text-[#3ab2eb] transition">
                   {item.title}
@@ -131,7 +160,7 @@ export default function GrepGate({ autoQuery = "", title = "" }) {
                 <div className="mt-3 flex items-center gap-4 text-xs font-medium text-slate-500">
                   <span className="flex items-center gap-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                    {item.author_username || "Anonymous"}
+                    {item._type === "compound" ? `📦 ${item.category || "compound"}` : (item.author_username || "Anonymous")}
                   </span>
                   <span>
                     {new Date(item.created_at || Date.now()).toLocaleDateString()}
