@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
     if (search) {
       params.push(`%${search}%`);
-      sql += ` AND (name ILIKE $${params.length} OR slug ILIKE $${params.length} OR summary ILIKE $${params.length})`;
+      sql += ` AND (name ILIKE $${params.length} OR slug ILIKE $${params.length} OR summary ILIKE $${params.length} OR REPLACE(name, '-', ' ') ILIKE $${params.length} OR REPLACE(slug, '-', ' ') ILIKE $${params.length})`;
     }
 
     sql += ' ORDER BY name ASC';
