@@ -68,7 +68,7 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
 
   async function runSearch(e) {
     if (e) e.preventDefault();
-    const query = (q || "").trim().slice(0, 100);
+    const query = (q || "").trim().replace(/-/g, " ").replace(/\s+/g, " ").slice(0, 100);
     if (!query) return;
     setLoading(true);
     setErr("");

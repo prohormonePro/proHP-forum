@@ -275,7 +275,7 @@ export default function CompoundDetail() {
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in px-4 py-6">
-      <Link to="/compounds" className="sticky top-4 z-30 inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-prohp-400 transition-colors mb-4 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
+      <Link to="/compounds" className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:bottom-8 md:right-8 z-50 inline-flex items-center gap-2 text-sm font-semibold text-slate-200 bg-slate-900/90 backdrop-blur-md hover:bg-slate-800 border border-slate-700 transition-all px-5 py-2.5 rounded-full shadow-lg">
         <ChevronLeft className="w-3.5 h-3.5" /> Encyclopedia
       </Link>
 
