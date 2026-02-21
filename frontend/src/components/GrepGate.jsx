@@ -1,10 +1,56 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Beaker, MessageSquare, Lock } from "lucide-react";
+import { Beaker, MessageSquare, Lock, Search } from "lucide-react";
 import GrepGateCTA from "./GrepGateCTA";
 import useAuthStore from "../stores/auth";
 
-export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" }) {
+function escapeRegExp(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function tokenizeQuery(q) {
+  const raw = (q || "").trim().slice(0, 100);
+  if (!raw) return [];
+  const parts = raw
+    .replace(/[()]/g, " ")
+    .split(/[\s\-_\/.,:;]+/g)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  const seen = new Set();
+  const tokens = [];
+  for (const p of parts) {
+    const key = p.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      tokens.push(p);
+    }
+  }
+  return tokens.slice(0, 8);
+}
+
+function highlightTokens(text, tokens) {
+  if (!text) return text;
+  if (!tokens || tokens.length === 0) return text;
+  const pattern = tokens
+    .filter((t) => t.length >= 2 || /^\d+$/.test(t))
+    .map(escapeRegExp)
+    .join("|");
+  if (!pattern) return text;
+  const re = new RegExp("(" + pattern + ")", "gi");
+  const parts = String(text).split(re);
+  return parts.map((part, i) => {
+    if (!part) return null;
+    const isHit = re.test(part);
+    re.lastIndex = 0;
+    return isHit ? (
+      <mark key={i} className="rounded px-0.5" style={{ background: "rgba(34, 157, 216, 0.40)", color: "#fff" }}>{part}</mark>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    );
+  });
+}
+
+export default function GrepGate({ title = "", excludeSlug = "" }) {
   const user = useAuthStore((s) => s.user);
   const userTier = user?.tier || "lab_rat";
   const restricted = useMemo(() => userTier === "lab_rat", [userTier]);
@@ -12,28 +58,27 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
   const MAX_VISIBLE = 5;
   const BLUR_TEASERS = restricted ? 3 : 0;
 
-  const [q, setQ] = useState((autoQuery || "").trim().slice(0, 100));
+  const [q, setQ] = useState("");
+  const [lastQuery, setLastQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [searched, setSearched] = useState(false);
   const [compounds, setCompounds] = useState([]);
   const [threads, setThreads] = useState([]);
 
-  async function runSearch(e, forcedQuery) {
+  async function runSearch(e) {
     if (e) e.preventDefault();
-    const query = (forcedQuery ?? q ?? "").trim().slice(0, 100);
+    const query = (q || "").trim().slice(0, 100);
     if (!query) return;
-
     setLoading(true);
     setErr("");
     setSearched(true);
-
+    setLastQuery(query);
     try {
       const [threadsRes, compoundsRes] = await Promise.all([
         fetch("/api/threads/search/query?q=" + encodeURIComponent(query), { credentials: "include" }),
         fetch("/api/compounds?search=" + encodeURIComponent(query), { credentials: "include" })
       ]);
-
       let cItems = [];
       if (compoundsRes.ok) {
         const cj = await compoundsRes.json();
@@ -46,16 +91,15 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
             url: "/compounds/" + c.slug,
             title: c.name || c.slug,
             excerpt: c.summary || "",
-            meta1: (c.category || "").toUpperCase() || "COMPOUND",
+            meta1: ((c.category || "") + "").toUpperCase() || "COMPOUND",
             meta2: c.risk_tier ? "Risk: " + c.risk_tier : ""
           }));
       }
-
       let tItems = [];
       if (threadsRes.ok) {
         const tj = await threadsRes.json();
-        const items = Array.isArray(tj.results) ? tj.results : Array.isArray(tj.threads) ? tj.threads : Array.isArray(tj.items) ? tj.items : [];
-        tItems = items.map((t) => ({
+        const list = Array.isArray(tj.results) ? tj.results : Array.isArray(tj.threads) ? tj.threads : Array.isArray(tj.items) ? tj.items : [];
+        tItems = list.map((t) => ({
           _type: "thread",
           id: "thread_" + t.id,
           url: "/t/" + t.id,
@@ -65,7 +109,6 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
           meta2: t.created_at ? new Date(t.created_at).toLocaleDateString() : ""
         }));
       }
-
       setCompounds(cItems);
       setThreads(tItems);
     } catch (e2) {
@@ -77,22 +120,14 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
     }
   }
 
-  useEffect(() => {
-    const initial = (autoQuery || "").trim().slice(0, 100);
-    if (initial) {
-      setQ(initial);
-      // prefill only, no auto-fire
-    }
-  }, [autoQuery]);
-
+  const total = compounds.length + threads.length;
+  const heading = title?.trim() ? title.trim() : "Search the library.";
   const compoundsShown = compounds.slice(0, MAX_VISIBLE);
   const remainingSlots = Math.max(0, MAX_VISIBLE - compoundsShown.length);
   const visibleThreads = threads.slice(0, Math.min(visibleThreadCap, remainingSlots));
   const hasMoreBlurred = restricted && threads.length > visibleThreadCap;
   const blurredTeasers = hasMoreBlurred ? threads.slice(visibleThreadCap, visibleThreadCap + BLUR_TEASERS) : [];
-  const total = compounds.length + threads.length;
-
-  const heading = title?.trim() ? title.trim() : "Still have a question? Search the library.";
+  const tokens = useMemo(() => tokenizeQuery(lastQuery), [lastQuery]);
 
   function Card({ item, blurred }) {
     const isCompound = item._type === "compound";
@@ -113,9 +148,11 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
           </div>
           <div className="flex-1 min-w-0">
             <h3 className={"text-lg font-bold truncate transition " + (isCompound ? "text-emerald-400 group-hover:text-emerald-300" : "text-[#229DD8] group-hover:text-[#3ab2eb]")}>
-              {item.title}
+              {highlightTokens(item.title, tokens)}
             </h3>
-            <div className="mt-1 text-sm text-slate-300 line-clamp-2 leading-relaxed">{item.excerpt}</div>
+            <div className="mt-1 text-sm text-slate-300 line-clamp-2 leading-relaxed">
+              {highlightTokens(item.excerpt, tokens)}
+            </div>
             <div className="mt-3 flex items-center gap-4 text-xs font-bold tracking-wide text-slate-500 uppercase">
               {item.meta1 && <span>{item.meta1}</span>}
               {item.meta1 && item.meta2 && <span>&middot;</span>}
@@ -134,8 +171,11 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
       </div>
       <form onSubmit={runSearch} className="mb-6">
         <div className="relative flex items-center">
-          <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search compounds, side effects, or user logs..." className="w-full rounded-xl border border-slate-700 bg-slate-900 py-4 pl-5 pr-20 text-white placeholder-slate-500 focus:border-[#229DD8] focus:outline-none focus:ring-1 focus:ring-[#229DD8] shadow-lg" />
-          <button type="submit" disabled={loading} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#229DD8] px-4 py-2 text-white font-bold hover:bg-[#1b87bc] transition disabled:opacity-50">Search</button>
+          <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search compounds, side effects, or user logs..." className="w-full rounded-xl border border-slate-700 bg-slate-900 py-4 pl-5 pr-28 text-white placeholder-slate-500 focus:border-[#229DD8] focus:outline-none focus:ring-1 focus:ring-[#229DD8] shadow-lg" />
+          <button type="submit" disabled={loading} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#229DD8] px-4 py-2 text-white font-bold hover:bg-[#1b87bc] transition disabled:opacity-50 flex items-center gap-2">
+            <Search size={18} />
+            Search
+          </button>
         </div>
       </form>
       {err && <div className="mb-5 rounded-lg bg-red-500/10 p-4 text-red-300 border border-red-500/20">{err}</div>}
