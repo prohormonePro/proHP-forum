@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, {useMemo, useState, useRef} from "react";
 import { Link } from "react-router-dom";
 import { Beaker, MessageSquare, Lock, Search } from "lucide-react";
 import GrepGateCTA from "./GrepGateCTA";
@@ -51,6 +51,7 @@ function highlightTokens(text, tokens) {
 }
 
 export default function GrepGate({ title = "", excludeSlug = "" }) {
+  const grepRef = useRef(null);
   const user = useAuthStore((s) => s.user);
   const userTier = user?.tier || "lab_rat";
   const restricted = useMemo(() => userTier === "lab_rat", [userTier]);
@@ -74,6 +75,8 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
     setErr("");
     setSearched(true);
     setLastQuery(query);
+    // Auto-center GrepGate in viewport on every search
+    setTimeout(() => { try { grepRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }); } catch(_){} }, 80);
     try {
       const [threadsRes, compoundsRes] = await Promise.all([
         fetch("/api/threads/search/query?q=" + encodeURIComponent(query), { credentials: "include" }),
@@ -165,11 +168,11 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full scroll-mt-20" ref={grepRef}>
       <div className="mb-5">
         <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">{heading}</h2>
       </div>
-      <form onSubmit={runSearch} className="mb-6">
+      <form onSubmit={runSearch} className="mb-6 sticky top-0 z-20 bg-[#0f1117] py-3 -mx-1 px-1">
         <div className="relative flex items-center">
           <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search compounds, side effects, or user logs..." className="w-full rounded-xl border border-slate-700 bg-slate-900 py-4 pl-5 pr-28 text-white placeholder-slate-500 focus:border-[#229DD8] focus:outline-none focus:ring-1 focus:ring-[#229DD8] shadow-lg" />
           <button type="submit" disabled={loading} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#229DD8] px-4 py-2 text-white font-bold hover:bg-[#1b87bc] transition disabled:opacity-50 flex items-center gap-2">
