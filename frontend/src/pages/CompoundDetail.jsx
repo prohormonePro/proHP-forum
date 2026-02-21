@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink } from 'lucide-react';
 import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
+import GrepGate from '../components/GrepGate';
 
 function getSessionInt(key, fallback) {
   try {
@@ -384,111 +385,13 @@ export default function CompoundDetail() {
         </div>
       ) : null}
 
-      <div className="prohp-card p-6 mb-4">
-        <div className="text-sm font-semibold text-slate-200">
-          Have a question about {compound.name}? Chances are it has been answered by me or the community.
-        </div>
-
-        <form onSubmit={runSearch} className="mt-3 flex gap-2">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input value={q} onChange={function(e) { setQ(e.target.value); }} placeholder={'Search ' + compound.name + '... (PCT, suppression, hair loss, dosing)'} className="prohp-input w-full pl-9" />
-          </div>
-          <button className="prohp-btn-primary text-xs" type="submit" disabled={searching}>
-            {searching ? 'Searching...' : 'Search'}
-          </button>
-        </form>
-
-        {showBanner5 ? (
-          <Banner
-            title={"Have not found what you are looking for on " + compound.name + "?"}
-            body="Try a different phrase. If it is still not showing up, post the question in the Library so the answer gets sealed once and stops repeating."
-            onDismiss={function() { setBannerDismissed(true); }}
-            actions={<Link to="/rooms/library" className="prohp-btn-primary text-xs">Ask in Library</Link>}
+      <div className="mb-12">
+        {compound && (
+          <GrepGate
+            autoQuery={compound.name}
+            title={`Still have a question about ${compound.name} or another product? Search the library.`}
           />
-        ) : null}
-
-        {showBanner15 ? (
-          <Banner
-            title={"Deep dive needed on " + compound.name + "."}
-            body="You have searched a lot. Post the question clean in the Library. That turns the answer into a permanent reference."
-            onDismiss={function() { setBannerDismissed(true); }}
-            actions={<Link to="/rooms/library" className="prohp-btn-primary text-xs">Ask in Library</Link>}
-          />
-        ) : null}
-
-        {searchErr ? <div className="mt-3 text-[13px] text-red-300">{searchErr}</div> : null}
-
-        {results ? (
-          <div className="mt-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold text-slate-200">Results</div>
-              <div className="text-xs text-slate-500">{results.results ? results.results.length : 0} found</div>
-            </div>
-
-            {results.results && results.results.length ? (
-              <div className="mt-3 flex flex-col gap-2">
-                {results.results.map(function(t, idx) {
-                  if (idx === 0) {
-                    return (
-                      <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
-                        <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
-                        <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
-                          <span>{t.room_name}</span>
-                          <span>{t.reply_count} replies</span>
-                          <span>{t.author_username}</span>
-                        </div>
-                      </Link>
-                    );
-                  }
-
-                  if (idx === 1) {
-                    var remaining = results.results.length - 1;
-                    return (
-                      <div key="gated" className="relative">
-                        <div className="select-none pointer-events-none" style={{ filter: 'blur(6px)', opacity: 0.5 }}>
-                          {results.results.slice(1, 4).map(function(bt) {
-                            return (
-                              <div key={bt.id} className="prohp-card p-3 mb-2">
-                                <div className="text-[13px] font-semibold text-slate-200">{bt.title}</div>
-                                <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-500">
-                                  <span>{bt.room_name}</span>
-                                  <span>{bt.reply_count} replies</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/60 backdrop-blur-[2px] rounded-xl">
-                          <Lock className="w-5 h-5 text-prohp-400 mb-2" />
-                          <div className="text-sm font-semibold text-slate-200 mb-1">
-                            {remaining} more result{remaining > 1 ? 's' : ''} available
-                          </div>
-                          <div className="text-xs text-slate-400 mb-3">
-                            Full search access is for Brothers in Arms members.
-                          </div>
-                          <button
-                            type="button"
-                            onClick={function() { setJoinOpen(true); }}
-                            className="prohp-btn-primary text-xs inline-flex items-center gap-1.5"
-                          >
-                            Join Brothers in Arms — $19/mo
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return null;
-                })}
-              </div>
-            ) : (
-              <div className="mt-2 text-[13px] text-slate-400">
-                No matches. Try shorter terms (e.g. "PCT", "ALT", "gyno", "suppression", "hair loss").
-              </div>
-            )}
-          </div>
-        ) : null}
+        )}
       </div>
 
       <div className="prohp-card p-6 mb-4">
