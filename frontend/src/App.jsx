@@ -13,6 +13,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import GrepGate from "./components/GrepGate";
 
+import CreateThread from "./pages/CreateThread";
+
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const loading = useAuthStore((s) => s.loading);
@@ -34,6 +36,7 @@ export default function App() {
         <Sidebar />
         <main className="flex-1 min-w-0 px-4 py-6 lg:px-8">
           <Routes>
+            <Route path="/create-thread" element={<CreateThread />} />
           <Route path="/grep" element={<GrepGate />} />
             <Route path="/" element={<Home />} />
             <Route path="/r/:slug" element={<RoomPage />} />
