@@ -82,7 +82,7 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
       let cItems = [];
       if (compoundsRes.ok) {
         const cj = await compoundsRes.json();
-        const list = Array.isArray(cj) ? cj : Array.isArray(cj.items) ? cj.items : [];
+        const list = Array.isArray(cj) ? cj : Array.isArray(cj.compounds) ? cj.compounds : Array.isArray(cj.items) ? cj.items : [];
         cItems = list
           .filter((c) => !(excludeSlug && c.slug === excludeSlug))
           .map((c) => ({
