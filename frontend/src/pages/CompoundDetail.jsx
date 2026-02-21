@@ -387,7 +387,7 @@ export default function CompoundDetail() {
 
       <div className="mb-12">
         {compound && (
-          <GrepGate
+          <GrepGate excludeSlug={compound?.slug || ""}
             autoQuery={compound.name}
             title={`Still have a question about ${compound.name} or another product? Search the library.`}
           />

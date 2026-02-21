@@ -81,7 +81,7 @@ export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" 
     const initial = (autoQuery || "").trim().slice(0, 100);
     if (initial) {
       setQ(initial);
-      runSearch(null, initial);
+      // prefill only, no auto-fire
     }
   }, [autoQuery]);
 
