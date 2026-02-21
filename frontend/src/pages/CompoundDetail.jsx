@@ -5,7 +5,7 @@ import useAuthStore from '../stores/auth';
 import GrepGateCTA from '../components/GrepGateCTA';
 
 export default function CompoundDetail() {
-  const { id } = useParams();
+  const { slug: id } = useParams();
   const [compound, setCompound] = useState(null);
   const [threads, setThreads] = useState([]);
   const [cycles, setCycles] = useState([]);
