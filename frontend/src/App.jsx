@@ -11,6 +11,7 @@ import CompoundDetail from './pages/CompoundDetail';
 import CyclesPage from './pages/CyclesPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import GrepGate from "./components/GrepGate";
 
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -33,6 +34,7 @@ export default function App() {
         <Sidebar />
         <main className="flex-1 min-w-0 px-4 py-6 lg:px-8">
           <Routes>
+          <Route path="/grep" element={<GrepGate />} />
             <Route path="/" element={<Home />} />
             <Route path="/r/:slug" element={<RoomPage />} />
             <Route path="/t/:id" element={<ThreadPage />} />
