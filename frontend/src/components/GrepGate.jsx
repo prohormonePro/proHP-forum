@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import GrepGateCTA from "./GrepGateCTA";
 import useAuthStore from "../stores/auth";
 
-export default function GrepGate() {
+export default function GrepGate({ autoQuery = "", title = "" }) {
   const user = useAuthStore((s) => s.user);
   const userTier = user?.tier || "lab_rat";
 
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(autoQuery || "");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [data, setData] = useState({ total: 0, items: [] });
@@ -15,6 +15,25 @@ export default function GrepGate() {
 
   const restricted = useMemo(() => userTier === "lab_rat", [userTier]);
   const visibleCap = restricted ? 2 : 50;
+  // Auto-search on mount when autoQuery is provided
+  useEffect(() => {
+    if (autoQuery && autoQuery.trim()) {
+      setQ(autoQuery);
+      setLoading(true);
+      setErr("");
+      setSearched(true);
+      fetch("/api/threads/search/query?q=" + encodeURIComponent(autoQuery.trim().slice(0, 100)), { credentials: "include" })
+        .then(r => { if (!r.ok) throw new Error("HTTP_" + r.status); return r.json(); })
+        .then(j => {
+          const items = Array.isArray(j.results) ? j.results : Array.isArray(j.threads) ? j.threads : Array.isArray(j.items) ? j.items : [];
+          const total = Number(j.total || j.count || items.length || 0);
+          setData({ total, items });
+        })
+        .catch(() => { setErr("Search failed."); setData({ total: 0, items: [] }); })
+        .finally(() => setLoading(false));
+    }
+  }, [autoQuery]);
+
 
   async function runSearch(e) {
     if (e) e.preventDefault();
@@ -49,8 +68,8 @@ export default function GrepGate() {
   return (
     <div className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Grep</h1>
-        <p className="mt-2 text-slate-400">Search the collective logs, protocols, and bloodwork.</p>
+        <h1 className="text-3xl font-bold text-white">{title || "Grep"}</h1>
+        <p className="mt-2 text-slate-400">{title ? "" : "Search the collective logs, protocols, and bloodwork."}</p>
       </div>
 
       <form onSubmit={runSearch} className="mb-8">
