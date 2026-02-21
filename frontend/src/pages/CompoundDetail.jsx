@@ -278,6 +278,7 @@ export default function CompoundDetail() {
       <Link to="/compounds" className="sticky top-0 z-30 flex w-fit items-center gap-1.5 text-xs text-slate-500 hover:text-prohp-400 transition-colors mb-4 py-3 -mt-6 pt-6 bg-[#0f1117]">
         <ChevronLeft className="w-3.5 h-3.5" /> Encyclopedia
       </Link>
+      <Link to="/compounds" className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 z-[100] inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/90 backdrop-blur-md px-5 py-3 text-sm font-semibold text-slate-200 shadow-lg transition hover:bg-slate-800 hover:border-white/20 hover:text-[#229DD8]" aria-label="Back to Encyclopedia"><ChevronLeft className="w-4 h-4" /> Encyclopedia</Link>
 
       <div className="prohp-card p-6 mb-4">
         <div className="flex items-start justify-between gap-4 flex-wrap mb-4">

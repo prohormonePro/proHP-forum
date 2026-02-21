@@ -76,7 +76,7 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
     setSearched(true);
     setLastQuery(query);
     // Auto-center GrepGate in viewport on every search
-    setTimeout(() => { try { grepRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }); } catch(_){} }, 80);
+    setTimeout(() => { try { grepRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); } catch(_){} }, 80);
     try {
       const [threadsRes, compoundsRes] = await Promise.all([
         fetch("/api/threads/search/query?q=" + encodeURIComponent(query), { credentials: "include" }),
