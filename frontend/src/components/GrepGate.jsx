@@ -1,31 +1,27 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Beaker, MessageSquare, Lock } from "lucide-react";
 import GrepGateCTA from "./GrepGateCTA";
 import useAuthStore from "../stores/auth";
 
-export default function GrepGate({ autoQuery = "", title = "" }) {
+export default function GrepGate({ autoQuery = "", title = "", excludeSlug = "" }) {
   const user = useAuthStore((s) => s.user);
   const userTier = user?.tier || "lab_rat";
+  const restricted = useMemo(() => userTier === "lab_rat", [userTier]);
+  const visibleThreadCap = restricted ? 2 : 50;
+  const MAX_VISIBLE = 5;
+  const BLUR_TEASERS = restricted ? 3 : 0;
 
-  const [q, setQ] = useState(autoQuery || "");
+  const [q, setQ] = useState((autoQuery || "").trim().slice(0, 100));
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const [data, setData] = useState({ total: 0, items: [] });
   const [searched, setSearched] = useState(false);
+  const [compounds, setCompounds] = useState([]);
+  const [threads, setThreads] = useState([]);
 
-  const restricted = useMemo(() => userTier === "lab_rat", [userTier]);
-  const visibleCap = restricted ? 2 : 50;
-  // Auto-search on mount when autoQuery is provided
-  useEffect(() => {
-    if (autoQuery && autoQuery.trim()) {
-      runSearch(null);
-    }
-  }, [autoQuery]);
-
-
-  async function runSearch(e) {
+  async function runSearch(e, forcedQuery) {
     if (e) e.preventDefault();
-    const query = (q || "").trim().slice(0, 100);
+    const query = (forcedQuery ?? q ?? "").trim().slice(0, 100);
     if (!query) return;
 
     setLoading(true);
@@ -33,144 +29,127 @@ export default function GrepGate({ autoQuery = "", title = "" }) {
     setSearched(true);
 
     try {
-      const [threadRes, compoundRes] = await Promise.all([
+      const [threadsRes, compoundsRes] = await Promise.all([
         fetch("/api/threads/search/query?q=" + encodeURIComponent(query), { credentials: "include" }),
         fetch("/api/compounds?search=" + encodeURIComponent(query), { credentials: "include" })
       ]);
 
-      let threadItems = [];
-      if (threadRes.ok) {
-        const j = await threadRes.json();
-        threadItems = Array.isArray(j.results) ? j.results : Array.isArray(j.threads) ? j.threads : Array.isArray(j.items) ? j.items : [];
+      let cItems = [];
+      if (compoundsRes.ok) {
+        const cj = await compoundsRes.json();
+        const list = Array.isArray(cj) ? cj : Array.isArray(cj.items) ? cj.items : [];
+        cItems = list
+          .filter((c) => !(excludeSlug && c.slug === excludeSlug))
+          .map((c) => ({
+            _type: "compound",
+            id: "comp_" + c.id,
+            url: "/compounds/" + c.slug,
+            title: c.name || c.slug,
+            excerpt: c.summary || "",
+            meta1: (c.category || "").toUpperCase() || "COMPOUND",
+            meta2: c.risk_tier ? "Risk: " + c.risk_tier : ""
+          }));
       }
 
-      let compoundItems = [];
-      if (compoundRes.ok) {
-        const cj = await compoundRes.json();
-        const raw = Array.isArray(cj) ? cj : Array.isArray(cj.compounds) ? cj.compounds : [];
-        compoundItems = raw.map(c => ({
-          id: c.id,
-          title: c.name,
-          slug: c.slug,
-          _type: "compound",
-          body: c.summary || "",
-          excerpt: c.summary || "",
-          author_username: c.category || "compound",
-          created_at: null,
-          category: c.category,
-          risk_tier: c.risk_tier
+      let tItems = [];
+      if (threadsRes.ok) {
+        const tj = await threadsRes.json();
+        const items = Array.isArray(tj.results) ? tj.results : Array.isArray(tj.threads) ? tj.threads : Array.isArray(tj.items) ? tj.items : [];
+        tItems = items.map((t) => ({
+          _type: "thread",
+          id: "thread_" + t.id,
+          url: "/t/" + t.id,
+          title: t.title || "Untitled",
+          excerpt: t.excerpt || t.body || "",
+          meta1: t.author_username || t.username || "prohp",
+          meta2: t.created_at ? new Date(t.created_at).toLocaleDateString() : ""
         }));
       }
 
-      const items = [...compoundItems, ...threadItems];
-      const total = items.length;
-      setData({ total, items });
-    } catch {
-      setErr("Search failed. Try again or check back shortly.");
-      setData({ total: 0, items: [] });
+      setCompounds(cItems);
+      setThreads(tItems);
+    } catch (e2) {
+      setErr("Search failed. Try again.");
+      setCompounds([]);
+      setThreads([]);
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">{title || "Grep"}</h1>
-        <p className="mt-2 text-slate-400">{title ? "" : "Search the collective logs, protocols, and bloodwork."}</p>
-      </div>
+  useEffect(() => {
+    const initial = (autoQuery || "").trim().slice(0, 100);
+    if (initial) {
+      setQ(initial);
+      runSearch(null, initial);
+    }
+  }, [autoQuery]);
 
-      <form onSubmit={runSearch} className="mb-8">
+  const compoundsShown = compounds.slice(0, MAX_VISIBLE);
+  const remainingSlots = Math.max(0, MAX_VISIBLE - compoundsShown.length);
+  const visibleThreads = threads.slice(0, Math.min(visibleThreadCap, remainingSlots));
+  const hasMoreBlurred = restricted && threads.length > visibleThreadCap;
+  const blurredTeasers = hasMoreBlurred ? threads.slice(visibleThreadCap, visibleThreadCap + BLUR_TEASERS) : [];
+  const total = compounds.length + threads.length;
+
+  const heading = title?.trim() ? title.trim() : "Still have a question? Search the library.";
+
+  function Card({ item, blurred }) {
+    const isCompound = item._type === "compound";
+    return (
+      <div
+        className={"group relative rounded-xl border bg-slate-900 p-5 transition " + (blurred ? "border-transparent select-none" : "border-white/5 hover:border-white/20")}
+        style={blurred ? { filter: "blur(6px)", pointerEvents: "none" } : {}}
+      >
+        {!blurred && <Link to={item.url} className="absolute inset-0 z-10" />}
+        {blurred && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/10 rounded-xl">
+            <Lock className="text-slate-400" size={28} />
+          </div>
+        )}
+        <div className="flex items-start gap-4">
+          <div className="mt-1">
+            {isCompound ? <Beaker size={16} className="text-emerald-400" /> : <MessageSquare size={16} className="text-[#229DD8]" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className={"text-lg font-bold truncate transition " + (isCompound ? "text-emerald-400 group-hover:text-emerald-300" : "text-[#229DD8] group-hover:text-[#3ab2eb]")}>
+              {item.title}
+            </h3>
+            <div className="mt-1 text-sm text-slate-300 line-clamp-2 leading-relaxed">{item.excerpt}</div>
+            <div className="mt-3 flex items-center gap-4 text-xs font-bold tracking-wide text-slate-500 uppercase">
+              {item.meta1 && <span>{item.meta1}</span>}
+              {item.meta1 && item.meta2 && <span>&middot;</span>}
+              {item.meta2 && <span>{item.meta2}</span>}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <div className="mb-5">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">{heading}</h2>
+      </div>
+      <form onSubmit={runSearch} className="mb-6">
         <div className="relative flex items-center">
-          <input
-            type="text"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search compounds, side effects, labs, user logs..."
-            className="w-full rounded-xl border border-white/10 bg-slate-900 py-3.5 pl-5 pr-4 text-white placeholder-slate-500 focus:border-[#229DD8] focus:outline-none focus:ring-1 focus:ring-[#229DD8]"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#229DD8] px-3 py-2 text-sm font-semibold text-white hover:bg-[#1b87bc] transition disabled:opacity-50"
-          >
-            Search
-          </button>
+          <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search compounds, side effects, or user logs..." className="w-full rounded-xl border border-slate-700 bg-slate-900 py-4 pl-5 pr-20 text-white placeholder-slate-500 focus:border-[#229DD8] focus:outline-none focus:ring-1 focus:ring-[#229DD8] shadow-lg" />
+          <button type="submit" disabled={loading} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#229DD8] px-4 py-2 text-white font-bold hover:bg-[#1b87bc] transition disabled:opacity-50">Search</button>
         </div>
       </form>
-
-      {err && (
-        <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">
-          {err}
-        </div>
-      )}
-
-      {loading && (
-        <div className="py-12 text-center text-slate-400 animate-pulse">
-          Scanning the archives...
-        </div>
-      )}
-
-      {!loading && searched && data.items.length === 0 && !err && (
-        <div className="py-12 text-center text-slate-500">
-          No logs found matching your query.
-        </div>
-      )}
-
-      {!loading && data.items.length > 0 && (
+      {err && <div className="mb-5 rounded-lg bg-red-500/10 p-4 text-red-300 border border-red-500/20">{err}</div>}
+      {loading && <div className="py-10 text-center text-slate-400 animate-pulse font-medium tracking-wide">Scanning the archives...</div>}
+      {!loading && searched && total === 0 && !err && <div className="py-10 text-center text-slate-500">No results found.</div>}
+      {!loading && total > 0 && (
         <div className="space-y-4">
-          <div className="mb-4 text-sm font-medium text-slate-400">
-            Found {data.total} results
-          </div>
-
-          {data.items.slice(0, visibleCap).map((item) => (
-            <div
-              key={item.id}
-              className="group relative rounded-xl border border-white/5 bg-slate-900 p-5 transition hover:border-white/10"
-            >
-              <Link to={item._type === "compound" ? `/compounds/${item.slug}` : `/t/${item.id}`} className="absolute inset-0 z-10" />
-              <div>
-                <h3 className="text-lg font-semibold text-[#229DD8] group-hover:text-[#3ab2eb] transition">
-                  {item.title}
-                </h3>
-                <div className="mt-1 text-sm text-slate-300 line-clamp-2">
-                  {item.body || item.excerpt || ""}
-                </div>
-                <div className="mt-3 flex items-center gap-4 text-xs font-medium text-slate-500">
-                  <span className="flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                    {item._type === "compound" ? `📦 ${item.category || "compound"}` : (item.author_username || "Anonymous")}
-                  </span>
-                  <span>
-                    {new Date(item.created_at || Date.now()).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {restricted && data.items.length > visibleCap && (
-            <>
-              <GrepGateCTA />
-              {data.items.slice(visibleCap).map((item) => (
-                <div
-                  key={item.id}
-                  className="relative overflow-hidden rounded-xl border border-white/5 bg-slate-900 p-5 select-none"
-                  style={{ filter: "blur(5px)" }}
-                >
-                  <div className="pointer-events-none">
-                    <h3 className="text-lg font-semibold text-slate-400">{item.title}</h3>
-                    <div className="mt-1 text-sm text-slate-600 line-clamp-2">
-                      {item.body || item.excerpt || ""}
-                    </div>
-                    <div className="mt-3 flex items-center gap-4 text-xs font-medium text-slate-600">
-                      <span>Anonymous</span>
-                      <span>Date hidden</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </>
+          <div className="mb-4 text-sm font-semibold tracking-wide text-slate-400 uppercase">Found {total} results</div>
+          {compoundsShown.map((item) => <Card key={item.id} item={item} blurred={false} />)}
+          {visibleThreads.map((item) => <Card key={item.id} item={item} blurred={false} />)}
+          {hasMoreBlurred && <GrepGateCTA />}
+          {blurredTeasers.map((item) => <Card key={item.id} item={item} blurred={true} />)}
+          {(compounds.length > compoundsShown.length || threads.length > visibleThreads.length) && (
+            <div className="pt-2 text-xs text-slate-500">Showing top results. Refine your search to drill deeper.</div>
           )}
         </div>
       )}
