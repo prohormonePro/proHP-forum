@@ -18,28 +18,7 @@ export default function GrepGate({ autoQuery = "", title = "" }) {
   // Auto-search on mount when autoQuery is provided
   useEffect(() => {
     if (autoQuery && autoQuery.trim()) {
-      setQ(autoQuery);
-      setLoading(true);
-      setErr("");
-      setSearched(true);
-      fetch("/api/threads/search/query?q=" + encodeURIComponent(autoQuery.trim().slice(0, 100)), { credentials: "include" })
-        .then(r => { if (!r.ok) throw new Error("HTTP_" + r.status); return r.json(); })
-        .then(async j => {
-          const threadItems = Array.isArray(j.results) ? j.results : Array.isArray(j.threads) ? j.threads : Array.isArray(j.items) ? j.items : [];
-          let compoundItems = [];
-          try {
-            const cr = await fetch("/api/compounds?search=" + encodeURIComponent(autoQuery.trim().slice(0, 100)), { credentials: "include" });
-            if (cr.ok) {
-              const cj = await cr.json();
-              const raw = Array.isArray(cj) ? cj : Array.isArray(cj.compounds) ? cj.compounds : [];
-              compoundItems = raw.map(c => ({ id: c.id, title: c.name, slug: c.slug, _type: "compound", body: c.summary || "", excerpt: c.summary || "", author_username: c.category || "compound", created_at: null }));
-            }
-          } catch(e) {}
-          const items = [...compoundItems, ...threadItems];
-          setData({ total: items.length, items });
-        })
-        .catch(() => { setErr("Search failed."); setData({ total: 0, items: [] }); })
-        .finally(() => setLoading(false));
+      runSearch(null);
     }
   }, [autoQuery]);
 
