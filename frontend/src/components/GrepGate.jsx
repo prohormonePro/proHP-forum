@@ -182,7 +182,7 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
       {loading && <div className="py-10 text-center text-slate-400 animate-pulse font-medium tracking-wide">Scanning the archives...</div>}
       {!loading && searched && total === 0 && !err && <div className="py-10 text-center text-slate-500">No results found.</div>}
       {!loading && total > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
           <div className="mb-4 text-sm font-semibold tracking-wide text-slate-400 uppercase">Found {total} results</div>
           {compoundsShown.map((item) => <Card key={item.id} item={item} blurred={false} />)}
           {visibleThreads.map((item) => <Card key={item.id} item={item} blurred={false} />)}
