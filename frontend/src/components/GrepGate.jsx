@@ -148,10 +148,10 @@ export default function GrepGate({ title = "", excludeSlug = "" }) {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className={"text-lg font-bold truncate transition " + (isCompound ? "text-emerald-400 group-hover:text-emerald-300" : "text-[#229DD8] group-hover:text-[#3ab2eb]")}>
-              {highlightTokens(item.title, tokens)}
+              {item.title}
             </h3>
             <div className="mt-1 text-sm text-slate-300 line-clamp-2 leading-relaxed">
-              {highlightTokens(item.excerpt, tokens)}
+              {item.excerpt}
             </div>
             <div className="mt-3 flex items-center gap-4 text-xs font-bold tracking-wide text-slate-500 uppercase">
               {item.meta1 && <span>{item.meta1}</span>}
