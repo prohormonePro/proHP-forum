@@ -1,0 +1,148 @@
+.user-profile {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: #e0e0e0;
+}
+
+.profile-header {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.username {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  color: #00ff88;
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tier-badge.premium {
+  background: linear-gradient(45deg, #ff6b35, #ff8e53);
+  color: #000;
+}
+
+.tier-badge.lab-rat {
+  background: #333;
+  color: #00ff88;
+  border: 1px solid #00ff88;
+}
+
+.join-date {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.recent-activity {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.recent-activity h2 {
+  color: #00ff88;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.no-activity {
+  color: #888;
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.activity-item {
+  background: #0f0f0f;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.activity-type {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.activity-content {
+  margin-bottom: 0.5rem;
+}
+
+.activity-link {
+  color: #00ff88;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.activity-link:hover {
+  color: #00cc6a;
+  text-decoration: underline;
+}
+
+.post-preview {
+  margin-top: 0.5rem;
+  color: #ccc;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.activity-date {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: #00ff88;
+  font-size: 1.2rem;
+}
+
+.error {
+  text-align: center;
+  padding: 4rem;
+  color: #ff4444;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .user-profile {
+    padding: 1rem;
+  }
+  
+  .profile-header,
+  .recent-activity {
+    padding: 1rem;
+  }
+  
+  .username {
+    font-size: 2rem;
+  }
+}
