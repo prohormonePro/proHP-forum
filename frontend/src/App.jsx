@@ -1,95 +1,55 @@
-import React, { useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, AuthContext } from './context/AuthContext';
-import Navbar from './components/Navbar';
+import { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import useAuthStore from './stores/auth';
+import Navbar from './components/layout/Navbar';
+import Sidebar from './components/layout/Sidebar';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Forum from './pages/Forum';
-import Thread from './pages/Thread';
-import CreateThread from './pages/CreateThread';
+import RoomPage from './pages/RoomPage';
+import ThreadPage from './pages/ThreadPage';
+import CompoundsPage from './pages/CompoundsPage';
+import CompoundDetail from './pages/CompoundDetail';
+import CyclesPage from './pages/CyclesPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import GrepGate from "./components/GrepGate";
+import CreateThread from "./pages/CreateThread";
 import UserProfile from './pages/UserProfile';
-import './App.css';
 
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
-  
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-  
-  return user ? children : <Navigate to="/login" replace />;
-};
+export default function App() {
+  const fetchMe = useAuthStore((s) => s.fetchMe);
+  const loading = useAuthStore((s) => s.loading);
 
-const PublicRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
-  
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-  
-  return !user ? children : <Navigate to="/dashboard" replace />;
-};
-
-function AppContent() {
-  const { loading } = useContext(AuthContext);
+  useEffect(() => { fetchMe(); }, []);
 
   if (loading) {
-    return <div className="loading">Loading application...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="text-prohp-500 font-bold tracking-wider animate-pulse">PROHP</div>
+      </div>
+    );
   }
 
   return (
-    <div className="App">
+    <div className="min-h-screen bg-slate-950">
       <Navbar />
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          } />
-          <Route path="/register" element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          } />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/forum" element={
-            <ProtectedRoute>
-              <Forum />
-            </ProtectedRoute>
-          } />
-          <Route path="/t/:threadId" element={
-            <ProtectedRoute>
-              <Thread />
-            </ProtectedRoute>
-          } />
-          <Route path="/create-thread" element={
-            <ProtectedRoute>
-              <CreateThread />
-            </ProtectedRoute>
-          } />
-          <Route path="/u/:username" element={<UserProfile />} />
-        </Routes>
-      </main>
+      <div className="flex max-w-7xl mx-auto">
+        <Sidebar />
+        <main className="flex-1 min-w-0 px-4 py-6 lg:px-8">
+          <Routes>
+            <Route path="/create-thread" element={<CreateThread />} />
+            <Route path="/grep" element={<GrepGate />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/r/:slug" element={<RoomPage />} />
+            <Route path="/t/:id" element={<ThreadPage />} />
+            <Route path="/compounds" element={<CompoundsPage />} />
+            <Route path="/compounds/:slug" element={<CompoundDetail />} />
+            <Route path="/cycles" element={<CyclesPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/u/:username" element={<UserProfile />} />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }
-
-function App() {
-  return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
-  );
-}
-
-export default App;

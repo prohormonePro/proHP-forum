@@ -1,142 +1,160 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './UserProfile.css';
 
-const UserProfile = () => {
+const TIER_NAMES = {
+  lab_rat: 'Lab Rat',
+  premium: 'Brother in Arms',
+  elite: 'Elite',
+  admin: 'Admin'
+};
+
+export default function UserProfile() {
   const { username } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchUserProfile();
-  }, [username]);
-
-  const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/users/${username}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          setError('User not found');
-        } else {
-          setError('Failed to load user profile');
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/users/${username}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('User not found');
+          } else {
+            setError('Failed to load user profile');
+          }
+          return;
         }
-        return;
+
+        const data = await response.json();
+        setProfile(data);
+      } catch (err) {
+        console.error('Profile fetch error:', err);
+        setError('Failed to load user profile');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data = await response.json();
-      setProfile(data);
-    } catch (err) {
-      setError('Network error');
-    } finally {
-      setLoading(false);
+    if (username) {
+      fetchProfile();
     }
-  };
-
-  const getTierDisplay = (tier) => {
-    switch (tier) {
-      case 'premium':
-        return 'Brother in Arms';
-      case 'lab_rat':
-        return 'Lab Rat';
-      default:
-        return tier;
-    }
-  };
-
-  const getTierBadgeClass = (tier) => {
-    switch (tier) {
-      case 'premium':
-        return 'tier-badge premium';
-      case 'lab_rat':
-        return 'tier-badge lab-rat';
-      default:
-        return 'tier-badge';
-    }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatContent = (content) => {
-    if (content.length > 150) {
-      return content.substring(0, 150) + '...';
-    }
-    return content;
-  };
+  }, [username]);
 
   if (loading) {
     return (
-      <div className="user-profile">
-        <div className="loading">Loading profile...</div>
+      <div className="profile-container">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-prohp-500"></div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="user-profile">
-        <div className="error">{error}</div>
+      <div className="profile-container">
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-slate-200 mb-4">{error}</h2>
+          <Link 
+            to="/" 
+            className="text-prohp-400 hover:text-prohp-300 underline"
+          >
+            Back to Home
+          </Link>
+        </div>
       </div>
     );
   }
 
+  if (!profile) {
+    return null;
+  }
+
+  const { user, recentActivity } = profile;
+  const joinDate = new Date(user.created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const truncateText = (text, maxLength = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   return (
-    <div className="user-profile">
-      <div className="profile-header">
-        <h1 className="username">{profile.user.username}</h1>
-        <div className={getTierBadgeClass(profile.user.tier)}>
-          {getTierDisplay(profile.user.tier)}
+    <div className="profile-container">
+      {/* Profile Header */}
+      <div className="bg-slate-900 rounded-lg p-6 mb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <h1 className="text-3xl font-bold text-slate-200">{user.username}</h1>
+          <span className={`tier-badge tier-${user.tier}`}>
+            {TIER_NAMES[user.tier] || user.tier}
+          </span>
         </div>
-        <div className="join-date">
-          Member since {formatDate(profile.user.created_at)}
-        </div>
+        <p className="text-slate-400">Joined: {joinDate}</p>
       </div>
 
-      <div className="recent-activity">
-        <h2>Recent Activity</h2>
-        {profile.recentActivity.length === 0 ? (
-          <div className="no-activity">No recent activity</div>
-        ) : (
-          <div className="activity-list">
-            {profile.recentActivity.map((item) => (
-              <div key={`${item.type}-${item.id}`} className="activity-item">
-                <div className="activity-type">
-                  {item.type === 'thread' ? 'Started thread:' : 'Posted in:'}
+      {/* Recent Activity */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Recent Threads */}
+        <div className="activity-section">
+          <h2 className="text-xl font-bold text-slate-200 mb-4">Recent Threads</h2>
+          {recentActivity.threads.length > 0 ? (
+            <div className="space-y-3">
+              {recentActivity.threads.map((thread) => (
+                <div key={thread.id} className="bg-slate-900 rounded-lg p-4">
+                  <Link 
+                    to={`/t/${thread.id}`}
+                    className="text-prohp-400 hover:text-prohp-300 font-medium block mb-2"
+                  >
+                    {thread.title}
+                  </Link>
+                  <p className="text-slate-500 text-sm">
+                    {new Date(thread.created_at).toLocaleDateString()}
+                  </p>
                 </div>
-                <div className="activity-content">
-                  {item.type === 'thread' ? (
-                    <Link to={`/t/${item.id}`} className="activity-link">
-                      {item.title}
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-500">No recent threads</p>
+          )}
+        </div>
+
+        {/* Recent Posts */}
+        <div className="activity-section">
+          <h2 className="text-xl font-bold text-slate-200 mb-4">Recent Posts</h2>
+          {recentActivity.posts.length > 0 ? (
+            <div className="space-y-3">
+              {recentActivity.posts.map((post) => (
+                <div key={post.id} className="bg-slate-900 rounded-lg p-4">
+                  <p className="text-slate-300 mb-2">
+                    {truncateText(post.body)}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <Link 
+                      to={`/t/${post.thread_id}`}
+                      className="text-prohp-400 hover:text-prohp-300 text-sm"
+                    >
+                      View Thread →
                     </Link>
-                  ) : (
-                    <>
-                      <Link to={`/t/${item.thread_id}`} className="activity-link">
-                        {item.thread_title}
-                      </Link>
-                      <div className="post-preview">
-                        {formatContent(item.content)}
-                      </div>
-                    </>
-                  )}
+                    <p className="text-slate-500 text-sm">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="activity-date">
-                  {formatDate(item.created_at)}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-500">No recent posts</p>
+          )}
+        </div>
       </div>
     </div>
   );
-};
-
-export default UserProfile;
+}
