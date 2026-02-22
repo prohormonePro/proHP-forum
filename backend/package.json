@@ -7,7 +7,8 @@
     "dev": "node --watch src/index.js",
     "start": "NODE_ENV=production node src/index.js",
     "migrate": "psql -U prohp -d prohp_forum -f migrations/001_foundation.sql && psql -U prohp -d prohp_forum -f migrations/002_seed.sql",
-    "seed": "psql -U prohp -d prohp_forum -f migrations/002_seed.sql"
+    "seed": "psql -U prohp -d prohp_forum -f migrations/002_seed.sql",
+    "migrate:245": "node scripts/run_migration_245.js"
   },
   "dependencies": {
     "express": "^4.21.0",
