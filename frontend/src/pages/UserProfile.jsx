@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import BackButton from '../components/layout/BackButton';
 import './UserProfile.css';
 
 const TIER_NAMES = {
@@ -20,7 +21,7 @@ export default function UserProfile() {
       try {
         setLoading(true);
         const response = await fetch(`/api/users/${username}`);
-        
+
         if (!response.ok) {
           if (response.status === 404) {
             setError('User not found');
@@ -60,8 +61,8 @@ export default function UserProfile() {
       <div className="profile-container">
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-slate-200 mb-4">{error}</h2>
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="text-prohp-400 hover:text-prohp-300 underline"
           >
             Back to Home
@@ -89,6 +90,7 @@ export default function UserProfile() {
 
   return (
     <div className="profile-container">
+      <BackButton fallback="/" />
       {/* Profile Header */}
       <div className="bg-slate-900 rounded-lg p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
@@ -109,7 +111,7 @@ export default function UserProfile() {
             <div className="space-y-3">
               {recentActivity.threads.map((thread) => (
                 <div key={thread.id} className="bg-slate-900 rounded-lg p-4">
-                  <Link 
+                  <Link
                     to={`/t/${thread.id}`}
                     className="text-prohp-400 hover:text-prohp-300 font-medium block mb-2"
                   >
@@ -137,11 +139,11 @@ export default function UserProfile() {
                     {truncateText(post.body)}
                   </p>
                   <div className="flex items-center justify-between">
-                    <Link 
+                    <Link
                       to={`/t/${post.thread_id}`}
                       className="text-prohp-400 hover:text-prohp-300 text-sm"
                     >
-                      View Thread →
+                      View Thread â†’
                     </Link>
                     <p className="text-slate-500 text-sm">
                       {new Date(post.created_at).toLocaleDateString()}

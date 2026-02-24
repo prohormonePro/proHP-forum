@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/layout/BackButton';
 import useAuthStore from '../stores/auth';
 
 export default function CreateThread() {
@@ -125,6 +126,7 @@ export default function CreateThread() {
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
       <div className="max-w-2xl mx-auto">
+        <BackButton fallback="/" label="Back to Forum" />
         <h1 className="text-2xl font-bold mb-8">Create Thread</h1>
 
         {initialDataLoading && (
