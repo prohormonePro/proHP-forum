@@ -29,6 +29,7 @@ export default function App() {
     );
   }
 
+  console.log("SOVEREIGN SWARM PHASE 1: SEEKER NODE ACTIVE");
   return (
     <div className="min-h-screen bg-slate-950">
       <Navbar />
