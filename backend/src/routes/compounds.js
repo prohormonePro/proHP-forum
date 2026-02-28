@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const { query } = require('../config/db');
 const { optionalAuth } = require('../middleware/auth');
 
@@ -48,19 +49,72 @@ router.get('/categories', async (req, res) => {
   }
 });
 
-// ── GET /api/compounds/:slug — Compound detail with related threads ──
+// ── GET /api/compounds/:slug — API-enforced 3-state gating ──
 router.get('/:slug', optionalAuth, async (req, res) => {
   try {
     const { slug } = req.params;
-
     const compoundResult = await query('SELECT * FROM compounds WHERE slug = $1 AND is_published = true', [slug]);
     if (!compoundResult.rows[0]) {
       return res.status(404).json({ error: 'Compound not found' });
     }
-
     const compound = compoundResult.rows[0];
 
-    // Related threads
+    // Gate detection
+    let gate_state = 'window';
+    if (req.user && (req.user.tier === 'inner_circle' || req.user.tier === 'admin')) {
+      gate_state = 'member';
+    } else if (req.cookies && req.cookies.prohp_lead_access) {
+      try {
+        const decoded = jwt.verify(req.cookies.prohp_lead_access, process.env.JWT_SECRET);
+        if (decoded && decoded.lead === true) gate_state = 'lead';
+      } catch (e) { /* invalid/expired -> window */ }
+    }
+
+    const pick = (obj, keys) => {
+      const out = {};
+      for (const k of keys) if (obj[k] !== undefined) out[k] = obj[k];
+      return out;
+    };
+
+    const WINDOW_FIELDS = [
+      'id','slug','name','category','risk_tier','trust_level','summary',
+      'youtube_video_id','youtube_url','causes_hair_loss','hair_loss_severity',
+      'company','is_published','created_at','updated_at','product_url'
+    ];
+    const LEAD_FIELDS = [...WINDOW_FIELDS,'mechanism','side_effects','benefits','compounds_list'];
+
+    if (gate_state === 'window') {
+      return res.json({
+        gate_state: 'window',
+        upgrade_cta: 'Unlock the full encyclopedia for free. Enter your email.',
+        compound: pick(compound, WINDOW_FIELDS),
+        related_threads: [],
+        related_cycles: [],
+      });
+    }
+
+    if (gate_state === 'lead') {
+      const threadsResult = await query(
+        `SELECT t.id, t.title, t.reply_count, t.created_at
+         FROM threads t WHERE t.compound_id = $1 AND NOT t.is_deleted
+         ORDER BY t.score DESC, t.created_at DESC LIMIT 5`,
+        [compound.id]
+      );
+      const cycleCountResult = await query(
+        `SELECT COUNT(*)::int AS count FROM cycle_logs
+         WHERE compound_id = $1 AND is_public = true`,
+        [compound.id]
+      );
+      return res.json({
+        gate_state: 'lead',
+        upgrade_cta: 'You are in the Library. The Lab is next. Unlock Inner Circle for full threads, cycle logs, and community intel.',
+        compound: pick(compound, LEAD_FIELDS),
+        related_threads: threadsResult.rows,
+        related_cycles: cycleCountResult.rows[0] || { count: 0 },
+      });
+    }
+
+    // MEMBER: full access
     const threadsResult = await query(
       `SELECT t.id, t.title, t.reply_count, t.score, t.created_at,
               u.username AS author_username, r.slug AS room_slug
@@ -68,24 +122,21 @@ router.get('/:slug', optionalAuth, async (req, res) => {
        JOIN users u ON u.id = t.author_id
        JOIN rooms r ON r.id = t.room_id
        WHERE t.compound_id = $1 AND NOT t.is_deleted
-       ORDER BY t.score DESC, t.created_at DESC
-       LIMIT 10`,
+       ORDER BY t.score DESC, t.created_at DESC LIMIT 10`,
       [compound.id]
     );
-
-    // Related cycle logs
     const cyclesResult = await query(
       `SELECT cl.id, cl.title, cl.compound_name, cl.status, cl.duration_weeks,
               cl.update_count, cl.created_at, u.username
        FROM cycle_logs cl
        JOIN users u ON u.id = cl.user_id
        WHERE cl.compound_id = $1 AND cl.is_public = true
-       ORDER BY cl.created_at DESC
-       LIMIT 5`,
+       ORDER BY cl.created_at DESC LIMIT 5`,
       [compound.id]
     );
-
-    res.json({
+    return res.json({
+      gate_state: 'member',
+      upgrade_cta: null,
       compound,
       related_threads: threadsResult.rows,
       related_cycles: cyclesResult.rows,

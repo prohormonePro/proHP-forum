@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Lock, FlaskConical, BookOpen } from 'lucide-react';
+import { Lock, FlaskConical, BookOpen, Home } from 'lucide-react';
 import useAuthStore from '../../stores/auth';
 
 const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2 };
@@ -20,6 +20,20 @@ export default function Sidebar() {
       <div className="sticky top-16 space-y-6 py-4">
         <div>
           <h3 className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)] mb-2.5 px-2">
+        {/* Home nav — Backlog #020 */}
+        <div className="px-2 mb-2">
+          <Link
+            to="/"
+            className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-150
+              ${location.pathname === '/'
+                ? 'bg-[var(--prohp-glow)] text-[var(--prohp-blue)] border border-[rgba(34,157,216,0.15)]'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'}`}
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span className="flex-1">Home</span>
+          </Link>
+        </div>
+
             Districts
           </h3>
           <div className="space-y-0.5">
