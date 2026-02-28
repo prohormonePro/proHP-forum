@@ -86,7 +86,14 @@ router.post('/create-lead-checkout', async (req, res) => {
     }
 
     if (!leadEmail) {
-      return res.status(400).json({ error: 'Email required for checkout' });
+      // Clear stale lead cookie server-side (httpOnly cannot be cleared from JS)
+      res.clearCookie('prohp_lead_access', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax',
+        path: '/',
+      });
+      return res.status(400).json({ error: 'Email required for checkout', action: 'recapture' });
     }
 
     const customer = await stripe.customers.create({

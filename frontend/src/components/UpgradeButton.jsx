@@ -41,6 +41,11 @@ export default function UpgradeButton({
           setLoading(false);
           return;
         }
+        // Backend cleared stale cookie; reload to show email gate
+        if (data.action === 'recapture') {
+          window.location.reload();
+          return;
+        }
         throw new Error(data.error || 'Checkout failed');
       }
 
