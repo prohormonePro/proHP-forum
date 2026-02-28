@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     return res.status(500).json({ error: 'Database insertion error.' });
   }
 
-  const token = jwt.sign({ lead: true }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  const token = jwt.sign({ lead: true, email: email.trim() }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
   res.cookie('prohp_lead_access', token, {
     httpOnly: true,

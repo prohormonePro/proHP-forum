@@ -42,7 +42,7 @@ export default function Home() {
               Welcome back, {user.display_name || user.username}.
             </h1>
             <p className="text-sm text-[var(--text-secondary)]">
-              52+ compounds reviewed. 1M+ views. Every claim receipted.
+              52+ compounds reviewed. 2M+ views. Every claim receipted.
             </p>
           </div>
         ) : (
@@ -51,7 +51,7 @@ export default function Home() {
               The place where proof beats hype.
             </h1>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              52+ compounds reviewed. 1M+ YouTube views. 200+ consultations.
+              52+ compounds reviewed. 2M+ YouTube views. 200+ consultations.
               Every claim receipted, every protocol questioned, every side effect documented.
               No unverified claims. Just the work.
             </p>
@@ -214,7 +214,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="text-center">
-            <div className="stat-value">1M+</div>
+            <div className="stat-value">2M+</div>
             <div className="stat-label">Views</div>
           </div>
           <div className="text-center">
