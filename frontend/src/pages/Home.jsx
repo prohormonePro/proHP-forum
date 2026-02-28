@@ -48,7 +48,7 @@ export default function Home() {
         ) : (
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] mb-2 leading-tight">
-              The place where proof beats hype.
+              Real compounds. Real logs. No guessing.
             </h1>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
               52+ compounds reviewed. 2M+ YouTube views. 200+ consultations.
@@ -56,7 +56,7 @@ export default function Home() {
               No unverified claims. Just the work.
             </p>
             <div className="flex items-center gap-3 mt-4">
-              <Link to="/register" className="prohp-btn-primary text-sm">
+              <Link to="/compounds" className="prohp-btn-primary text-sm">
                 Start Here
               </Link>
               <Link to="/r/general" className="prohp-btn-ghost text-sm">
