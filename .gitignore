@@ -7,3 +7,9 @@ build/
 
 # ignore local backups
 frontend/src/App.jsx.bak_*
+*.bak
+*.bak_*
+*.bak.*
+*.v3.bak
+*.v4.bak
+frontend/public/videos/welcome_placeholder.mp4
