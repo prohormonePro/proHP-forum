@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Lock, MessageSquare, Users, FlaskConical, Play, ExternalLink, Plus } from 'lucide-react';
 import { api } from '../hooks/api';
+import WelcomeVideo from '../components/WelcomeVideo';
 import useAuthStore from '../stores/auth';
 
 const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2 };
@@ -65,6 +66,8 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <WelcomeVideo />
 
       {/* ── Room Cards ── */}
       <div className="stagger space-y-3 mb-8">

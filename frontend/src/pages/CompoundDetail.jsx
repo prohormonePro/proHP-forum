@@ -6,6 +6,7 @@ import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer'; 
 import GrepGate from '../components/GrepGate'; 
 import BackButton from '../components/layout/BackButton';
+import UpgradeButton from '../components/UpgradeButton';
 
 function getSessionInt(key, fallback) {  
   try {    
@@ -184,6 +185,34 @@ function hairClass(sev) {
   return 'bg-slate-800 text-slate-300'; 
 }
 
+
+function GateCTA({ gate_state, upgrade_cta }) {
+  if (!upgrade_cta || gate_state === "member") return null;
+  var isWindow = gate_state === "window";
+  return (
+    <div className="prohp-card p-6 mb-4 border border-[rgba(34,157,216,0.2)] bg-[rgba(34,157,216,0.04)]">
+      <div className="flex items-center gap-2 mb-2">
+        <Lock className="w-4 h-4 text-[#229DD8]" />
+        <span className="text-sm font-bold text-slate-100">
+          {isWindow ? "Unlock the Full Breakdown" : "Go Deeper"}
+        </span>
+      </div>
+      <p className="text-[13px] text-slate-400 leading-relaxed mb-4">{upgrade_cta}</p>
+      {isWindow ? (
+        <a href="/compounds" className="prohp-btn-primary inline-flex items-center gap-2 text-xs px-4 py-2">
+          Enter Your Email to Unlock
+        </a>
+      ) : (
+        <div className="mt-2">
+          <UpgradeButton variant="primary" className="!w-auto !px-5 !py-2.5 !text-xs !rounded-lg !shadow-none">
+            Unlock Inner Circle
+          </UpgradeButton>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CompoundDetail() {  
   var { slug } = useParams();   
 
@@ -195,7 +224,9 @@ export default function CompoundDetail() {
 
   var compound = data ? data.compound : null;  
   var relatedThreads = data ? (data.related_threads || []) : [];  
-  var relatedCycles = data ? (data.related_cycles || []) : [];   
+  var relatedCycles = data ? (data.related_cycles || []) : [];
+  var gate_state = data ? (data.gate_state || 'window') : 'window';
+  var upgrade_cta = data ? (data.upgrade_cta || '') : '';   
 
   var videoId = useMemo(function() {    
     if (!compound) return '';    
@@ -350,7 +381,9 @@ export default function CompoundDetail() {
         </div>      
       </Modal>       
 
-      <JoinModal open={joinOpen} onClose={function() { setJoinOpen(false); }} />       
+      <JoinModal open={joinOpen} onClose={function() { setJoinOpen(false); }} />
+
+      {gate_state === "window" && <GateCTA gate_state={gate_state} upgrade_cta={upgrade_cta} />}       
 
       {compound.mechanism ? (        
         <div className="prohp-card p-6 mb-4">          
@@ -380,6 +413,8 @@ export default function CompoundDetail() {
           Hair loss note: {compound.hair_loss_explanation}        
         </div>      
       ) : null}       
+
+      {gate_state === "lead" && <GateCTA gate_state={gate_state} upgrade_cta={upgrade_cta} />}
 
       <div className="mb-12">        
         {compound && (          
