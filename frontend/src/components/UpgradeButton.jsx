@@ -43,7 +43,7 @@ export default function UpgradeButton({
         }
         // Backend cleared stale cookie; reload to show email gate
         if (data.action === 'recapture') {
-          window.location.reload();
+          window.location.href = '/compounds';
           return;
         }
         throw new Error(data.error || 'Checkout failed');
