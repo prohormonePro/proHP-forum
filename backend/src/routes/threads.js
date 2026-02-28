@@ -34,7 +34,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     const thread = threadResult.rows[0];
 
     // Check read access
-    const userLevel = TIER_LEVELS[req.user?.tier || 'lab_rat'] ?? 0;
+    const userLevel = TIER_LEVELS[req.user?.tier || 'free'] ?? 0;
     if (userLevel < (TIER_LEVELS[thread.read_tier] ?? 0)) {
       return res.status(403).json({ error: 'Tier required', code: 'TIER_REQUIRED', required_tier: thread.read_tier });
     }

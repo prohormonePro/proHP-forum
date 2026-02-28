@@ -4,8 +4,8 @@ import BackButton from '../components/layout/BackButton';
 import './UserProfile.css';
 
 const TIER_NAMES = {
-  lab_rat: 'Lab Rat',
-  premium: 'Brother in Arms',
+  free: 'Free',
+  inner_circle: 'Inner Circle',
   elite: 'Elite',
   admin: 'Admin'
 };

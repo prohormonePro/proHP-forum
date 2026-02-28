@@ -53,8 +53,8 @@ function highlightTokens(text, tokens) {
 export default function GrepGate({ title = "", excludeSlug = "" }) {
   const grepRef = useRef(null);
   const user = useAuthStore((s) => s.user);
-  const userTier = user?.tier || "lab_rat";
-  const restricted = useMemo(() => userTier === "lab_rat", [userTier]);
+  const userTier = user?.tier || "free";
+  const restricted = useMemo(() => userTier === "free", [userTier]);
   const visibleThreadCap = restricted ? 2 : 50;
   const MAX_VISIBLE = 5;
   const BLUR_TEASERS = restricted ? 3 : 0;

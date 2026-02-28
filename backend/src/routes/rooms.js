@@ -7,7 +7,7 @@ const router = express.Router();
 // ── GET /api/rooms — List all rooms (filtered by user tier) ──
 router.get('/', optionalAuth, async (req, res) => {
   try {
-    const userTier = req.user?.tier || 'lab_rat';
+    const userTier = req.user?.tier || 'free';
     const userLevel = TIER_LEVELS[userTier] ?? 0;
 
     const result = await query(
@@ -59,7 +59,7 @@ router.get('/:slug', optionalAuth, async (req, res) => {
     }
 
     const room = roomResult.rows[0];
-    const userTier = req.user?.tier || 'lab_rat';
+    const userTier = req.user?.tier || 'free';
     const userLevel = TIER_LEVELS[userTier] ?? 0;
 
     // Check read access

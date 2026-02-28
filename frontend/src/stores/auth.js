@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 const API = import.meta.env.VITE_API_URL || '';
 
-const TIER_LEVELS = { lab_rat: 0, premium: 1, elite: 2, admin: 3 };
+const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2, lab_rat: 0, premium: 1, elite: 1 }; // legacy-alias
 
 const useAuthStore = create((set, get) => ({
   user: null,

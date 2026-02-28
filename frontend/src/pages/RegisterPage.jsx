@@ -30,7 +30,7 @@ export default function RegisterPage() {
   return (
     <div className="max-w-sm mx-auto py-12 animate-fade-in">
       <h1 className="text-xl font-extrabold mb-1">Start here.</h1>
-      <p className="text-sm text-slate-400 mb-2">Free as a Lab Rat. No credit card. No hype. Just proof.</p>
+      <p className="text-sm text-slate-400 mb-2">Free tier. No credit card. No hype. Just proof.</p>
       <p className="text-xs text-slate-500 mb-6">First 1,000 members get a permanent Founding Member badge.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">

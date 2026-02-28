@@ -20,7 +20,7 @@
   letter-spacing: 0.05em;
 }
 
-.tier-lab_rat {
+.tier-lab_rat, .tier-free, .tier-inner_circle { /* legacy-alias */
   background-color: rgb(55 65 81);
   color: rgb(209 213 219);
 }

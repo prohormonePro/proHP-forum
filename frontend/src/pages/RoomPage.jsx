@@ -67,7 +67,7 @@ export default function RoomPage() {
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-xl font-extrabold tracking-tight">{room.name}</h1>
           {!room.can_write && (
-            <span className="tier-badge tier-premium text-[9px]">Brother-in-Arms to post</span>
+            <span className="tier-badge tier-inner_circle text-[9px]">Inner Circle to post</span>
           )}
         </div>
         <p className="text-sm text-slate-400">{room.description}</p>

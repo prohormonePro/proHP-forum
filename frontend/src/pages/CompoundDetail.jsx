@@ -120,7 +120,7 @@ function JoinModal({ open, onClose }) {
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />      
       <div className="relative w-full max-w-md rounded-2xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">        
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">          
-          <div className="text-base font-bold text-slate-100">Join Brothers in Arms</div>          
+          <div className="text-base font-bold text-slate-100">Join Inner Circle</div>          
           <button onClick={onClose} className="text-slate-400 hover:text-slate-200">            
             <X className="w-5 h-5" />          
           </button>        
@@ -156,7 +156,7 @@ function JoinModal({ open, onClose }) {
             <span className="text-sm text-slate-400 ml-1">/ month</span>          
           </div>          
           <button className="prohp-btn-primary w-full text-center block py-3 text-sm font-bold opacity-50 cursor-not-allowed" onClick={function(e) { e.preventDefault(); }}>            
-            Join Brothers in Arms          
+            Join Inner Circle          
           </button>          
           <div className="mt-3 text-center text-[11px] text-slate-500">            
             First 1,000 members get a permanent Founding Member badge.          
