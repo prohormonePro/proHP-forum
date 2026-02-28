@@ -4,9 +4,8 @@ import { Search, LogOut } from 'lucide-react';
 import useAuthStore from '../../stores/auth';
 
 const TIER_LABELS = {
-  lab_rat: 'Lab Rat',
-  premium: 'Brother-in-Arms',
-  elite: 'Elite',
+  free: 'Free',
+  inner_circle: 'Inner Circle',
   admin: 'Admin',
 };
 

@@ -1,15 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { FlaskConical, Search, ArrowRight } from 'lucide-react';
 import { api } from '../hooks/api';
+import useAuthStore from '../stores/auth';
+import EncyclopediaGate from '../components/EncyclopediaGate';
 
 const CATEGORY_LABELS = {
-  sarm: 'SARMs', prohormone: 'Prohormones', peptide: 'Peptides', serm: 'SERMs / PCT',
-  ai: 'Aromatase Inhibitors', natural: 'Naturals', ancillary: 'Ancillaries', other: 'Other',
+  sarm: 'SARMs',
+  prohormone: 'Prohormones',
+  peptide: 'Peptides',
+  serm: 'SERMs / PCT',
+  ai: 'Aromatase Inhibitors',
+  natural: 'Naturals',
+  ancillary: 'Ancillaries',
+  other: 'Other',
 };
 
 export default function CompoundsPage() {
+  const { user, hasLeadAccess, setHasLeadAccess, checkLeadAccess } = useAuthStore();
+  const [gateChecked, setGateChecked] = useState(false);
+
+  useEffect(() => {
+    checkLeadAccess().finally(() => setGateChecked(true));
+  }, [checkLeadAccess]);
+
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
 
@@ -22,6 +37,11 @@ export default function CompoundsPage() {
     queryKey: ['compounds', category, search],
     queryFn: () => api.get(`/api/compounds?${category ? `category=${category}&` : ''}${search ? `search=${search}` : ''}`),
   });
+
+  if (!gateChecked) return null;
+  if (!user && !hasLeadAccess) {
+    return <EncyclopediaGate onUnlock={() => setHasLeadAccess(true)} />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -36,13 +56,36 @@ export default function CompoundsPage() {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search compounds..." className="prohp-input pl-9 text-xs" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search compounds..."
+            className="prohp-input pl-9 text-xs"
+          />
         </div>
         <div className="flex gap-1.5 flex-wrap">
-          <button onClick={() => setCategory('')} className={`text-[10px] font-bold px-2.5 py-1.5 rounded-md transition-colors ${!category ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25' : 'text-slate-500 hover:text-slate-300 bg-slate-800/50'}`}>All</button>
+          <button
+            onClick={() => setCategory('')}
+            className={`text-[10px] font-bold px-2.5 py-1.5 rounded-md transition-colors ${
+              !category
+                ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
+                : 'text-slate-500 hover:text-slate-300 bg-slate-800/50'
+            }`}
+          >
+            All
+          </button>
           {catData?.categories?.map((c) => (
-            <button key={c.category} onClick={() => setCategory(c.category)} className={`text-[10px] font-bold px-2.5 py-1.5 rounded-md transition-colors ${category === c.category ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25' : 'text-slate-500 hover:text-slate-300 bg-slate-800/50'}`}>
-              {CATEGORY_LABELS[c.category] || c.category} <span className="text-slate-600 ml-0.5">{c.count}</span>
+            <button
+              key={c.category}
+              onClick={() => setCategory(c.category)}
+              className={`text-[10px] font-bold px-2.5 py-1.5 rounded-md transition-colors ${
+                category === c.category
+                  ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
+                  : 'text-slate-500 hover:text-slate-300 bg-slate-800/50'
+              }`}
+            >
+              {CATEGORY_LABELS[c.category] || c.category}{' '}
+              <span className="text-slate-600 ml-0.5">{c.count}</span>
             </button>
           ))}
         </div>
@@ -51,17 +94,30 @@ export default function CompoundsPage() {
       <div className="grid gap-2">
         {isLoading ? (
           Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="prohp-card p-4 animate-pulse"><div className="h-4 bg-slate-800 rounded w-1/2 mb-2" /><div className="h-3 bg-slate-800 rounded w-3/4" /></div>
+            <div key={i} className="prohp-card p-4 animate-pulse">
+              <div className="h-4 bg-slate-800 rounded w-1/2 mb-2" />
+              <div className="h-3 bg-slate-800 rounded w-3/4" />
+            </div>
           ))
         ) : (
           data?.compounds?.map((c) => (
-            <Link key={c.slug} to={`/compounds/${c.slug}`} className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group">
+            <Link
+              key={c.slug}
+              to={`/compounds/${c.slug}`}
+              className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group"
+            >
               <div className="flex items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold text-slate-200 group-hover:text-prohp-400 transition-colors">{c.name}</span>
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded risk-${c.risk_tier}`}>{c.risk_tier}</span>
-                    <span className="text-[9px] font-semibold text-slate-600 bg-slate-800/60 px-1.5 py-0.5 rounded">{CATEGORY_LABELS[c.category] || c.category}</span>
+                    <span className="text-sm font-bold text-slate-200 group-hover:text-prohp-400 transition-colors">
+                      {c.name}
+                    </span>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded risk-${c.risk_tier}`}>
+                      {c.risk_tier}
+                    </span>
+                    <span className="text-[9px] font-semibold text-slate-600 bg-slate-800/60 px-1.5 py-0.5 rounded">
+                      {CATEGORY_LABELS[c.category] || c.category}
+                    </span>
                   </div>
                   <p className="text-xs text-slate-500 truncate">{c.summary}</p>
                 </div>
@@ -76,7 +132,7 @@ export default function CompoundsPage() {
       </div>
 
       <div className="text-center mt-6 text-xs text-slate-600">
-        {data?.count || 0} compounds · Free access · Proof Over Hype
+        {data?.count || 0} compounds {'\u00B7'} Free access {'\u00B7'} Proof Over Hype
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { ArrowRight, Lock, MessageSquare, Users, FlaskConical, Play, ExternalLin
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
 
-const TIER_LEVELS = { lab_rat: 0, premium: 1, elite: 2, admin: 3 };
+const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2 };
 
 function timeAgo(dateStr) {
   if (!dateStr) return '';
@@ -21,7 +21,7 @@ function timeAgo(dateStr) {
 
 export default function Home() {
   const user = useAuthStore((s) => s.user);
-  const userLevel = TIER_LEVELS[user?.tier || 'lab_rat'] ?? 0;
+  const userLevel = TIER_LEVELS[user?.tier || 'free'] ?? 0;
 
   const { data } = useQuery({
     queryKey: ['rooms'],
@@ -52,13 +52,13 @@ export default function Home() {
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
               52+ compounds reviewed. 1M+ YouTube views. 200+ consultations.
               Every claim receipted, every protocol questioned, every side effect documented.
-              No bro-science. No unverified claims. Just the work.
+              No unverified claims. Just the work.
             </p>
             <div className="flex items-center gap-3 mt-4">
               <Link to="/register" className="prohp-btn-primary text-sm">
                 Start Here
               </Link>
-              <Link to="/r/airlock" className="prohp-btn-ghost text-sm">
+              <Link to="/r/general" className="prohp-btn-ghost text-sm">
                 Browse the Forum
               </Link>
             </div>
@@ -87,7 +87,7 @@ export default function Home() {
                     </h2>
                     {locked && (
                       <span className="tier-badge tier-premium text-[8px] py-0">
-                        <Lock className="w-2.5 h-2.5 mr-0.5" /> Brother-in-Arms
+                        <Lock className="w-2.5 h-2.5 mr-0.5" /> Inner Circle
                       </span>
                     )}
                   </div>
@@ -256,7 +256,7 @@ export default function Home() {
               Book a Consultation
             </a>
             <Link
-              to="/r/airlock"
+              to="/r/general"
               className="text-[10px] text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors text-right"
             >
               See what a real session looks like

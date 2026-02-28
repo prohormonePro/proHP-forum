@@ -6,11 +6,11 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const stripeWebhookHandler = require('./handlers/webhooksStripe');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
-// -- Process guards --
 process.on('uncaughtException', (err) => {
   console.error('[UNCAUGHT]', err.stack || err);
   process.exit(1);
@@ -20,7 +20,6 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-// -- Middleware --
 app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({
@@ -28,14 +27,12 @@ app.use(cors({
   credentials: true,
 }));
 
-// STAGE_245: Stripe webhook MUST receive raw body for signature verification
-// This route MUST be mounted BEFORE express.json()
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 app.use(express.json({ limit: '5mb' }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(cookieParser());
 
-// -- Rate limiting --
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
@@ -54,11 +51,10 @@ app.use('/api', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// -- Health --
 app.get('/health', (req, res) => {
   res.json({
     status: 'online',
-    stage: '247_USER_PROFILE_PAGES',
+    stage: '264',
     anchor: process.env.PROHP_ANCHOR || 'E3592DC3',
     port: PORT,
     ts: new Date().toISOString(),
@@ -66,10 +62,9 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'alive', stage: 247, ts: new Date().toISOString() });
+  res.json({ status: 'alive', stage: 264, ts: new Date().toISOString() });
 });
 
-// -- Routes --
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/rooms', require('./routes/rooms'));
 app.use('/api/threads', require('./routes/threads'));
@@ -77,14 +72,14 @@ app.use('/api/posts', require('./routes/posts'));
 app.use('/api/compounds', require('./routes/compounds'));
 app.use('/api/cycles', require('./routes/cycles'));
 app.use('/api/stripe', require('./routes/stripe'));
+app.use('/api/claim-account', require('./routes/claim'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/leads', require('./routes/leads'));
 
-// -- 404 --
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// -- Error handler --
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err.stack || err);
   res.status(err.status || 500).json({
@@ -92,10 +87,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// -- Start --
 app.listen(PORT, () => {
-  console.log(`[STAGE_247] ProHP Forum API`);
-  console.log(`[STAGE_247] Port: ${PORT} | PID: ${process.pid} | Node: ${process.version}`);
-  console.log(`[STAGE_247] Anchor: ${process.env.PROHP_ANCHOR || 'E3592DC3'}`);
-  console.log(`[STAGE_247] Proof Over Hype.`);
+  console.log('[STAGE_264] ProHP Forum API');
+  console.log(`[STAGE_264] Port: ${PORT} | PID: ${process.pid} | Node: ${process.version}`);
+  console.log(`[STAGE_264] Anchor: ${process.env.PROHP_ANCHOR || 'E3592DC3'}`);
+  console.log('[STAGE_264] Proof Over Hype.');
 });

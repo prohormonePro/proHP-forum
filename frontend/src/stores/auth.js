@@ -9,6 +9,7 @@ const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem('prohp_at') || null,
   refreshToken: localStorage.getItem('prohp_rt') || null,
   loading: true,
+  hasLeadAccess: false,
 
   isLoggedIn: () => !!get().user,
   hasTier: (tier) => (TIER_LEVELS[get().user?.tier] ?? -1) >= (TIER_LEVELS[tier] ?? 0),
@@ -23,7 +24,13 @@ const useAuthStore = create((set, get) => ({
   _clear() {
     localStorage.removeItem('prohp_at');
     localStorage.removeItem('prohp_rt');
-    set({ user: null, accessToken: null, refreshToken: null, loading: false });
+    set({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      loading: false,
+      hasLeadAccess: false,
+    });
   },
 
   async register(email, username, password) {
@@ -54,32 +61,51 @@ const useAuthStore = create((set, get) => ({
 
   async refresh() {
     const rt = get().refreshToken;
-    if (!rt) { get()._clear(); return; }
+    if (!rt) {
+      get()._clear();
+      return;
+    }
     try {
       const res = await fetch(`${API}/api/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: rt }),
       });
-      if (!res.ok) { get()._clear(); return; }
+      if (!res.ok) {
+        get()._clear();
+        return;
+      }
       const data = await res.json();
       get()._setTokens(data.access_token, data.refresh_token);
       set({ user: data.user, loading: false });
-    } catch { get()._clear(); }
+    } catch {
+      get()._clear();
+    }
   },
 
   async fetchMe() {
     const token = get().accessToken;
-    if (!token) { set({ loading: false }); return; }
+    if (!token) {
+      set({ loading: false });
+      return;
+    }
     try {
       const res = await fetch(`${API}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.status === 401) { await get().refresh(); return; }
-      if (!res.ok) { get()._clear(); return; }
+      if (res.status === 401) {
+        await get().refresh();
+        return;
+      }
+      if (!res.ok) {
+        get()._clear();
+        return;
+      }
       const data = await res.json();
       set({ user: data.user, loading: false });
-    } catch { get()._clear(); }
+    } catch {
+      get()._clear();
+    }
   },
 
   async logout() {
@@ -91,6 +117,20 @@ const useAuthStore = create((set, get) => ({
       }).catch(() => {});
     }
     get()._clear();
+  },
+
+  setHasLeadAccess: (val) => set({ hasLeadAccess: val }),
+
+  checkLeadAccess: async () => {
+    try {
+      const res = await fetch(`${API}/api/leads/check`, { credentials: 'include' });
+      const data = await res.json();
+      if (data.hasLeadAccess) {
+        set({ hasLeadAccess: true });
+      }
+    } catch (error) {
+      console.error('Failed to check lead access:', error);
+    }
   },
 }));
 

@@ -2,18 +2,18 @@ import { Link, useLocation } from 'react-router-dom';
 import { Lock, FlaskConical, BookOpen } from 'lucide-react';
 import useAuthStore from '../../stores/auth';
 
-const TIER_LEVELS = { lab_rat: 0, premium: 1, elite: 2, admin: 3 };
+const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2 };
 
 const rooms = [
-  { slug: 'airlock', name: 'The Airlock', tier: 'lab_rat', desc: 'Start here' },
-  { slug: 'library', name: 'The Library', tier: 'premium', desc: 'Research' },
-  { slug: 'lab', name: 'The Lab', tier: 'premium', desc: 'Bloodwork' },
+  { slug: 'general', name: 'General', tier: 'free', desc: 'Start here' },
+  { slug: 'library', name: 'The Library', tier: 'inner_circle', desc: 'Research' },
+  { slug: 'lab', name: 'The Lab', tier: 'inner_circle', desc: 'Bloodwork' },
 ];
 
 export default function Sidebar() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
-  const userLevel = TIER_LEVELS[user?.tier || 'lab_rat'] ?? 0;
+  const userLevel = TIER_LEVELS[user?.tier || 'free'] ?? 0;
 
   return (
     <aside className="w-52 flex-shrink-0 hidden lg:block">

@@ -15,6 +15,7 @@ import GrepGate from "./components/GrepGate";
 import CreateThread from "./pages/CreateThread";
 import UserProfile from './pages/UserProfile';
 
+import ClaimAccountPage from "./pages/ClaimAccountPage";
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const loading = useAuthStore((s) => s.loading);
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/compounds" element={<CompoundsPage />} />
             <Route path="/compounds/:slug" element={<CompoundDetail />} />
             <Route path="/cycles" element={<CyclesPage />} />
+          <Route path="/claim-account" element={<ClaimAccountPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/u/:username" element={<UserProfile />} />

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { query } = require('../config/db');
 
 // ── Tier hierarchy (higher index = higher access) ──
-const TIER_LEVELS = { lab_rat: 0, premium: 1, elite: 2, admin: 3 };
+const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2 };
 
 /**
  * authenticate — Verify JWT and attach user to req
@@ -45,7 +45,7 @@ async function authenticate(req, res, next) {
 
 /**
  * requireTier — Middleware factory for tier-gated routes
- * Usage: router.get('/lab', authenticate, requireTier('premium'), handler)
+ * Usage: router.get('/lab', authenticate, requireTier('inner_circle'), handler)
  */
 function requireTier(minimumTier) {
   return (req, res, next) => {
