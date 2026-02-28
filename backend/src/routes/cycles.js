@@ -36,8 +36,8 @@ router.get('/', optionalAuth, async (req, res) => {
   }
 });
 
-// ── POST /api/cycles — Create cycle log (premium+) ──
-router.post('/', authenticate, requireTier('premium'), async (req, res) => {
+// ── POST /api/cycles — Create cycle log (inner_circle+) ──
+router.post('/', authenticate, requireTier('inner_circle'), async (req, res) => {
   try {
     const { title, description, compound_slug, compound_name, dose, duration_weeks, start_date } = req.body;
 
@@ -95,7 +95,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
 });
 
 // ── POST /api/cycles/:id/updates — Add weekly update ──
-router.post('/:id/updates', authenticate, requireTier('premium'), async (req, res) => {
+router.post('/:id/updates', authenticate, requireTier('inner_circle'), async (req, res) => {
   try {
     const { id } = req.params;
 

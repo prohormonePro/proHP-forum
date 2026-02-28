@@ -104,7 +104,7 @@
     background: rgba(245, 158, 11, 0.12);
     border: 1px solid rgba(245, 158, 11, 0.20);
   }
-  .tier-premium {
+  .tier-premium, .tier-inner_circle { /* legacy-alias */
     color: var(--prohp-blue);
     background: var(--prohp-glow);
     border: 1px solid rgba(34, 157, 216, 0.20);

@@ -89,7 +89,7 @@ export default function Home() {
                       {room.name}
                     </h2>
                     {locked && (
-                      <span className="tier-badge tier-premium text-[8px] py-0">
+                      <span className="tier-badge tier-inner_circle text-[8px] py-0">
                         <Lock className="w-2.5 h-2.5 mr-0.5" /> Inner Circle
                       </span>
                     )}
