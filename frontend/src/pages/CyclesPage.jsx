@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Dumbbell, Activity, CheckCircle, XCircle } from 'lucide-react';
 import { api } from '../hooks/api';
+import CycleLogForm from '../components/CycleLogForm';
 import useAuthStore from '../stores/auth';
 
 const STATUS_CONFIG = {
@@ -12,6 +14,7 @@ const STATUS_CONFIG = {
 
 export default function CyclesPage() {
   const accessToken = useAuthStore((x) => x.accessToken);
+  const [showForm, setShowForm] = useState(false);
   const userTier = useAuthStore((x) => x.user?.tier);
   const isInner = userTier === 'inner_circle' || userTier === 'admin';
 
@@ -25,6 +28,21 @@ export default function CyclesPage() {
         <p className="text-sm text-slate-400 mb-6">
           Real cycles. Real bloodwork. Real results. Posted by members who put in the work.
         </p>
+
+      {!showForm && (
+        <button
+          onClick={() => setShowForm(true)}
+          className="mt-4 mb-6 inline-flex items-center justify-center rounded-xl bg-[#229DD8] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1b87bc] transition"
+        >
+          Log New Cycle
+        </button>
+      )}
+
+      {showForm && (
+        <div className="mb-6">
+          <CycleLogForm onSuccess={() => setShowForm(false)} />
+        </div>
+      )}
         <div className="rounded-2xl border border-[#229DD8]/30 bg-[#0f1117] p-6 shadow-[0_14px_40px_rgba(0,0,0,0.35)]">
           <Dumbbell className="w-8 h-8 text-[#229DD8] mx-auto mb-3" />
           <div className="text-center">
