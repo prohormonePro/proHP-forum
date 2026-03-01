@@ -132,9 +132,9 @@ function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
           <div><label className="block text-xs font-medium text-slate-300 mb-1">Severity (1-5)</label>
             <select name="side_effect_severity" value={formData.side_effect_severity} onChange={handleChange} className={ic}>
               <option value="">None</option>
-              <option value="1">1 — Minimal</option><option value="2">2 — Mild</option>
-              <option value="3">3 — Moderate</option><option value="4">4 — Significant</option>
-              <option value="5">5 — Severe</option>
+              <option value="1">1 – Minimal</option><option value="2">2 – Mild</option>
+              <option value="3">3 – Moderate</option><option value="4">4 – Significant</option>
+              <option value="5">5 – Severe</option>
             </select></div>
         </div>
         <div><label className="block text-xs font-medium text-slate-300 mb-1">Mood / Energy</label>
