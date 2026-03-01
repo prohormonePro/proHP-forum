@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Dumbbell, Activity, CheckCircle, XCircle } from 'lucide-react';
 import { api } from '../hooks/api';
+import useAuthStore from '../stores/auth';
 
 const STATUS_CONFIG = {
   active: { icon: Activity, color: 'text-prohp-400', bg: 'bg-prohp-500/10', label: 'Active' },
@@ -10,6 +11,34 @@ const STATUS_CONFIG = {
 };
 
 export default function CyclesPage() {
+  const accessToken = useAuthStore((x) => x.accessToken);
+  const userTier = useAuthStore((x) => x.userTier);
+  const isInner = userTier === 'inner_circle' || userTier === 'admin';
+
+  if (!isInner) {
+    return (
+      <div className="max-w-3xl mx-auto animate-fade-in">
+        <div className="flex items-center gap-3 mb-2">
+          <Dumbbell className="w-6 h-6 text-prohp-400" />
+          <h1 className="text-xl font-extrabold tracking-tight">Cycle Logs</h1>
+        </div>
+        <p className="text-sm text-slate-400 mb-6">
+          Real cycles. Real bloodwork. Real results. Posted by members who put in the work.
+        </p>
+        <div className="rounded-2xl border border-[#229DD8]/30 bg-[#0f1117] p-6 shadow-[0_14px_40px_rgba(0,0,0,0.35)]">
+          <Dumbbell className="w-8 h-8 text-[#229DD8] mx-auto mb-3" />
+          <div className="text-center">
+            <div className="text-white text-base font-semibold mb-1">Cycle Logs are Inner Circle only</div>
+            <p className="text-sm text-slate-400 mb-4">Real protocols. Real bloodwork. Real mistakes. Posted by dudes actually under the bar.</p>
+            <a href="/compounds" className="inline-flex items-center justify-center rounded-xl bg-[#229DD8] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1b87bc] transition">
+              Join Inner Circle
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const { data, isLoading } = useQuery({
     queryKey: ['cycles'],
     queryFn: () => api.get('/api/cycles'),
