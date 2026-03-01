@@ -12,7 +12,7 @@ const STATUS_CONFIG = {
 
 export default function CyclesPage() {
   const accessToken = useAuthStore((x) => x.accessToken);
-  const userTier = useAuthStore((x) => x.userTier);
+  const userTier = useAuthStore((x) => x.user?.tier);
   const isInner = userTier === 'inner_circle' || userTier === 'admin';
 
   if (!isInner) {
