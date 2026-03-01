@@ -9,6 +9,7 @@ import ThreadPage from './pages/ThreadPage';
 import CompoundsPage from './pages/CompoundsPage';
 import CompoundDetail from './pages/CompoundDetail';
 import CyclesPage from './pages/CyclesPage';
+import CycleLogDetail from './pages/CycleLogDetail';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import GrepGate from "./components/GrepGate";
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/t/:id" element={<ThreadPage />} />
             <Route path="/compounds" element={<CompoundsPage />} />
             <Route path="/compounds/:slug" element={<CompoundDetail />} />
+            <Route path="/cycles/:id" element={<CycleLogDetail />} />
             <Route path="/cycles" element={<CyclesPage />} />
           <Route path="/claim-account" element={<ClaimAccountPage />} />
             <Route path="/login" element={<LoginPage />} />

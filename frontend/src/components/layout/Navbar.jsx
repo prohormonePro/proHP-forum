@@ -53,7 +53,7 @@ export default function Navbar() {
                   <div className="text-[10px] text-slate-500">{TIER_LABELS[user.tier] || user.tier}</div>
                 </div>
               </Link>
-              <button onClick={logout} className="text-slate-500 hover:text-slate-300 p-1.5 transition-colors" title="Log out">
+              <button onClick={() => { logout(); navigate("/"); }} className="text-slate-500 hover:text-slate-300 p-1.5 transition-colors" title="Log out">
                 <LogOut className="w-4 h-4" />
               </button>
             </>

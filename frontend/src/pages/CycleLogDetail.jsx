@@ -1,0 +1,313 @@
+import { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Activity, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { api } from '../hooks/api';
+import useAuthStore from '../stores/auth';
+
+const STATUS_MAP = {
+  active: { icon: Activity, color: 'text-prohp-400', bg: 'bg-prohp-500/10', label: 'Active' },
+  completed: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Completed' },
+  abandoned: { icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-500/10', label: 'Abandoned' },
+};
+
+function computeStatus(cycle) {
+  if (cycle.status === 'abandoned') return 'abandoned';
+  if (cycle.status === 'completed') return 'completed';
+  if (!cycle.start_date || !cycle.duration_weeks) return cycle.status || 'active';
+  const start = new Date(cycle.start_date);
+  const end = new Date(start);
+  end.setDate(end.getDate() + cycle.duration_weeks * 7);
+  return new Date() > end ? 'completed' : 'active';
+}
+
+function computeWeekProgress(cycle) {
+  if (!cycle.start_date || !cycle.duration_weeks) return null;
+  const start = new Date(cycle.start_date);
+  const now = new Date();
+  const diffMs = now - start;
+  const currentWeek = Math.max(1, Math.ceil(diffMs / (7 * 24 * 60 * 60 * 1000)));
+  return { current: Math.min(currentWeek, cycle.duration_weeks), total: cycle.duration_weeks };
+}
+
+function parseMediaLinks(description) {
+  if (!description) return { text: '', bloodwork: null, before: null, after: null };
+  const lines = description.split('\n');
+  const divider = lines.findIndex((l) => l.trim() === '---');
+  if (divider === -1) return { text: description, bloodwork: null, before: null, after: null };
+  const textPart = lines.slice(0, divider).join('\n').trim();
+  const mediaPart = lines.slice(divider + 1).join('\n');
+  let bloodwork = null, before = null, after = null;
+  const bld = mediaPart.match(/Bloodwork[^:]*:\s*(https?:\/\/\S+)/i);
+  const bfr = mediaPart.match(/Before[^:]*:\s*(https?:\/\/\S+)/i);
+  const aft = mediaPart.match(/After[^:]*:\s*(https?:\/\/\S+)/i);
+  if (bld) bloodwork = bld[1];
+  if (bfr) before = bfr[1];
+  if (aft) after = aft[1];
+  return { text: textPart, bloodwork, before, after };
+}
+
+const SEVERITY_LABELS = { 1: 'Minimal', 2: 'Mild', 3: 'Moderate', 4: 'Significant', 5: 'Severe' };
+
+function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
+  const nextWeek = existingWeeks.length > 0 ? Math.max(...existingWeeks) + 1 : 1;
+  const [formData, setFormData] = useState({
+    week_number: nextWeek, weight_lbs: '', body_fat_pct: '',
+    strength_notes: '', side_effects: '', side_effect_severity: '',
+    mood_notes: '', general_notes: '',
+  });
+  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (data) => api.post(`/api/cycles/${cycleId}/updates`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cycle', cycleId] });
+      setFormData((prev) => ({ ...prev, week_number: prev.week_number + 1,
+        weight_lbs: '', body_fat_pct: '', strength_notes: '',
+        side_effects: '', side_effect_severity: '', mood_notes: '', general_notes: '' }));
+      setError('');
+      onSuccess?.();
+    },
+    onError: (err) => setError(err?.message || 'Failed to post update'),
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    const wk = parseInt(formData.week_number, 10);
+    if (!wk || wk < 1) { setError('Week number required'); return; }
+    if (existingWeeks.includes(wk)) { setError(`Week ${wk} already posted.`); return; }
+    mutation.mutate({
+      week_number: wk,
+      weight_lbs: formData.weight_lbs ? parseFloat(formData.weight_lbs) : null,
+      body_fat_pct: formData.body_fat_pct ? parseFloat(formData.body_fat_pct) : null,
+      strength_notes: formData.strength_notes || '',
+      side_effects: formData.side_effects || '',
+      side_effect_severity: formData.side_effect_severity ? parseInt(formData.side_effect_severity, 10) : null,
+      mood_notes: formData.mood_notes || '',
+      general_notes: formData.general_notes || '',
+    });
+  };
+
+  const ic = "w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all";
+
+  return (
+    <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-[#229DD8]/25 p-6">
+      <h3 className="text-lg font-bold text-white mb-1">Post Weekly Update</h3>
+      <p className="text-xs text-slate-500 mb-5">Drop the data. That is how we learn.</p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div><label className="block text-xs font-medium text-slate-300 mb-1">Week #</label>
+            <input type="number" name="week_number" value={formData.week_number} onChange={handleChange} min="1" max="52" required className={ic} /></div>
+          <div><label className="block text-xs font-medium text-slate-300 mb-1">Weight (lbs)</label>
+            <input type="number" name="weight_lbs" value={formData.weight_lbs} onChange={handleChange} step="0.1" placeholder="185" className={ic} /></div>
+          <div><label className="block text-xs font-medium text-slate-300 mb-1">Body Fat %</label>
+            <input type="number" name="body_fat_pct" value={formData.body_fat_pct} onChange={handleChange} step="0.1" placeholder="14" className={ic} /></div>
+        </div>
+        <div><label className="block text-xs font-medium text-slate-300 mb-1">Strength Notes</label>
+          <input type="text" name="strength_notes" value={formData.strength_notes} onChange={handleChange} placeholder="Bench up 10lbs, squat same" className={ic} /></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div><label className="block text-xs font-medium text-slate-300 mb-1">Side Effects</label>
+            <input type="text" name="side_effects" value={formData.side_effects} onChange={handleChange} placeholder="Mild suppression, no hair issues" className={ic} /></div>
+          <div><label className="block text-xs font-medium text-slate-300 mb-1">Severity (1-5)</label>
+            <select name="side_effect_severity" value={formData.side_effect_severity} onChange={handleChange} className={ic}>
+              <option value="">None</option>
+              <option value="1">1 — Minimal</option><option value="2">2 — Mild</option>
+              <option value="3">3 — Moderate</option><option value="4">4 — Significant</option>
+              <option value="5">5 — Severe</option>
+            </select></div>
+        </div>
+        <div><label className="block text-xs font-medium text-slate-300 mb-1">Mood / Energy</label>
+          <input type="text" name="mood_notes" value={formData.mood_notes} onChange={handleChange} placeholder="Energy stable, sleep slightly off" className={ic} /></div>
+        <div><label className="block text-xs font-medium text-slate-300 mb-1">General Notes</label>
+          <textarea name="general_notes" value={formData.general_notes} onChange={handleChange} rows={3} placeholder="Anything else worth documenting..." className={ic + " resize-vertical"} /></div>
+        {error && (<div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3"><p className="text-red-400 text-sm">{error}</p></div>)}
+        <button type="submit" disabled={mutation.isPending} className="w-full bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg hover:shadow-[#229DD8]/20">
+          {mutation.isPending ? 'Posting...' : `Post Week ${formData.week_number} Update`}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function CycleLogDetail() {
+  const { id } = useParams();
+  const user = useAuthStore((x) => x.user);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['cycle', id],
+    queryFn: () => api.get(`/api/cycles/${id}`),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-3xl mx-auto animate-fade-in p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-slate-800 rounded w-1/3" />
+          <div className="h-4 bg-slate-800 rounded w-2/3" />
+          <div className="h-40 bg-slate-800 rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data?.cycle) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
+          <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
+        </Link>
+        <div className="prohp-card p-10 text-center border border-white/5">
+          <p className="text-red-400">Cycle log not found or access denied.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { cycle, updates } = data;
+  const status = computeStatus(cycle);
+  const sc = STATUS_MAP[status] || STATUS_MAP.active;
+  const Icon = sc.icon;
+  const weekProgress = computeWeekProgress(cycle);
+  const media = parseMediaLinks(cycle.description);
+  const isOwner = user?.id === cycle.user_id;
+  const existingWeeks = (updates || []).map((u) => u.week_number);
+
+  return (
+    <div className="max-w-3xl mx-auto animate-fade-in p-6">
+      <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
+        <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
+      </Link>
+
+      {/* Protocol Header */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 md:p-8 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-2">{cycle.title}</h1>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <span className="text-[#229DD8] font-semibold">{cycle.username}</span>
+              {cycle.is_founding && <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
+              <span className="w-1 h-1 rounded-full bg-slate-600" />
+              <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>
+          <div className={`flex items-center self-start gap-1.5 px-3 py-1.5 rounded-lg ${sc.bg}`}>
+            <Icon className={`w-4 h-4 ${sc.color}`} />
+            <span className={`text-xs font-bold uppercase ${sc.color}`}>{sc.label}</span>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
+            <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Compound</p>
+            <p className="text-sm font-bold text-white">{cycle.compound_name}</p>
+          </div>
+          {cycle.dose && (
+            <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
+              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Dose</p>
+              <p className="text-sm font-bold text-white">{cycle.dose}</p>
+            </div>
+          )}
+          {cycle.duration_weeks && (
+            <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
+              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Duration</p>
+              <p className="text-sm font-bold text-white">{cycle.duration_weeks} weeks</p>
+            </div>
+          )}
+          {weekProgress && (
+            <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
+              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Progress</p>
+              <p className="text-sm font-bold text-[#229DD8]">Week {weekProgress.current} / {weekProgress.total}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        {media.text && (
+          <div className="mb-6">
+            <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{media.text}</p>
+          </div>
+        )}
+
+        {/* Media Links */}
+        {(media.bloodwork || media.before || media.after) && (
+          <div className="flex flex-wrap gap-3">
+            {media.bloodwork && (
+              <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-[#229DD8] hover:bg-[#229DD8]/10 transition">Bloodwork PDF</a>
+            )}
+            {media.before && (
+              <a href={media.before} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-[#229DD8] hover:bg-[#229DD8]/10 transition">Before Pic</a>
+            )}
+            {media.after && (
+              <a href={media.after} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-[#229DD8] hover:bg-[#229DD8]/10 transition">After Pic</a>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Weekly Updates Timeline */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-white">Weekly Updates</h2>
+          <span className="text-xs text-slate-500">{(updates || []).length} update{(updates || []).length !== 1 ? 's' : ''}</span>
+        </div>
+
+        {(updates || []).length === 0 ? (
+          <div className="prohp-card p-8 text-center border border-white/5">
+            <Clock className="w-8 h-8 text-slate-600 mx-auto mb-3" />
+            <p className="text-sm text-slate-400">
+              {isOwner ? 'No updates yet. Drop your first weekly check-in below.' : 'No weekly updates posted yet. Check back soon.'}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {updates.map((update) => (
+              <div key={update.id} className="prohp-card p-5 border border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold text-[#229DD8]">Week {update.week_number}</span>
+                  <span className="text-[10px] text-slate-500">{new Date(update.created_at).toLocaleDateString()}</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+                  {update.weight_lbs && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Weight</p><p className="text-sm text-white">{update.weight_lbs} lbs</p></div>)}
+                  {update.body_fat_pct && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-sm text-white">{update.body_fat_pct}%</p></div>)}
+                  {update.side_effect_severity && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Side Effects</p><p className="text-sm text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
+                </div>
+                {update.strength_notes && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Strength:</span> {update.strength_notes}</p>}
+                {update.side_effects && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Sides:</span> {update.side_effects}</p>}
+                {update.mood_notes && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Mood:</span> {update.mood_notes}</p>}
+                {update.general_notes && <p className="text-sm text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Author Update Form */}
+      {isOwner && (
+        <div className="mb-6">
+          {!showUpdateForm ? (
+            <button onClick={() => setShowUpdateForm(true)}
+              className="w-full border border-[#229DD8]/30 bg-[#229DD8]/5 hover:bg-[#229DD8]/10 text-[#229DD8] font-semibold rounded-xl py-3 px-6 transition-all">
+              + Post Weekly Update
+            </button>
+          ) : (
+            <WeeklyUpdateForm cycleId={id} existingWeeks={existingWeeks} onSuccess={() => setShowUpdateForm(false)} />
+          )}
+        </div>
+      )}
+
+      {/* Placeholder for STAGE_033 comments */}
+      <div className="prohp-card p-6 text-center border border-white/5">
+        <p className="text-xs text-slate-500">Community feedback coming soon. The Lab is getting built.</p>
+      </div>
+    </div>
+  );
+}

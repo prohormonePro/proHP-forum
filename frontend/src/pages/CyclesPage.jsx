@@ -30,20 +30,14 @@ export default function CyclesPage() {
           <Dumbbell className="w-6 h-6 text-[#229DD8]" />
           <h1 className="text-xl font-extrabold tracking-tight text-white">Cycle Logs</h1>
         </div>
-        <p className="text-sm text-slate-400 mb-8">
-          Real cycles. Real bloodwork. Real results. Posted by members who put in the work.
-        </p>
-        <div className="rounded-2xl border border-[#229DD8]/30 bg-slate-900/80 backdrop-blur-md p-10 shadow-2xl text-center">
-          <div className="w-20 h-20 mx-auto mb-5 bg-[#229DD8]/10 rounded-full flex items-center justify-center">
-            <Dumbbell className="w-10 h-10 text-[#229DD8]" />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Cycle Logs are Inner Circle only</h2>
-          <p className="text-base text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
-            Real protocols. Real bloodwork. Real mistakes. Posted by dudes actually under the bar.
-          </p>
-          <Link to="/compounds" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] px-8 py-4 text-base font-bold text-white transition-all shadow-lg hover:shadow-[#229DD8]/20">
+        <p className="text-sm text-slate-400 mb-6">Real cycles. Real bloodwork. Real results. Posted by members who put in the work.</p>
+        <div className="rounded-2xl border border-[#229DD8]/30 bg-[#0f1117] p-8 shadow-[0_14px_40px_rgba(0,0,0,0.35)] text-center">
+          <Dumbbell className="w-10 h-10 text-[#229DD8] mx-auto mb-4" />
+          <div className="text-white text-lg font-bold mb-2">Cycle Logs are Inner Circle only</div>
+          <p className="text-sm text-slate-400 mb-5">Real protocols. Real bloodwork. Real mistakes. Posted by dudes actually under the bar.</p>
+          <a href="/compounds" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] px-6 py-3 text-sm font-bold text-white hover:from-[#1b87bc] hover:to-[#166e9c] transition-all shadow-lg">
             Join Inner Circle
-          </Link>
+          </a>
         </div>
       </div>
     );
@@ -55,15 +49,11 @@ export default function CyclesPage() {
         <Dumbbell className="w-6 h-6 text-[#229DD8]" />
         <h1 className="text-xl font-extrabold tracking-tight text-white">Cycle Logs</h1>
       </div>
-      <p className="text-sm text-slate-400 mb-6">
-        Real cycles. Real bloodwork. Real results. Drop your experience — that's how we learn.
-      </p>
+      <p className="text-sm text-slate-400 mb-6">Real cycles. Real bloodwork. Real results. Drop your experience — that is how we learn.</p>
 
       {!showForm && (
-        <button
-          onClick={() => setShowForm(true)}
-          className="mb-8 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] px-6 py-3 text-sm font-bold text-white hover:from-[#1b87bc] hover:to-[#166e9c] transition-all shadow-lg hover:shadow-[#229DD8]/20"
-        >
+        <button onClick={() => setShowForm(true)}
+          className="mb-8 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] px-6 py-3 text-sm font-bold text-white hover:from-[#1b87bc] hover:to-[#166e9c] transition-all shadow-lg hover:shadow-[#229DD8]/20">
           + Log New Cycle
         </button>
       )}
@@ -92,7 +82,7 @@ export default function CyclesPage() {
             const sc = STATUS_CONFIG[String(cycle.status || 'active').toLowerCase()] || STATUS_CONFIG.active;
             const Icon = sc.icon;
             return (
-              <div key={cycle.id} className="prohp-card px-5 py-4 hover:bg-slate-800/40 transition-colors border border-white/5">
+              <Link to={`/cycles/${cycle.id}`} key={cycle.id} className="block prohp-card px-5 py-4 hover:bg-slate-800/40 hover:border-[#229DD8]/20 transition-all border border-white/5 cursor-pointer">
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-xl ${sc.bg} flex items-center justify-center shrink-0`}>
                     <Icon className={`w-5 h-5 ${sc.color}`} />
@@ -116,7 +106,7 @@ export default function CyclesPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         )}
