@@ -1,10 +1,10 @@
 const express = require('express');
-const { query } = require('../config/db');
+const { query, getClient } = require('../config/db');
 const { authenticate, requireTier, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ── GET /api/cycles — List public cycle logs ──
+// ── GET /api/cycles – List public cycle logs ──
 router.get('/', optionalAuth, async (req, res) => {
   try {
     const { status, compound, featured } = req.query;
@@ -36,8 +36,10 @@ router.get('/', optionalAuth, async (req, res) => {
   }
 });
 
-// ── POST /api/cycles — Create cycle log (inner_circle+) ──
+// ── POST /api/cycles – Create cycle log (inner_circle+) ──
 router.post('/', authenticate, requireTier('inner_circle'), async (req, res) => {
+  const client = await getClient();
+  
   try {
     const { title, description, compound_slug, compound_name, dose, duration_weeks, start_date } = req.body;
 
@@ -48,25 +50,42 @@ router.post('/', authenticate, requireTier('inner_circle'), async (req, res) => 
     // Optionally link to compound
     let compoundId = null;
     if (compound_slug) {
-      const cr = await query('SELECT id FROM compounds WHERE slug = $1', [compound_slug]);
+      const cr = await client.query('SELECT id FROM compounds WHERE slug = $1', [compound_slug]);
       compoundId = cr.rows[0]?.id || null;
     }
 
-    const result = await query(
-      `INSERT INTO cycle_logs (user_id, compound_id, title, description, compound_name, dose, duration_weeks, start_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    await client.query('BEGIN');
+
+    // Create thread first
+    const threadResult = await client.query(
+      `INSERT INTO threads (room_id, author_id, compound_id, title, body)
+       VALUES ('ab2ff4da-2b34-4a3c-a9fc-5de2b25c9823', $1, $2, $3, $4)
+       RETURNING id`,
+      [req.user.id, compoundId, title.trim(), description || 'Cycle Log Discussion']
+    );
+    const threadId = threadResult.rows[0].id;
+
+    // Create cycle log with thread_id
+    const cycleResult = await client.query(
+      `INSERT INTO cycle_logs (user_id, compound_id, title, description, compound_name, dose, duration_weeks, start_date, thread_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [req.user.id, compoundId, title.trim(), description || '', compound_name, dose || null, duration_weeks || null, start_date || null]
+      [req.user.id, compoundId, title.trim(), description || '', compound_name, dose || null, duration_weeks || null, start_date || null, threadId]
     );
 
-    res.status(201).json({ cycle: result.rows[0] });
+    await client.query('COMMIT');
+    
+    res.status(201).json({ cycle: cycleResult.rows[0] });
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('[cycles/create]', err.message);
     res.status(500).json({ error: 'Failed to create cycle log' });
+  } finally {
+    client.release();
   }
 });
 
-// ── GET /api/cycles/:id — Cycle detail with updates ──
+// ── GET /api/cycles/:id – Cycle detail with updates ──
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -94,7 +113,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
   }
 });
 
-// ── POST /api/cycles/:id/updates — Add weekly update ──
+// ── POST /api/cycles/:id/updates – Add weekly update ──
 router.post('/:id/updates', authenticate, requireTier('inner_circle'), async (req, res) => {
   try {
     const { id } = req.params;

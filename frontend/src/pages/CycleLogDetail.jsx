@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Activity, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
 
@@ -45,6 +45,20 @@ function parseMediaLinks(description) {
   if (bfr) before = bfr[1];
   if (aft) after = aft[1];
   return { text: textPart, bloodwork, before, after };
+}
+
+function timeAgo(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 60) return diffMinutes <= 1 ? 'now' : `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
 }
 
 const SEVERITY_LABELS = { 1: 'Minimal', 2: 'Mild', 3: 'Moderate', 4: 'Significant', 5: 'Severe' };
@@ -139,12 +153,39 @@ function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
 export default function CycleLogDetail() {
   const { id } = useParams();
   const user = useAuthStore((x) => x.user);
+  const queryClient = useQueryClient();
   const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [posting, setPosting] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['cycle', id],
     queryFn: () => api.get(`/api/cycles/${id}`),
   });
+
+  const { data: threadData, isLoading: threadLoading } = useQuery({
+    queryKey: ['thread', data?.cycle?.thread_id],
+    queryFn: () => api.get(`/api/threads/${data.cycle.thread_id}`).then(r => r?.data ?? r),
+    enabled: !!data?.cycle?.thread_id,
+  });
+
+  const postComment = async () => {
+    if (!commentText.trim() || !data?.cycle?.thread_id) return;
+    
+    setPosting(true);
+    try {
+      await api.post('/api/posts', {
+        thread_id: data.cycle.thread_id,
+        body: commentText.trim()
+      });
+      queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
+      setCommentText('');
+    } catch (err) {
+      console.error('Failed to post comment:', err);
+    } finally {
+      setPosting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -179,6 +220,8 @@ export default function CycleLogDetail() {
   const media = parseMediaLinks(cycle.description);
   const isOwner = user?.id === cycle.user_id;
   const existingWeeks = (updates || []).map((u) => u.week_number);
+  const posts = threadData?.posts || [];
+  const canComment = user && (user.tier === 'inner_circle' || user.tier === 'admin');
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in p-6">
@@ -304,9 +347,88 @@ export default function CycleLogDetail() {
         </div>
       )}
 
-      {/* Placeholder for STAGE_033 comments */}
-      <div className="prohp-card p-6 text-center border border-white/5">
-        <p className="text-xs text-slate-500">Community feedback coming soon. The Lab is getting built.</p>
+      {/* Community Feedback Section */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-[#229DD8]" />
+            <h3 className="text-lg font-bold text-white">Community Feedback</h3>
+          </div>
+          <span className="text-xs text-slate-500">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
+        </div>
+
+        {!cycle.thread_id ? (
+          <div className="text-center p-8">
+            <p className="text-sm text-slate-400">Comments not available for this log.</p>
+          </div>
+        ) : (
+          <>
+            {/* Comments List */}
+            {posts.length === 0 ? (
+              <div className="text-center p-8">
+                <p className="text-sm text-slate-400">No comments yet. Be the first to share your thoughts.</p>
+              </div>
+            ) : (
+              <div className="space-y-4 mb-6">
+                {posts.map((post) => (
+                  <div key={post.id} className="bg-slate-950/50 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#229DD8] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                        {post.author_username?.charAt(0).toUpperCase() || 'A'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm font-semibold text-[#229DD8]">{post.author_username}</span>
+                          {(post.author_tier === 'inner_circle' || post.author_tier === 'admin') && (
+                            <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                              {post.author_tier === 'admin' ? 'ADM' : 'IC'}
+                            </span>
+                          )}
+                          <span className="text-xs text-slate-500">{timeAgo(post.created_at)}</span>
+                        </div>
+                        <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{post.body}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Comment Form */}
+            {canComment ? (
+              <div className="mt-6">
+                <textarea
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Share your thoughts, advice, or questions..."
+                  rows={3}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3"
+                />
+                <button
+                  onClick={postComment}
+                  disabled={!commentText.trim() || posting}
+                  className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
+                >
+                  {posting ? 'Posting...' : 'Post Comment'}
+                </button>
+              </div>
+            ) : user ? (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-slate-400 mb-3">Join Inner Circle to comment and engage with the community.</p>
+                <Link
+                  to="/compounds"
+                  className="inline-block bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
+                >
+                  Upgrade to Inner Circle
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-slate-400">Sign in to join the discussion.</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
