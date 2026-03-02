@@ -1,6 +1,8 @@
 # ProHP Forum
 
-Evidence-based performance enhancement community. Built by [ProHormonePro](https://youtube.com/@ProHormonePro).
+Evidence-based performance enhancement community - risk first, receipts required.
+
+Built by [ProHormonePro](https://youtube.com/@ProHormonePro). 52+ compounds reviewed · 2M+ YouTube views · 200+ consultations.
 
 **Live:** [forum.prohormonepro.com](https://forum.prohormonepro.com)
 
@@ -8,40 +10,62 @@ Evidence-based performance enhancement community. Built by [ProHormonePro](https
 
 ## What This Is
 
-A structured forum where every compound has a risk tier, hair loss profile, and benefits breakdown. Cycle logs are structured: compound, dose, duration, bloodwork, sides. No sourcing discussion. No vendor names for grey-market compounds.
+A structured forum and compound encyclopedia where every compound has a risk tier, hair loss profile, and benefits breakdown. Cycle logs are structured: compound, dose, duration, bloodwork markers, sides, weekly updates. No sourcing discussion. No vendor names for grey-market compounds.
 
 Risk comes before recommendation. Always.
 
 ---
 
+## Access Model
+
+Three-state access control enforced at the API layer. Frontend renders what the API returns.
+
+| State | Auth | Access |
+|-------|------|--------|
+| **WINDOW** | No cookie, no session | Title, risk tier, category, YouTube video only |
+| **LEAD** | `prohp_lead_access` httpOnly cookie | Full encyclopedia grid + expanded fields (mechanism, side effects, summary) |
+| **INNER CIRCLE** | Authenticated JWT | Everything: dosing, cycle logs, all rooms, posting, full compound data |
+
+State **INNER CIRCLE** maps to tier value `inner_circle`.
+
+---
+
+## Rules
+
+- **No sourcing discussion.** No vendor names for grey-market compounds.
+- **No "how to buy" content.**
+- Education, risk framing, and documentation only.
+- Proof over hype.
+
+Violations are removed. Repeat offenders are banned.
+
+---
+
 ## Stack
 
-| Layer    | Technology                                            |
-|----------|-------------------------------------------------------|
+| Layer | Technology |
+|-------|------------|
 | Frontend | React 18, Vite, Tailwind CSS, Zustand, TanStack Query |
-| Backend  | Node.js, Express, JWT auth                            |
-| Database | PostgreSQL 16                                         |
-| Payments | Stripe Checkout + Webhooks                            |
-| Hosting  | Ubuntu 24.04 (dedicated servers)                      |
-| Deploy   | SOVEREIGN_L5 Swarm + manual hotfixes, both git-tagged |
+| Backend | Node.js, Express, JWT auth |
+| Database | PostgreSQL 16 |
+| Payments | Stripe Checkout + Webhooks (live) |
+| Hosting | Ubuntu 24.04 (dedicated servers) |
+| Deploy | SOVEREIGN_L5 Swarm + manual hotfixes, both git-tagged |
 
 ### Servers
 
-| Server | IP               | Role                          |
-|--------|------------------|-------------------------------|
-| srv2   | 107.152.45.184   | Production (app + DB + nginx) |
-| srv1   | 135.148.32.108   | Secondary / staging           |
+| Server | IP | Role |
+|--------|-----|------|
+| srv2 | 107.152.45.184 | Production (app + DB + nginx) |
+| srv1 | 135.148.32.108 | Secondary / staging |
 
 ### Process Management
 
 Backend runs via systemd (`prohp-forum` service). Frontend is a Vite static build served by nginx.
 
 ```bash
-# Backend
 sudo systemctl status prohp-forum
 sudo systemctl restart prohp-forum
-
-# Frontend rebuild
 cd ~/prohp-forum/frontend && npm run build && sudo systemctl reload nginx
 ```
 
@@ -51,11 +75,11 @@ cd ~/prohp-forum/frontend && npm run build && sudo systemctl reload nginx
 
 Three tiers, canonical. No aliases. No legacy names.
 
-| Tier             | Value          | Access                                               |
-|------------------|----------------|------------------------------------------------------|
-| Free             | `free`         | Encyclopedia browsing, GrepGate search, General (read) |
-| Inner Circle     | `inner_circle` | Full compound data, cycle logs, all rooms            |
-| Admin            | `admin`        | Everything + user management + content moderation    |
+| Tier | Value | Access |
+|------|-------|--------|
+| Free | `free` | Encyclopedia browsing, GrepGate search, General (read) |
+| Inner Circle | `inner_circle` | Full compound data, cycle logs, all rooms, posting |
+| Admin | `admin` | Everything + user management + content moderation |
 
 Tier hierarchy in code: `{ free: 0, inner_circle: 1, admin: 2 }`
 
@@ -63,142 +87,78 @@ Tier hierarchy in code: `{ free: 0, inner_circle: 1, admin: 2 }`
 
 ## Auth Model
 
-### Middleware Exports
+### Middleware Exports (`backend/src/middleware/auth.js`)
 
-```
-authenticate       — requires valid JWT (rejects anonymous)
-optionalAuth       — attaches user if JWT present, continues if not
-requireTier(tier)  — requires user.tier >= specified level
-requireAdmin       — requires user.tier === 'admin'
-```
-
-All exported from `backend/src/middleware/auth.js`.
+- `authenticate` - requires valid JWT (rejects anonymous)
+- `optionalAuth` - attaches user if JWT present, continues if not
+- `requireTier(tier)` - requires `user.tier >= specified level`
+- `requireAdmin` - requires `user.tier === 'admin'`
 
 ### Token Architecture
 
-| Token/Cookie         | Storage                    | Purpose                             |
-|----------------------|----------------------------|-------------------------------------|
-| Access token         | Zustand store (memory)     | JWT with `{userId, tier}`, 15m TTL  |
-| Refresh token        | SHA256 hash in `refresh_tokens` table | 7-day TTL, stored as hash not raw |
-| `prohp_lead_access`  | httpOnly cookie            | Lead JWT with `{lead: true, email}` |
+| Token/Cookie | Storage | Purpose |
+|-------------|---------|---------|
+| Access token | Zustand store (memory) | JWT with `{userId, tier}`, 15m TTL |
+| Refresh token | SHA256 hash in `refresh_tokens` table | 7-day TTL, stored as hash not raw |
+| `prohp_lead_access` | httpOnly cookie | Lead JWT with `{lead: true, email}` |
 
 ### Zustand Auth Store
 
 ```javascript
-// Token setter (the ONLY way to persist tokens):
-useAuthStore.getState()._setTokens(access, refresh)
-
-// Tier check:
-useAuthStore.getState().hasTier('inner_circle')  // returns boolean
-
-// Admin check:
-useAuthStore.getState().isAdmin()
+useAuthStore.getState()._setTokens(access, refresh)  // THE ONLY token setter
+useAuthStore.getState().hasTier('inner_circle')        // tier check → boolean
+useAuthStore.getState().isAdmin()                       // admin check
 ```
 
-**Do not invent new setter names.** The store uses `_setTokens`, not `setToken`/`setTokens`/`setUser`.
+Do not invent new setter names. The store uses `_setTokens`, not `setToken`/`setTokens`/`setUser`.
 
 ### Lead Self-Healing
 
-If a lead cookie is missing the `email` field (legacy/corrupted), the backend clears it server-side and returns `{action: 'recapture'}`. The frontend routes the user back to `/compounds` to re-enter their email.
+If a lead cookie is missing the `email` field, the backend clears it server-side and returns `{action: 'recapture'}`. Frontend routes the user back to `/compounds` to re-enter their email.
 
 ---
 
 ## User Flows
 
-### Email Capture (Lead)
+### Email Capture → Lead
 
-1. User visits `/compounds` → sees `EncyclopediaGate`
-2. Submits email → `POST /api/leads`
-3. Backend mints `prohp_lead_access` httpOnly cookie
-4. User gains lead-level access to compound index
+User visits `/compounds` → sees `EncyclopediaGate` → submits email → `POST /api/leads` → backend mints `prohp_lead_access` httpOnly cookie → lead-level access granted.
 
-### Payment (Inner Circle)
+### Payment → Inner Circle
 
-1. Lead clicks Upgrade → `UpgradeButton` triggers Stripe Checkout
-2. Stripe redirects to `/claim-account?session_id=cs_...`
-3. User sets username + password → `POST /api/claim-account`
-4. Backend validates Stripe session, creates user with `tier=inner_circle`
-5. Issues JWT, frontend calls `_setTokens()`, redirects to `/compounds`
+Lead clicks Upgrade → `UpgradeButton` triggers Stripe Checkout → Stripe redirects to `/claim-account?session_id=cs_...` → user sets username + password → `POST /api/claim-account` → backend validates Stripe session, creates user with `tier=inner_circle` → JWT issued, `_setTokens()` called, redirect to `/compounds`.
 
-### Compound Detail Gating (DEPLOYED — STAGE_271)
+### Compound Detail Gating (STAGE_271)
 
-Three-state access control on every compound detail page. Deployed Feb 28, 2026. API enforces field-level access based on auth state.
+API enforces field-level access based on auth state. Window shoppers see title and video. Leads see mechanism and side effects. Inner Circle sees everything including dosing and cycle logs.
 
-1. **Window Shopper** (no cookie) — API returns title, risk tier, category, video only
-2. **Lead** (lead cookie) — API adds mechanism, side effects, summary
-3. **Inner Circle** (authenticated) — API returns everything including dosing, cycle logs
+### Cycle Logs (STAGE_031)
 
-The gate is enforced at the API layer. Frontend renders what the API returns.
+Inner Circle members create and view structured cycle logs with compound, dose, duration, bloodwork markers, and weekly progress updates. The Lab (`/cycles`) uses living threads where weekly updates are comments on the original cycle post.
+
+### Thread Comments (STAGE_033)
+
+Threaded discussion with replies. Comments live in the thread system.
 
 ---
 
-## Database Schema (Key Tables)
+## Database Schema
 
-### users
+**users:** id (UUID PK), email (UNIQUE), username (UNIQUE, 3-20 chars), `password_hash` (bcrypt 12 rounds - NOT `password`), tier (`free`/`inner_circle`/`admin`), stripe_customer_id, stripe_subscription_id, subscription_status.
 
-| Column                  | Type     | Notes                                    |
-|-------------------------|----------|------------------------------------------|
-| id                      | UUID     | PK, auto-generated                       |
-| email                   | text     | UNIQUE                                   |
-| username                | text     | UNIQUE, 3-20 chars, `[A-Za-z0-9_]`      |
-| password_hash           | text     | bcrypt, 12 rounds                        |
-| tier                    | text     | `free` / `inner_circle` / `admin`        |
-| stripe_customer_id      | text     | Stripe customer reference                |
-| stripe_subscription_id  | text     | Active subscription ID                   |
-| subscription_status     | text     | `active` / `canceled` / etc.             |
+**compounds:** id (UUID PK), slug, name, category, summary, mechanism, side_effects, dosing, risk_tier (`low`/`moderate`/`high`/`extreme`), trust_level, youtube_video_id, youtube_url, causes_hair_loss (boolean), hair_loss_severity (`none`/`mild`/`moderate`/`severe`), company, is_published.
 
-**Critical:** The column is `password_hash`, not `password`. Swarm payloads that use `password` will break inserts.
+**leads:** email, first_name, last_name, converted_at.
 
-### compounds
+**refresh_tokens:** user_id (UUID FK), `token_hash` (SHA256 - never raw token), expires_at.
 
-| Column              | Type     | Notes                            |
-|---------------------|----------|----------------------------------|
-| id                  | UUID     | PK                               |
-| slug                | text     | URL-safe identifier              |
-| name                | text     | Display name                     |
-| category            | text     | Default: `sarm`                  |
-| summary             | text     | Short description                |
-| mechanism           | text     | Mechanism of action (markdown)   |
-| side_effects        | text     | Side effects (markdown)          |
-| dosing              | text     | Dosing protocols (markdown)      |
-| risk_tier           | text     | `low` / `moderate` / `high` / `extreme` |
-| trust_level         | text     | `reviewed` / etc.                |
-| youtube_video_id    | text     | 11-char YouTube ID               |
-| youtube_url         | text     | Full YouTube URL                 |
-| causes_hair_loss    | boolean  |                                  |
-| hair_loss_severity  | text     | `none` / `mild` / `moderate` / `severe` |
-| company             | text     | Manufacturer                     |
-| is_published        | boolean  | Default: true                    |
+**audit_log:** id (serial PK), actor_user_id (UUID), target_user_id (UUID), `action` (text - NOT `event_type`), stripe_event_id, `meta` (JSONB - NOT `metadata`).
 
-### leads
+**cycle_logs:** id, user_id, title, compound_name, thread_id (UUID FK to threads).
 
-| Column       | Type      | Notes                           |
-|--------------|-----------|---------------------------------|
-| email        | text      | Captured email                  |
-| first_name   | text      | Optional                        |
-| last_name    | text      | Optional                        |
-| converted_at | timestamp | Set when lead claims an account |
+**threads:** id, room_id, user_id, title, content. **rooms:** id, name, slug, read_tier, write_tier.
 
-### refresh_tokens
-
-| Column     | Type  | Notes                                         |
-|------------|-------|-----------------------------------------------|
-| user_id    | UUID  | FK to users                                   |
-| token_hash | text  | SHA256 hash of refresh token (never raw token) |
-| expires_at | timestamp | 7-day TTL                                 |
-
-### audit_log
-
-| Column          | Type   | Notes                     |
-|-----------------|--------|---------------------------|
-| id              | serial | PK                        |
-| actor_user_id   | UUID   |                           |
-| target_user_id  | UUID   |                           |
-| action          | text   | Event description         |
-| stripe_event_id | text   | Stripe webhook event ID   |
-| meta            | JSONB  | Additional context        |
-
-**Column names are canonical.** Not `event_type`, not `metadata`. Swarm payloads must match exactly.
+Column names are canonical. Swarm payloads must match exactly. Schema evolves; refer to migrations for canonical columns.
 
 ---
 
@@ -224,66 +184,52 @@ Both `STRIPE_PREMIUM_PRICE_ID` and `STRIPE_INNER_CIRCLE_PRICE_ID` are set. The S
 
 ```
 prohp-forum/
-├── backend/
-│   └── src/
-│       ├── index.js                  # Express entry, route mounts, helmet, CORS
-│       ├── config/
-│       │   └── db.js                 # PostgreSQL pool (THIS is the import path)
-│       ├── middleware/
-│       │   └── auth.js               # JWT auth + tier gates
-│       └── routes/
-│           ├── auth.js               # Login, register, refresh, fetchMe
-│           ├── claim.js              # Stripe session → account creation
-│           ├── compounds.js          # Encyclopedia API
-│           ├── cycles.js             # Cycle logs
-│           ├── leads.js              # Email capture + cookie minting
-│           ├── rooms.js              # Forum districts
-│           ├── stripe.js             # Checkout + webhooks
-│           └── threads.js            # Discussion threads
-├── frontend/
-│   └── src/
-│       ├── App.jsx                   # Router + layout shell
-│       ├── stores/
-│       │   └── auth.js               # Zustand: _setTokens, hasTier, isAdmin
-│       ├── hooks/
-│       │   └── api.js                # API client wrapper
-│       ├── components/
-│       │   ├── EncyclopediaGate.jsx  # Email capture overlay
-│       │   ├── GrepGate.jsx          # Search with result gating
-│       │   ├── GrepGateCTA.jsx       # Search paywall CTA
-│       │   ├── UpgradeButton.jsx     # Stripe checkout trigger
-│       │   ├── WelcomeVideo.jsx      # Onboarding video
-│       │   ├── MarkdownRenderer.jsx  # Markdown → React
-│       │   └── layout/
-│       │       ├── Navbar.jsx        # Top nav: search, auth, profile
-│       │       ├── Sidebar.jsx       # Districts, Explore, rooms
-│       │       └── BackButton.jsx    # Navigation breadcrumb
-│       └── pages/
-│           ├── Home.jsx              # Landing / welcome
-│           ├── CompoundsPage.jsx     # Encyclopedia index (gated)
-│           ├── CompoundDetail.jsx    # Individual compound view
-│           ├── ClaimAccountPage.jsx  # Post-Stripe account setup
-│           ├── CyclesPage.jsx        # Cycle logs
-│           ├── RoomPage.jsx          # Discussion room
-│           ├── ThreadPage.jsx        # Individual thread
-│           ├── LoginPage.jsx         # Login form
-│           ├── RegisterPage.jsx      # Registration form
-│           ├── CreateThread.jsx      # New thread form
-│           └── UserProfile.jsx       # Profile page
-├── docs/
-│   └── intel/
-│       └── stages/                   # Auto-generated deployment intel
-├── _outbox/                          # Intel mirror for L5 swarm sync
+├── backend/src/
+│   ├── index.js              # Express entry, route mounts, helmet, CORS
+│   ├── config/db.js          # PostgreSQL pool (require('../config/db'))
+│   ├── middleware/auth.js     # JWT auth + tier gates
+│   └── routes/
+│       ├── auth.js            # Login, register, refresh, fetchMe
+│       ├── claim.js           # Stripe session → account creation
+│       ├── compounds.js       # Encyclopedia API (3-state gating)
+│       ├── cycles.js          # Cycle logs (tier-gated)
+│       ├── leads.js           # Email capture + cookie minting
+│       ├── rooms.js           # Forum districts
+│       ├── stripe.js          # Checkout + webhooks
+│       └── threads.js         # Discussion threads + comments
+├── frontend/src/
+│   ├── App.jsx                # Router + layout shell
+│   ├── stores/auth.js         # Zustand: _setTokens, hasTier, isAdmin
+│   ├── hooks/api.js           # API client wrapper
+│   ├── components/
+│   │   ├── EncyclopediaGate.jsx
+│   │   ├── GrepGate.jsx       # Search with result gating
+│   │   ├── GrepGateCTA.jsx    # Search paywall CTA
+│   │   ├── UpgradeButton.jsx  # Stripe checkout trigger
+│   │   ├── WelcomeVideo.jsx
+│   │   ├── MarkdownRenderer.jsx
+│   │   └── layout/ (Navbar, Sidebar, BackButton)
+│   └── pages/
+│       ├── CompoundsPage.jsx  # Encyclopedia index (gated)
+│       ├── CompoundDetail.jsx # Individual compound (3-state)
+│       ├── ClaimAccountPage.jsx
+│       ├── CyclesPage.jsx / CycleDetail.jsx
+│       ├── RoomPage.jsx / ThreadPage.jsx
+│       ├── LoginPage.jsx / RegisterPage.jsx
+│       ├── CreateThread.jsx
+│       └── UserProfile.jsx
+├── docs/intel/stages/         # Auto-generated deployment intel
+├── _outbox/                   # Intel mirror for L5 swarm sync
 └── README.md
 ```
 
 ### Import Path Warnings
 
-| What                | Correct                    | Wrong                |
-|---------------------|----------------------------|----------------------|
-| Database pool       | `require('../config/db')`  | `require('../db')`   |
-| Auth middleware      | `require('../middleware/auth')` | anything else   |
-| Auth store (frontend) | `from '../stores/auth'`  | `from '../stores/auth.js'` sometimes works but be consistent |
+| What | Correct | Wrong |
+|------|---------|-------|
+| Database pool | `require('../config/db')` | `require('../db')` |
+| Auth middleware | `require('../middleware/auth')` | anything else |
+| Auth store | `from '../stores/auth'` | `from './stores/auth'` |
 
 ---
 
@@ -294,47 +240,67 @@ prohp-forum/
 Primary deployment path. An autonomous AI pipeline on Windows that writes, reviews, and deploys code to srv2.
 
 ```
-inbox/ (drop .md payload)
-  → Watcher (polls 650ms)
+inbox/ (drop payload)
+  → Watcher (polls 650ms, Windows scheduled task, auto-restart)
   → Seeker (SSH discovery on srv2)
-  → Generator (Claude Sonnet)
-  → Critic (Gemini Flash)
-  → Judge (GPT o1)
-  → Executioner (SSH deploy)
+  → Generator
+  → Critic
+  → Judge
+  → Mechanical gates (complexity classifier, contract chain, scope allowlist)
+  → Executioner (SSH deploy via payload bridge)
   → outbox/ (INTEL report with SHA256 trace)
 ```
 
+The pipeline includes a complexity classifier (Profile S/M/L/X) that gates payloads by scope, a four-contract chain (C0: language, C1: file scope, C2: build safety, C3: secret exposure), write-once guards that prevent duplicate INTEL sections, and a code-first stream selector that ships valid `<PROHP_FILE>` blocks regardless of which model produced them.
+
 ### Swarm Applier (`swarm_apply.sh`)
 
-Deployment gatekeeper on srv2:
-
-1. Parses STAGE, TITLE, ANCHOR from payload header
-2. Denylist scan: blocks `sudo`, `rm -rf`, `curl`, `wget`, `ssh`
-3. Executes bash block scoped to `~/prohp-forum`
-4. Emits intel doc to `docs/intel/stages/`
-5. Secret scan: rejects API keys, DB URLs, private keys
-6. Atomic commit + SWARM tag + push to GitHub
-
-### Manual Hotfixes
-
-When the swarm can't handle a deploy (schema mismatches, emergency fixes), manual deployment is allowed. Same tagging convention, same commit messages.
+Deployment gatekeeper on srv2: parses STAGE/TITLE/ANCHOR from header, runs denylist scan (blocks `sudo`, `rm -rf`, `curl`, `wget`, `ssh`), executes bash block scoped to `~/prohp-forum`, emits intel doc, runs secret scan, atomic commit + SWARM tag + push to GitHub.
 
 ### Safety Rails
 
-| Control           | Purpose                                                    |
-|-------------------|------------------------------------------------------------|
-| Denylist          | Blocks destructive shell commands before execution         |
-| Secret scan       | Blocks credential leakage to public repo                   |
-| Repo-root lock    | All execution scoped to `~/prohp-forum`                    |
-| SWARM tags        | Immutable provenance: `SWARM_YYYYMMDD_HHMMSS`             |
-| Intel docs        | Human-readable audit trail with SHA256 integrity           |
+| Control | Purpose |
+|---------|---------|
+| Denylist | Blocks destructive shell commands (PCRE word boundaries) |
+| Secret scan | Blocks credential leakage to public repo |
+| Repo-root lock | All execution scoped to `~/prohp-forum` |
+| Scope allowlist | Executioner only touches files declared in payload header |
+| Complexity classifier | Auto-elevates profile, hard-stops undeclared X payloads |
+| Contract chain | C0-C3 mechanical validation on every deploy |
+| Write-once guards | RUN-keyed deduplication prevents duplicate INTEL sections |
+| SWARM tags | Immutable provenance: `SWARM_YYYYMMDD_HHMMSS` |
+| Intel docs | Human-readable audit trail with SHA256 integrity |
 
 ### Surgical Patch Rules
 
-The swarm must **never** overwrite `index.js` or `App.jsx` in full. These files accumulate route mounts and imports from many stages. Full rewrites drop helmet config, middleware, and route mounts.
+The swarm must never overwrite `index.js` or `App.jsx` in full. These files accumulate route mounts and imports from many stages. Full rewrites drop helmet config, middleware, and route mounts. Allowed: 2-line additions (one import, one route/mount). Forbidden: full heredoc replacement.
 
-**Allowed:** 2-line additions (one import, one route/mount).
-**Forbidden:** Full heredoc replacement of either file.
+---
+
+## Deployment History
+
+Key stages deployed since February 2026:
+
+| Stage | What | Status |
+|-------|------|--------|
+| 215 | Forum API MVP - systemd, PostgreSQL, nginx, 50 compounds | SEALED |
+| 221 | Voice Codex - UI language aligned to Codex V2 | SEALED |
+| 226 | sovereign-seal v0.1.0 published to PyPI + GitHub | SEALED |
+| 271 | API-enforced compound detail gating (3-state) | SEALED |
+| 271b | Frontend CTA wrappers + UpgradeButton | SEALED |
+| 266 | Stripe key fix + lead JWT email + admin reset | SEALED |
+| HOTFIX_STRIPE | Stripe e2e checkout verification | SEALED |
+| 275 | GrepGate CTA → Stripe parity | SEALED |
+| 029 | Stripe email self-healing | SEALED |
+| 030/030b | Cycle logs tier gating | SEALED |
+| 031/031b | Cycle log creation UI + form | SEALED |
+| 032 | Cycle detail page + weekly updates + logout | SEALED |
+| 033 | Thread comments | SEALED |
+| 037/037b | Payload bridge + code-first stream selection + denylist fix | SEALED |
+| 038a/b/c | Audit contract injection + scope allowlist enforcement | SEALED |
+| 039 | Meta enrichment + contract chain + complexity classifier + 70x multiplier fix | SEALED |
+
+Canonical stage receipts live in `docs/intel/stages/` and `_outbox/`.
 
 ---
 
@@ -352,28 +318,51 @@ Public repo: [github.com/prohormonePro/proHP-forum](https://github.com/prohormon
 
 ## Brand
 
-| Token        | Value                      |
-|--------------|----------------------------|
-| Primary Blue | `#229DD8`                  |
-| Glow         | `rgba(34, 157, 216, 0.12)` |
-| Button Class | `prohp-btn-primary`        |
-| Tagline      | Proof Over Hype            |
-| Anchor       | `E3592DC3`                 |
+| Token | Value |
+|-------|-------|
+| Primary Blue | `#229DD8` |
+| Glow | `rgba(34, 157, 216, 0.12)` |
+| Button Class | `prohp-btn-primary` |
+| Tagline | Proof Over Hype |
+| Anchor | `E3592DC3` |
 
 ---
 
-## Known Issues / Backlog
+## Backlog
 
-Active backlog is tracked in operator memory and conversation history. Key items:
+Active items tracked as of March 2, 2026:
 
-- **Cycle logs post form:** Inner Circle members can view but no post UI exists yet.
-- **Welcome video CTA:** Start Here overlay renders but is not clickable.
-- **Profile page:** Renders blank for all users.
-- **AC-262 mojibake:** Encoding bug in thread title (not compound record).
-- **DB credential rotation (#004):** Post-launch security hardening.
-- **Swarm preflight gate (#008):** Schema validation before code generation to prevent hallucinated column names.
+| # | Item | Status |
+|---|------|--------|
+| 001 | Sidebar read/write gate bug | QUEUED |
+| 002 | Kill outbound Watch links | QUEUED |
+| 003 | Dylan M quote → real screenshot | QUEUED |
+| 004 | DB credential rotation post-launch | QUEUED |
+| 007 | OCULAR auto-capture hook | QUEUED |
+| 008 | Swarm preflight gate (schema discovery) | QUEUED |
+| 011 | Softr encyclopedia redirect | QUEUED |
+| 012 | Product detail URL redirects | QUEUED |
+| 013 | Founding member badge + coupon | QUEUED |
+| 014 | Voice message feature | QUEUED |
+| 015 | Airtable cord-cut | QUEUED |
 
-Full backlog: 22+ items tracked. See conversation history for current status.
+Additional: profile page blank, AC-262 mojibake in thread title, welcome video CTA not clickable, GrepGate search discoloration on compound pages.
+
+---
+
+## Security
+
+Never paste secrets (API keys, DB URLs, private keys) into payloads, docs, or tickets. Secrets live in `.env` only.
+
+---
+
+## Related Projects
+
+| Project | Description |
+|---------|-------------|
+| [sovereign-seal](https://github.com/prohormonePro/sovereign-seal) | Deterministic governance layer for autonomous AI agents. [PyPI](https://pypi.org/project/sovereign-seal/0.1.0/) |
+| ProHP VSO | VA disability claims automation tool (prohpvso.com) |
+| USPTO 63/907,226 | Sovereign Spine System - cryptographic verification architecture |
 
 ---
 
