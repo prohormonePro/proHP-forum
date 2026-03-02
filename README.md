@@ -10,7 +10,7 @@ Built by [ProHormonePro](https://youtube.com/@ProHormonePro). 52+ compounds revi
 
 ## What This Is
 
-A structured forum and compound encyclopedia where every compound has a risk tier, hair loss profile, and benefits breakdown. Cycle logs are structured: compound, dose, duration, bloodwork markers, sides, weekly updates.
+A structured forum and compound encyclopedia where every compound has a risk tier, hair loss profile, and benefits breakdown. Cycle logs are structured: compound, dose, duration, bloodwork markers, sides, weekly updates. No sourcing discussion. No vendor names for grey-market compounds.
 
 Risk comes before recommendation. Always.
 
@@ -32,9 +32,9 @@ State **INNER CIRCLE** maps to tier value `inner_circle`.
 
 ## Rules
 
-- Sourcing is centralized. No sourcing in threads or comments. No "where do I buy" posts.
-- Vetted sourcing links live in the Encyclopedia. If a compound has no link, it means no source has been vetted yet.
-- Discussion areas are for education, risk framing, and documentation only.
+- **No sourcing discussion.** No vendor names for grey-market compounds.
+- **No "how to buy" content.**
+- Education, risk framing, and documentation only.
 - Proof over hype.
 
 Violations are removed. Repeat offenders are banned.
