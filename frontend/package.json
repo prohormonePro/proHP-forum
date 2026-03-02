@@ -2,7 +2,7 @@
   "name": "prohp-forum-frontend",
   "version": "1.0.0",
   "private": true,
-  "description": "ProHP Forum — canary 2026-03-02",
+  "description": "ProHP Forum — canary debug",
   "type": "module",
   "scripts": {
     "dev": "vite",
