@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useNavigate } from 'react-router-dom';
 
 var AUTO_LINK = [
@@ -87,7 +88,7 @@ export default function MarkdownRenderer({ content = '', className = '', maxAuto
 
   return (
     <div className={('markdown-body ' + className).trim()}>
-      <ReactMarkdown
+      <ReactMarkdown remarkPlugins={[remarkGfm]}
         components={{
           a: function(props) {
             var raw = extractHref(props);
