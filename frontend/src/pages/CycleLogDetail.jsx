@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply } from 'lucide-react';
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 const STATUS_MAP = {
   active: { icon: Activity, color: 'text-prohp-400', bg: 'bg-prohp-500/10', label: 'Active' },
@@ -132,9 +133,9 @@ function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
           <div><label className="block text-xs font-medium text-slate-300 mb-1">Severity (1-5)</label>
             <select name="side_effect_severity" value={formData.side_effect_severity} onChange={handleChange} className={ic}>
               <option value="">None</option>
-              <option value="1">1 – Minimal</option><option value="2">2 – Mild</option>
-              <option value="3">3 – Moderate</option><option value="4">4 – Significant</option>
-              <option value="5">5 – Severe</option>
+              <option value="1">1 — Minimal</option><option value="2">2 — Mild</option>
+              <option value="3">3 — Moderate</option><option value="4">4 — Significant</option>
+              <option value="5">5 — Severe</option>
             </select></div>
         </div>
         <div><label className="block text-xs font-medium text-slate-300 mb-1">Mood / Energy</label>
@@ -157,6 +158,8 @@ export default function CycleLogDetail() {
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [posting, setPosting] = useState(false);
+  const [replyTo, setReplyTo] = useState(null);
+  const replyBoxRef = useRef(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['cycle', id],
@@ -169,22 +172,60 @@ export default function CycleLogDetail() {
     enabled: !!data?.cycle?.thread_id,
   });
 
+  const votePost = useMutation({
+    mutationFn: ({ postId, value }) => api.post(`/api/posts/${postId}/vote`, { value }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
+    },
+  });
+
+  const createReply = useMutation({
+    mutationFn: (data) => api.post('/api/posts', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
+      setCommentText('');
+      setReplyTo(null);
+    },
+    onError: (err) => console.error('Failed to post reply:', err),
+  });
+
   const postComment = async () => {
     if (!commentText.trim() || !data?.cycle?.thread_id) return;
     
     setPosting(true);
     try {
-      await api.post('/api/posts', {
-        thread_id: data.cycle.thread_id,
-        body: commentText.trim()
-      });
-      queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
-      setCommentText('');
+      if (replyTo) {
+        await createReply.mutateAsync({
+          thread_id: data.cycle.thread_id,
+          body: commentText.trim(),
+          parent_id: replyTo
+        });
+      } else {
+        await api.post('/api/posts', {
+          thread_id: data.cycle.thread_id,
+          body: commentText.trim()
+        });
+        queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
+        setCommentText('');
+      }
     } catch (err) {
       console.error('Failed to post comment:', err);
     } finally {
       setPosting(false);
     }
+  };
+
+  const handleReply = (postId, authorUsername) => {
+    setReplyTo(postId);
+    setTimeout(() => {
+      replyBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      replyBoxRef.current?.focus();
+    }, 100);
+  };
+
+  const handleVote = (postId, value) => {
+    if (!user) return;
+    votePost.mutate({ postId, value });
   };
 
   if (isLoading) {
@@ -222,6 +263,8 @@ export default function CycleLogDetail() {
   const existingWeeks = (updates || []).map((u) => u.week_number);
   const posts = threadData?.posts || [];
   const canComment = user && (user.tier === 'inner_circle' || user.tier === 'admin');
+
+  const replyToPost = replyTo ? posts.find(p => p.id === replyTo) : null;
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in p-6">
@@ -371,7 +414,7 @@ export default function CycleLogDetail() {
             ) : (
               <div className="space-y-4 mb-6">
                 {posts.map((post) => (
-                  <div key={post.id} className="bg-slate-950/50 rounded-xl p-4 border border-white/5">
+                  <div key={post.id} className={`bg-slate-950/50 rounded-xl p-4 border border-white/5 ${post.parent_id ? 'ml-8 border-l-2 border-l-slate-800/50' : ''}`}>
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-[#229DD8] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                         {post.author_username?.charAt(0).toUpperCase() || 'A'}
@@ -386,7 +429,52 @@ export default function CycleLogDetail() {
                           )}
                           <span className="text-xs text-slate-500">{timeAgo(post.created_at)}</span>
                         </div>
-                        <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{post.body}</p>
+                        <div className="text-sm text-slate-300 leading-relaxed mb-3">
+                          <MarkdownRenderer content={post.body} />
+                        </div>
+                        <div className="flex items-center gap-4">
+                          {/* Vote Buttons */}
+                          {user && (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleVote(post.id, 1)}
+                                className={`p-1 rounded transition-colors ${
+                                  post.user_vote === 1
+                                    ? 'text-[#229DD8] bg-[#229DD8]/10'
+                                    : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'
+                                }`}
+                                disabled={votePost.isPending}
+                              >
+                                <ArrowUp className="w-4 h-4" />
+                              </button>
+                              <span className="text-xs font-medium text-slate-400 min-w-[20px] text-center">
+                                {post.score || 0}
+                              </span>
+                              <button
+                                onClick={() => handleVote(post.id, -1)}
+                                className={`p-1 rounded transition-colors ${
+                                  post.user_vote === -1
+                                    ? 'text-red-400 bg-red-500/10'
+                                    : 'text-slate-500 hover:text-red-400 hover:bg-red-500/5'
+                                }`}
+                                disabled={votePost.isPending}
+                              >
+                                <ArrowDown className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Reply Button */}
+                          {canComment && (
+                            <button
+                              onClick={() => handleReply(post.id, post.author_username)}
+                              className="flex items-center gap-1 px-2 py-1 text-xs text-slate-400 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded transition-colors"
+                            >
+                              <Reply className="w-3 h-3" />
+                              Reply
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -396,21 +484,50 @@ export default function CycleLogDetail() {
 
             {/* Comment Form */}
             {canComment ? (
-              <div className="mt-6">
+              <div className="mt-6" ref={replyBoxRef}>
+                {replyToPost && (
+                  <div className="mb-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-slate-400">
+                        Replying to <span className="text-[#229DD8]">{replyToPost.author_username}</span>
+                      </span>
+                      <button
+                        onClick={() => setReplyTo(null)}
+                        className="text-xs text-slate-500 hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <div className="text-xs text-slate-500 line-clamp-2">
+                      {replyToPost.body.substring(0, 100)}
+                      {replyToPost.body.length > 100 ? '...' : ''}
+                    </div>
+                  </div>
+                )}
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Share your thoughts, advice, or questions..."
+                  placeholder={replyTo ? "Write your reply..." : "Share your thoughts, advice, or questions..."}
                   rows={3}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3"
                 />
-                <button
-                  onClick={postComment}
-                  disabled={!commentText.trim() || posting}
-                  className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
-                >
-                  {posting ? 'Posting...' : 'Post Comment'}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={postComment}
+                    disabled={!commentText.trim() || posting}
+                    className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
+                  >
+                    {posting ? 'Posting...' : replyTo ? 'Post Reply' : 'Post Comment'}
+                  </button>
+                  {replyTo && (
+                    <button
+                      onClick={() => setReplyTo(null)}
+                      className="text-sm text-slate-400 hover:text-white transition-colors"
+                    >
+                      Cancel Reply
+                    </button>
+                  )}
+                </div>
               </div>
             ) : user ? (
               <div className="mt-6 text-center">
