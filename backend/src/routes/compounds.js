@@ -5,7 +5,7 @@ const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ── GET /api/compounds — List all (with optional category filter) ──
+// ── GET /api/compounds – List all (with optional category filter) ──
 router.get('/', async (req, res) => {
   try {
     const { category, search } = req.query;
@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ── GET /api/compounds/categories — List categories with counts ──
+// ── GET /api/compounds/categories – List categories with counts ──
 router.get('/categories', async (req, res) => {
   try {
     const result = await query(
@@ -49,7 +49,7 @@ router.get('/categories', async (req, res) => {
   }
 });
 
-// ── GET /api/compounds/:slug — API-enforced 3-state gating ──
+// ── GET /api/compounds/:slug – API-enforced 3-state gating ──
 router.get('/:slug', optionalAuth, async (req, res) => {
   try {
     const { slug } = req.params;
@@ -79,15 +79,22 @@ router.get('/:slug', optionalAuth, async (req, res) => {
     const WINDOW_FIELDS = [
       'id','slug','name','category','risk_tier','trust_level','summary',
       'youtube_video_id','youtube_url','causes_hair_loss','hair_loss_severity',
-      'company','is_published','created_at','updated_at','product_url'
+      'company','is_published','created_at','updated_at','product_url',
+      'product_image_url','public_discount_code','product_price'
     ];
-    const LEAD_FIELDS = [...WINDOW_FIELDS,'mechanism','side_effects','benefits','compounds_list'];
+    const LEAD_FIELDS = [...WINDOW_FIELDS,'mechanism','side_effects','benefits','compounds_list','article_preview'];
 
     if (gate_state === 'window') {
+      const result = pick(compound, WINDOW_FIELDS);
+      // Safety net - prevent gated content leaks
+      delete result.article_content;
+      delete result.member_discount_code;
+      delete result.nutrition_label_url;
+      
       return res.json({
         gate_state: 'window',
         upgrade_cta: 'Unlock the full encyclopedia for free. Enter your email.',
-        compound: pick(compound, WINDOW_FIELDS),
+        compound: result,
         related_threads: [],
         related_cycles: [],
       });
@@ -105,10 +112,17 @@ router.get('/:slug', optionalAuth, async (req, res) => {
          WHERE compound_id = $1 AND is_public = true`,
         [compound.id]
       );
+      
+      const result = pick(compound, LEAD_FIELDS);
+      // Safety net - prevent gated content leaks
+      delete result.article_content;
+      delete result.member_discount_code;
+      delete result.nutrition_label_url;
+      
       return res.json({
         gate_state: 'lead',
         upgrade_cta: 'You are in the Library. The Lab is next. Unlock Inner Circle for full threads, cycle logs, and community intel.',
-        compound: pick(compound, LEAD_FIELDS),
+        compound: result,
         related_threads: threadsResult.rows,
         related_cycles: cycleCountResult.rows[0] || { count: 0 },
       });
