@@ -8,26 +8,44 @@ const router = express.Router();
 // ── GET /api/compounds – List all (with optional category filter) ──
 router.get('/', async (req, res) => {
   try {
-    const { category, search } = req.query;
-    let sql = `SELECT id, slug, name, category, risk_tier, trust_level, summary,
-                      youtube_url, causes_hair_loss, hair_loss_severity, is_published
-               FROM compounds WHERE is_published = true`;
+    const { category, search, sort } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 25));
+    const offset = (page - 1) * limit;
+
+    let where = "WHERE is_published = true";
     const params = [];
 
     if (category) {
       params.push(category);
-      sql += ` AND category = $${params.length}`;
+      where += ` AND category = $${params.length}`;
     }
 
     if (search) {
       params.push(`%${search}%`);
-      sql += ` AND (name ILIKE $${params.length} OR slug ILIKE $${params.length} OR summary ILIKE $${params.length} OR REPLACE(name, '-', ' ') ILIKE $${params.length} OR REPLACE(slug, '-', ' ') ILIKE $${params.length})`;
+      where += ` AND (name ILIKE $${params.length} OR slug ILIKE $${params.length} OR summary ILIKE $${params.length})`;
     }
 
-    sql += ' ORDER BY name ASC';
+    const orderCol = sort === "risk" ? "risk_tier" : sort === "category" ? "category" : "name";
+    const orderDir = req.query.dir === "desc" ? "DESC" : "ASC";
+
+    const countSql = `SELECT COUNT(*) as total FROM compounds ${where}`;
+    const countResult = await query(countSql, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    const sql = `SELECT id, slug, name, category, risk_tier, trust_level, summary,
+                        youtube_url, causes_hair_loss, hair_loss_severity, is_published
+                 FROM compounds ${where}
+                 ORDER BY ${orderCol} ${orderDir}
+                 LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await query(sql, params);
-    res.json({ compounds: result.rows, count: result.rows.length });
+    res.json({
+      compounds: result.rows,
+      count: result.rows.length,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+    });
   } catch (err) {
     console.error('[compounds/list]', err.message);
     res.status(500).json({ error: 'Failed to list compounds' });

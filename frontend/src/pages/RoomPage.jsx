@@ -14,10 +14,11 @@ export default function RoomPage() {
   const [body, setBody] = useState('');
   const [compoundSlug, setCompoundSlug] = useState('');
   const [createError, setCreateError] = useState('');
+    const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['room', slug],
-    queryFn: () => api.get(`/api/rooms/${slug}`),
+    queryKey: ['room', slug, page],
+    queryFn: () => api.get(`/api/rooms/${slug}?page=${page}`),
   });
 
   const { data: compoundsData } = useQuery({
@@ -134,7 +135,7 @@ export default function RoomPage() {
       {pagination.pages > 1 && (
         <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: Math.min(pagination.pages, 10) }, (_, i) => (
-            <button key={i} className={`w-8 h-8 rounded text-xs font-bold ${pagination.page === i + 1 ? 'bg-prohp-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}>{i + 1}</button>
+            <button key={i} onClick={function() { setPage(i + 1); }} className={`w-8 h-8 rounded text-xs font-bold ${pagination.page === i + 1 ? 'bg-prohp-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}>{i + 1}</button>
           ))}
         </div>
       )}
