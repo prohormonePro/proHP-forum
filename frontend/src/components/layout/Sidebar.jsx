@@ -19,7 +19,6 @@ export default function Sidebar() {
     <aside className="w-52 flex-shrink-0 hidden lg:block">
       <div className="sticky top-16 space-y-6 py-4">
         <div>
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)] mb-2.5 px-2">
         {/* Home nav — Backlog #020 */}
         <div className="px-2 mb-2">
           <Link
@@ -34,8 +33,10 @@ export default function Sidebar() {
           </Link>
         </div>
 
-            Districts
-          </h3>
+
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--text-muted)] mb-2.5 px-2">
+              Districts
+            </h3>
           <div className="space-y-0.5">
             {rooms.map((r) => {
               const locked = userLevel < (TIER_LEVELS[r.tier] ?? 0);
