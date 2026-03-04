@@ -1,12 +1,13 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink, ArrowUp, ArrowDown, CornerDownRight, CheckCircle, Award } from 'lucide-react';
 import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import GrepGate from '../components/GrepGate';
 import BackButton from '../components/layout/BackButton';
 import UpgradeButton from '../components/UpgradeButton';
+import useAuthStore from '../stores/auth';
 
 function getSessionInt(key, fallback) {
   try {
@@ -227,6 +228,51 @@ export default function CompoundDetail() {
   var relatedCycles = data ? (data.related_cycles || []) : [];
   var gate_state = data ? (data.gate_state || 'window') : 'window';
   var upgrade_cta = data ? (data.upgrade_cta || '') : '';
+
+    // --- STAGE_046b: Compound Discussion Thread ---
+    var user = useAuthStore(function(s) { return s.user; });
+    var queryClient = useQueryClient();
+    var [replyBody046, setReplyBody046] = useState("");
+    var [replyTo046, setReplyTo046] = useState(null);
+    var [replyError046, setReplyError046] = useState("");
+
+    var threadQuery = useQuery({
+      queryKey: ["compound-thread", compound ? compound.thread_id : null],
+      queryFn: function() { return api.get("/api/threads/" + compound.thread_id); },
+      enabled: !!(compound && compound.thread_id),
+    });
+
+    var threadData = threadQuery.data || null;
+    var threadPosts = threadData ? (threadData.posts || []) : [];
+    var threadPagination = threadData ? (threadData.pagination || {}) : {};
+
+    var votePost046 = useMutation({
+      mutationFn: function(args) { return api.post("/api/posts/" + args.postId + "/vote", { value: args.value }); },
+      onSuccess: function() { queryClient.invalidateQueries({ queryKey: ["compound-thread", compound ? compound.thread_id : null] }); },
+    });
+
+    var createReply046 = useMutation({
+      mutationFn: function(payload) { return api.post("/api/posts", payload); },
+      onSuccess: function() {
+        queryClient.invalidateQueries({ queryKey: ["compound-thread", compound ? compound.thread_id : null] });
+        setReplyBody046("");
+        setReplyTo046(null);
+        setReplyError046("");
+      },
+      onError: function(err) { setReplyError046(err.message); },
+    });
+
+    var handleReply046 = function(e) {
+      e.preventDefault();
+      if (!replyBody046.trim()) { setReplyError046("Say something."); return; }
+      setReplyError046("");
+      createReply046.mutate({
+        thread_id: compound.thread_id,
+        body: replyBody046.trim(),
+        parent_id: replyTo046 || undefined,
+      });
+    };
+    // --- /STAGE_046b ---
 
   var videoId = useMemo(function() {
     if (!compound) return '';
@@ -516,7 +562,119 @@ export default function CompoundDetail() {
         )}
       </div>
 
-      <div className="prohp-card p-6 mb-4">
+      
+        {/* --- STAGE_046b: Community Discussion Thread --- */}
+        {compound && compound.thread_id && (
+          <div className="prohp-card p-6 mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-prohp-400" />
+                <div className="text-sm font-semibold text-slate-200">
+                  Community Discussion
+                  <span className="text-slate-500 font-normal ml-1.5">
+                    ({threadPagination.total || 0} {threadPagination.total === 1 ? "reply" : "replies"})
+                  </span>
+                </div>
+              </div>
+              <Link to={"/t/" + compound.thread_id} className="text-xs text-prohp-400 hover:text-prohp-300 transition-colors">
+                View full discussion &rarr;
+              </Link>
+            </div>
+
+            {threadQuery.isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-16 bg-slate-800 rounded mb-2" />
+                <div className="h-16 bg-slate-800 rounded mb-2" />
+                <div className="h-16 bg-slate-800 rounded" />
+              </div>
+            ) : threadQuery.error ? (
+              <div className="text-center py-4">
+                <p className="text-xs text-slate-500">Discussion temporarily unavailable.</p>
+                <Link to={"/t/" + compound.thread_id} className="text-xs text-prohp-400 hover:text-prohp-300">View thread directly &rarr;</Link>
+              </div>
+            ) : threadPosts.length > 0 ? (
+              <div className="flex flex-col gap-1.5 mb-4">
+                {threadPosts.map(function(post) {
+                  return (
+                    <div key={post.id} className={"prohp-card px-4 py-3 " + (post.is_best_answer ? "border-l-2 border-l-emerald-500/50 bg-emerald-500/[0.03] " : "") + (post.parent_id ? "ml-8 border-l-2 border-l-slate-800/50" : "")}>
+                      <div className="flex items-start gap-3">
+                        <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
+                          <button
+                            onClick={function() { user && votePost046.mutate({ postId: post.id, value: 1 }); }}
+                            className={"p-0.5 transition-colors " + (!user ? "opacity-40 cursor-default" : "cursor-pointer") + " " + (post.user_vote === 1 ? "text-prohp-400" : "text-slate-600 hover:text-prohp-400")}
+                            disabled={!user}
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <span className={"text-[11px] font-bold font-mono " + (post.score > 0 ? "text-prohp-400" : post.score < 0 ? "text-red-400" : "text-slate-500")}>{post.score}</span>
+                          <button
+                            onClick={function() { user && votePost046.mutate({ postId: post.id, value: -1 }); }}
+                            className={"p-0.5 transition-colors " + (!user ? "opacity-40 cursor-default" : "cursor-pointer") + " " + (post.user_vote === -1 ? "text-red-400" : "text-slate-600 hover:text-red-400")}
+                            disabled={!user}
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {post.is_best_answer && (
+                            <div className="flex items-center gap-1.5 mb-2 text-emerald-400 text-xs font-bold">
+                              <CheckCircle className="w-3.5 h-3.5" /> Verdict
+                            </div>
+                          )}
+                          <MarkdownRenderer content={post.body} className="text-sm text-slate-300 leading-relaxed mb-2" />
+                          <div className="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap">
+                            <Link to={"/u/" + post.author_username} className="font-medium text-slate-400 hover:text-prohp-400 hover:underline transition-colors">{post.author_username}</Link>
+                            {post.author_founding && <span className="tier-badge tier-founding text-[8px] py-0">FM</span>}
+                            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                            {user && (
+                              <button onClick={function() { setReplyTo046(post.id); var el = document.getElementById("reply-box-046"); if (el) el.focus(); }} className="flex items-center gap-1 text-slate-500 hover:text-prohp-400 transition-colors ml-auto">
+                                <CornerDownRight className="w-3 h-3" /> Reply
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <MessageSquare className="w-5 h-5 text-slate-600 mx-auto mb-2" />
+                <p className="text-xs text-slate-400">No replies yet. Be the first to share your experience.</p>
+              </div>
+            )}
+
+            {user ? (
+              <form onSubmit={handleReply046} className="border-t border-white/[0.04] pt-4">
+                {replyTo046 && (
+                  <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
+                    <CornerDownRight className="w-3 h-3" />
+                    <span>Replying to a post</span>
+                    <button type="button" onClick={function() { setReplyTo046(null); }} className="text-slate-500 hover:text-slate-300 ml-1">cancel</button>
+                  </div>
+                )}
+                <textarea id="reply-box-046" value={replyBody046} onChange={function(e) { setReplyBody046(e.target.value); }} placeholder="Drop your experience, ask your question..." className="prohp-input min-h-[80px] resize-y mb-3 text-sm" rows={3} />
+                {replyError046 && <div className="text-xs text-red-400 mb-2">{replyError046}</div>}
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] text-slate-600">Receipts appreciated. Proof over hype.</p>
+                  <button type="submit" disabled={createReply046.isPending} className="prohp-btn-primary text-xs">
+                    {createReply046.isPending ? "Posting..." : "Post Reply"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="border-t border-white/[0.04] pt-4 text-center">
+                <p className="text-xs text-slate-400">
+                  <Link to="/login" className="text-prohp-400 hover:text-prohp-300">Log in</Link> to join the conversation.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+        {/* --- /STAGE_046b --- */}
+
+<div className="prohp-card p-6 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-slate-400" />
