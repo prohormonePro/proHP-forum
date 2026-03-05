@@ -2,7 +2,7 @@
 
 The compound encyclopedia that talks back.
 
-52+ compounds reviewed. 2M+ YouTube views. 200+ one-on-one consultations. 130+ community discussions seeded from real users. Three full consultation case files with bloodwork analysis. Risk first, receipts required.
+86+ compounds reviewed. 2M+ YouTube views. 200+ one-on-one consultations. 130+ community discussions seeded from real users. Three full consultation case files with bloodwork analysis. Risk first, receipts required.
 
 Built by [Travis Dillard](https://youtube.com/@ProHormonePro). Live at [forum.prohormonepro.com](https://forum.prohormonepro.com).
 
@@ -247,10 +247,12 @@ Features in active development or queued for pre-launch (March 31, 2026):
 | 008 | Swarm preflight gate (schema discovery) | QUEUED |
 | 013 | Founding member badge + 30% discount | QUEUED |
 | 016 | Verdict toggle (can't unselect/reassign) | QUEUED |
-| 046a | Library search + sort + pagination | NEXT |
-| 046b | Compound page discussion thread pipe | IN PROGRESS |
+| 046a | Library search + sort + pagination | SEALED |
+| 046b | Compound page discussion thread pipe | SEALED |
 | 047 | Night Goggles ASCII auditor | QUEUED |
-| — | Top nav broken | CRITICAL |
+| — | Top nav (sidebar h3 structure) | FIXED |
+| 047 | Quote cleanup (no-op, data clean) | SEALED |
+| 049 | Broadcaster v2 | OPERATIONAL |
 | — | YouTube comment search (7,100+ comments) | PRE-LAUNCH |
 | — | Softr comment parity (Jan-Mar 2026 gap) | LAUNCH BLOCKER |
 
