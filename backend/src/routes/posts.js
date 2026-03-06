@@ -138,13 +138,18 @@ router.post('/:id/best-answer', authenticate, async (req, res) => {
       return res.status(403).json({ error: 'Only the thread author can mark best answers' });
     }
 
-    // Unmark any existing best answer in this thread
-    await query('UPDATE posts SET is_best_answer = false WHERE thread_id = $1', [post.thread_id]);
+    // Toggle: if already best answer, unmark. Otherwise mark and clear others.
+    const current = await query('SELECT is_best_answer FROM posts WHERE id = $1', [id]);
+    const wasMarked = current.rows[0] && current.rows[0].is_best_answer;
 
-    // Mark this one
-    await query('UPDATE posts SET is_best_answer = true WHERE id = $1', [id]);
+    if (wasMarked) {
+      await query('UPDATE posts SET is_best_answer = false WHERE id = $1', [id]);
+    } else {
+      await query('UPDATE posts SET is_best_answer = false WHERE thread_id = $1 AND is_best_answer = true', [post.thread_id]);
+      await query('UPDATE posts SET is_best_answer = true WHERE id = $1', [id]);
+    }
 
-    res.json({ ok: true, post_id: id });
+    res.json({ ok: true, post_id: id, is_best_answer: !wasMarked });
   } catch (err) {
     console.error('[posts/best-answer]', err.message);
     res.status(500).json({ error: 'Failed to mark best answer' });
@@ -152,3 +157,9 @@ router.post('/:id/best-answer', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+
+
