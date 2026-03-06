@@ -565,7 +565,7 @@ export default function CompoundDetail() {
       
         {/* --- STAGE_046b: Community Discussion Thread --- */}
         {compound && compound.thread_id && (
-          <div className="prohp-card p-6 mb-4">
+          <div id="community-discussion" className="prohp-card p-6 mb-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-prohp-400" />
