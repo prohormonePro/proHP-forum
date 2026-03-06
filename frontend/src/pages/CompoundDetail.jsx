@@ -553,6 +553,14 @@ export default function CompoundDetail() {
 
       {gate_state === "lead" && <GateCTA gate_state={gate_state} upgrade_cta={upgrade_cta} />}
 
+      {!videoId && compound && (
+        <div className="prohp-card p-5 mb-4 border border-prohp-400/20 bg-prohp-400/[0.04] text-center">
+          <div className="text-sm font-semibold text-slate-200 mb-2">This compound hasn't been covered yet.</div>
+          <p className="text-xs text-slate-400 mb-3">Want Travis to break it down? Drop a comment below and let him know.</p>
+          <button onClick={function() { var el = document.getElementById('community-discussion'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className="prohp-btn-primary text-xs">Request Coverage</button>
+        </div>
+      )}
+
       <div className="mb-12">
         {compound && (
           <GrepGate excludeSlug={compound?.slug || ""}
