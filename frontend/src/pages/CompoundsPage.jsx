@@ -27,6 +27,7 @@ export default function CompoundsPage() {
 
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
+    const [sort, setSort] = useState('');
 
   const { data: catData } = useQuery({
     queryKey: ['compound-categories'],
@@ -50,7 +51,7 @@ export default function CompoundsPage() {
           <FlaskConical className="w-6 h-6 text-prohp-400" />
           <h1 className="text-xl font-extrabold tracking-tight">Compound Encyclopedia</h1>
         </div>
-        <p className="text-sm text-slate-400">52+ compounds. Every one reviewed. Proof over hype.</p>
+        <p className="text-sm text-slate-400">86+ compounds. Every one reviewed. Proof over hype.</p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
