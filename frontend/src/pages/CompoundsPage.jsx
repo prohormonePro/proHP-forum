@@ -27,7 +27,7 @@ export default function CompoundsPage() {
 
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
-    const [sort, setSort] = useState('');
+  const [sort, setSort] = useState('');
 
   const { data: catData } = useQuery({
     queryKey: ['compound-categories'],
@@ -35,8 +35,16 @@ export default function CompoundsPage() {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['compounds', category, search],
-    queryFn: () => api.get(`/api/compounds?${category ? `category=${category}&` : ''}${search ? `search=${search}` : ''}`),
+    queryKey: ['compounds', category, search, sort],
+    queryFn: () => {
+      const params = [];
+      if (category) params.push('category=' + encodeURIComponent(category));
+      if (search) params.push('search=' + encodeURIComponent(search));
+      if (sort === 'risk') { params.push('sort=risk'); params.push('dir=desc'); }
+      else if (sort === 'category') { params.push('sort=category'); params.push('dir=asc'); }
+      const qs = params.length ? '?' + params.join('&') : '';
+      return api.get('/api/compounds' + qs);
+    },
   });
 
   if (!gateChecked) return null;
@@ -64,6 +72,18 @@ export default function CompoundsPage() {
             className="prohp-input pl-9 text-xs"
           />
         </div>
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="bg-slate-900/60 border border-white/[0.06] rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-prohp-500/30 transition-colors"
+          aria-label="Sort compounds"
+        >
+          <option value="">Name (A-Z)</option>
+          <option value="risk">Risk (High first)</option>
+          <option value="category">Category</option>
+        </select>
+
         <div className="flex gap-1.5 flex-wrap">
           <button
             onClick={() => setCategory('')}
