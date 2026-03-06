@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink, ArrowUp, ArrowDown, CornerDownRight, CheckCircle, Award } from 'lucide-react';
@@ -570,11 +570,19 @@ export default function CompoundDetail() {
         )}
       </div>
 
-      
+
         {/* --- STAGE_046b: Community Discussion Thread --- */}
         {compound && compound.thread_id && (
-          <div id="community-discussion" className="prohp-card p-6 mb-4">
-            <div className="flex items-center justify-between mb-4">
+  gate_state === "window" ? (
+    <div id="community-discussion" className="prohp-card p-6 mb-4 border border-white/[0.04] text-center">
+      <Lock className="w-5 h-5 text-slate-600 mx-auto mb-2" />
+      <div className="text-sm font-semibold text-slate-200 mb-1">Community Discussion</div>
+      <p className="text-xs text-slate-400 mb-3">Community discussion available after unlocking the encyclopedia.</p>
+      <Link to="/compounds" className="prohp-btn-primary inline-flex items-center justify-center text-xs">Unlock with Email</Link>
+    </div>
+  ) : (
+    <div id="community-discussion" className="prohp-card p-6 mb-4">
+        <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-prohp-400" />
                 <div className="text-sm font-semibold text-slate-200">
@@ -634,7 +642,7 @@ export default function CompoundDetail() {
                             <Link to={"/u/" + post.author_username} className="font-medium text-slate-400 hover:text-prohp-400 hover:underline transition-colors">{post.author_username}</Link>
                             {post.author_founding && <span className="tier-badge tier-founding text-[8px] py-0">FM</span>}
                             <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                            {user && (
+                            {gate_state === "member" && user && (
                               <button onClick={function() { setReplyTo046(post.id); var el = document.getElementById("reply-box-046"); if (el) el.focus(); }} className="flex items-center gap-1 text-slate-500 hover:text-prohp-400 transition-colors ml-auto">
                                 <CornerDownRight className="w-3 h-3" /> Reply
                               </button>
@@ -653,7 +661,7 @@ export default function CompoundDetail() {
               </div>
             )}
 
-            {user ? (
+            {user && gate_state === "member" ? (
               <form onSubmit={handleReply046} className="border-t border-white/[0.04] pt-4">
                 {replyTo046 && (
                   <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
@@ -671,6 +679,11 @@ export default function CompoundDetail() {
                   </button>
                 </div>
               </form>
+              ) : gate_state === "lead" ? (
+              <div className="border-t border-white/[0.04] pt-4 text-center">
+                <p className="text-xs text-slate-400 mb-3">Join Inner Circle to join the discussion.</p>
+                <UpgradeButton variant="primary" className="!w-auto !px-5 !py-2.5 !text-xs !rounded-lg !shadow-none">Join Inner Circle</UpgradeButton>
+              </div>
             ) : (
               <div className="border-t border-white/[0.04] pt-4 text-center">
                 <p className="text-xs text-slate-400">
@@ -679,9 +692,10 @@ export default function CompoundDetail() {
               </div>
             )}
           </div>
-        )}
-        {/* --- /STAGE_046b --- */}
-
+        )
+      )}
+      {/* --- /STAGE_046b --- */}
+      
 <div className="prohp-card p-6 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -727,3 +741,5 @@ export default function CompoundDetail() {
     </div>
   );
 }
+ 
+
