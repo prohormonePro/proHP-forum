@@ -179,37 +179,31 @@ export default function CycleLogDetail() {
     },
   });
 
-  const createReply = useMutation({
-    mutationFn: (data) => api.post('/api/posts', data),
+  const [commentError, setCommentError] = useState(null);
+
+  const createPost = useMutation({
+    mutationFn: (postData) => api.post('/api/posts', postData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
       setCommentText('');
       setReplyTo(null);
+      setCommentError(null);
     },
-    onError: (err) => console.error('Failed to post reply:', err),
+    onError: (err) => {
+      setCommentError(err?.message || 'Failed to post. Please try again.');
+    },
   });
 
   const postComment = async () => {
     if (!commentText.trim() || !data?.cycle?.thread_id) return;
-    
+    setCommentError(null);
     setPosting(true);
     try {
-      if (replyTo) {
-        await createReply.mutateAsync({
-          thread_id: data.cycle.thread_id,
-          body: commentText.trim(),
-          parent_id: replyTo
-        });
-      } else {
-        await api.post('/api/posts', {
-          thread_id: data.cycle.thread_id,
-          body: commentText.trim()
-        });
-        queryClient.invalidateQueries({ queryKey: ['thread', data.cycle.thread_id] });
-        setCommentText('');
-      }
-    } catch (err) {
-      console.error('Failed to post comment:', err);
+      await createPost.mutateAsync({
+        thread_id: data.cycle.thread_id,
+        body: commentText.trim(),
+        ...(replyTo ? { parent_id: replyTo } : {}),
+      });
     } finally {
       setPosting(false);
     }
@@ -517,6 +511,9 @@ export default function CycleLogDetail() {
                     disabled={!commentText.trim() || posting}
                     className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
                   >
+                {commentError && (
+                  <p className="text-red-400 text-sm mt-1 mb-2">{commentError}</p>
+                )}
                     {posting ? 'Posting...' : replyTo ? 'Post Reply' : 'Post Comment'}
                   </button>
                   {replyTo && (
