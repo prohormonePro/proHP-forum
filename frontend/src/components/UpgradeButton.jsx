@@ -18,14 +18,19 @@ export default function UpgradeButton({
     setError('');
 
     try {
-      const isAuthed = !!accessToken;
+      // STAGE_074: refresh token before checkout to prevent expired-token failures
+      if (accessToken) {
+        try { await useAuthStore.getState().refresh(); } catch (_) {}
+      }
+      const freshToken = useAuthStore.getState().accessToken;
+      const isAuthed = !!freshToken;
       const endpoint = isAuthed
         ? '/api/stripe/create-checkout-session'
         : '/api/stripe/create-lead-checkout';
 
       const headers = { 'Content-Type': 'application/json' };
       if (isAuthed) {
-        headers.Authorization = `Bearer ${accessToken}`;
+        headers.Authorization = `Bearer ${freshToken}`;
       }
 
       const res = await fetch(`${API}${endpoint}`, {
