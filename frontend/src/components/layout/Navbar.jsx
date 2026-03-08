@@ -42,7 +42,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3 flex-shrink-0">
           {user ? (
             <>
-              <Link to="/profile" className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors">
+              <Link to={`/u/${user.username}`} className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition-colors">
                 <div className="w-7 h-7 rounded-full bg-prohp-500/20 border border-prohp-500/30 flex items-center justify-center">
                   <span className="text-[10px] font-bold text-prohp-400">
                     {(user.display_name || user.username).charAt(0).toUpperCase()}
