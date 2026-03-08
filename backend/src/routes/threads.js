@@ -52,7 +52,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
        FROM posts p
        JOIN users u ON u.id = p.author_id
        WHERE p.thread_id = $1 AND NOT p.is_deleted
-       ORDER BY p.created_at ASC
+       ORDER BY CASE WHEN p.parent_id IS NULL THEN 0 ELSE 1 END, CASE WHEN p.parent_id IS NULL THEN p.score ELSE 0 END DESC, p.created_at ASC
        LIMIT $2 OFFSET $3`,
       [id, limit, offset]
     );
