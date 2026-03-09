@@ -81,7 +81,13 @@ export default function MarkdownRenderer({ content = '', className = '', maxAuto
 
   var processed = useMemo(function() {
     if (!content) return '';
-    return autoLinkSparse(content, maxAutoLinks);
+    var linked = autoLinkSparse(content, maxAutoLinks);
+    // STAGE_100: linkify bare URLs not already in markdown link syntax
+    linked = linked.replace(
+      /(?<!\]\()(?<!\[)(https?:\/\/[^\s<)\]]+)/g,
+      '[$1]($1)'
+    );
+    return linked;
   }, [content, maxAutoLinks]);
 
   if (!processed) return null;
