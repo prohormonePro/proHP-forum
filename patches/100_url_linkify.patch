@@ -1,0 +1,26 @@
+﻿STAGE 100 P0-011: MarkdownRenderer.jsx URL linkify
+
+FIND (around line 78-82):
+  var processed = useMemo(function() {
+    if (!content) return '';
+    return autoLinkSparse(content, maxAutoLinks);
+  }, [content, maxAutoLinks]);
+
+REPLACE WITH:
+  var processed = useMemo(function() {
+    if (!content) return '';
+    var linked = autoLinkSparse(content, maxAutoLinks);
+    // STAGE_100: linkify bare URLs not already in markdown link syntax
+    linked = linked.replace(
+      /(?<!\]\()(?<!\[)(https?:\/\/[^\s<)\]]+)/g,
+      '[$1]($1)'
+    );
+    return linked;
+  }, [content, maxAutoLinks]);
+
+HOW IT WORKS:
+- Negative lookbehinds (?<!]\() and (?<!\[) skip URLs already in [text](url)
+- Bare URLs become [https://example.com](https://example.com)
+- ReactMarkdown renders them as <a> via existing components.a handler
+- External links get target=_blank from existing safeHref logic
+- No new dependencies required

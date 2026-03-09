@@ -100,9 +100,16 @@ export default function EncyclopediaGate({ onUnlock }) {
           style={{ filter: 'brightness(0.52) contrast(1.06) saturate(0.92)' }}
           onCanPlay={() => setVideoReady(true)}
           onError={() => { setVideoFailed(true); setVideoReady(false); }}
+          onStalled={() => setTimeout(() => { if (!videoReady) { setVideoFailed(true); } }, 8000)}
         >
           <source src="/videos/Prohormones_slow4x.mp4" type="video/mp4" />
         </video>
+      )}
+      {/* STAGE_100: Fallback when video fails on desktop */}
+      {videoFailed && isDesktop && (
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 50% 35%, rgba(30,30,40,1) 0%, rgba(10,10,15,1) 70%)',
+        }} />
       )}
 
       {/* LAYER 4: Cinematic overlays ONLY when video is actually visible */}
