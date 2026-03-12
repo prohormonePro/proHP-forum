@@ -8,6 +8,8 @@ import GrepGate from '../components/GrepGate';
 import BackButton from '../components/layout/BackButton';
 import UpgradeButton from '../components/UpgradeButton';
 import useAuthStore from '../stores/auth';
+import CommentErrorBoundary from '../components/CommentErrorBoundary';
+import DiscussionThread from '../components/DiscussionThread';
 
 function getSessionInt(key, fallback) {
   try {
@@ -432,21 +434,6 @@ export default function CompoundDetail() {
               var memSave = (price * 0.2).toFixed(2);
               var extraSave = (price * 0.1).toFixed(2);
               
-  // --- Stage 104: Recursive threading ---
-  const buildTree104 = (flatPosts) => {
-    const map = {};
-    const roots = [];
-    (flatPosts || []).forEach(p => { map[p.id] = { ...p, children: [] }; });
-    (flatPosts || []).forEach(p => {
-      if (p.parent_id && map[p.parent_id]) {
-        map[p.parent_id].children.push(map[p.id]);
-      } else {
-        roots.push(map[p.id]);
-      }
-    });
-    return roots;
-  };
-  const postTree104 = typeof threadPosts !== 'undefined' ? buildTree104(threadPosts) : [];
 
 return (
                 <div className="mt-3 space-y-2">
@@ -627,7 +614,6 @@ return (
               </div>
             ) : threadPosts.length > 0 ? (
               <div className="flex flex-col gap-1.5 mb-4">
-                {postTree104.map(function(post) {
                   return (
                     <div key={post.id} className={"prohp-card px-4 py-3 " + (post.is_best_answer ? "border-l-2 border-l-emerald-500/50 bg-emerald-500/[0.03] " : "") + (post.parent_id ? "ml-8 border-l-2 border-l-slate-800/50" : "")}>
                       <div className="flex items-start gap-3">
