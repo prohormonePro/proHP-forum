@@ -9,15 +9,34 @@ export default function GrepGateCTA() {
 
   async function handleStartHere() {
     // Not logged in → preserve original behavior
-    if (!accessToken) return nav("/compounds");
+    if (!accessToken) {
+      // Not logged in: use lead checkout (no auth required)
+      setLoading(true);
+      try {
+        const res = await fetch("/api/stripe/create-lead-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ return_path: window.location.pathname }),
+        });
+        if (!res.ok) throw new Error("Checkout failed");
+        const data = await res.json();
+        window.location.href = data.url;
+      } catch (e) {
+        console.error("Lead checkout failed:", e);
+        setLoading(false);
+      }
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
+        body: JSON.stringify({ return_path: window.location.pathname }),
       });
 
       if (!res.ok) {

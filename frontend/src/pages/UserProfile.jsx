@@ -143,7 +143,7 @@ export default function UserProfile() {
                       to={`/t/${post.thread_id}`}
                       className="text-prohp-400 hover:text-prohp-300 text-sm"
                     >
-                      View Thread â†’
+                      View Thread →
                     </Link>
                     <p className="text-slate-500 text-sm">
                       {new Date(post.created_at).toLocaleDateString()}

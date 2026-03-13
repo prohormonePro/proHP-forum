@@ -37,6 +37,7 @@ export default function UpgradeButton({
         method: 'POST',
         headers,
         credentials: 'include',
+        body: JSON.stringify({ return_path: window.location.pathname }),
       });
 
       if (!res.ok) {

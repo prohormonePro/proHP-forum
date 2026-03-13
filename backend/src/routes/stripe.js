@@ -43,7 +43,7 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
       mode: 'subscription',
       line_items: [{ price: PRICE_ID, quantity: 1 }],
       success_url: `${process.env.FRONTEND_URL}/welcome?upgraded=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/join`,
+      cancel_url: `${process.env.FRONTEND_URL}${req.body.return_path || '/join'}`,
       metadata: { userId: String(userId) },
       client_reference_id: String(userId),
     });
@@ -106,7 +106,7 @@ router.post('/create-lead-checkout', async (req, res) => {
       mode: 'subscription',
       line_items: [{ price: PRICE_ID, quantity: 1 }],
       success_url: `${process.env.FRONTEND_URL}/claim-account?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/compounds`,
+      cancel_url: `${process.env.FRONTEND_URL}${req.body.return_path || '/compounds'}`,
       metadata: { lead_checkout: 'true' },
       client_reference_id: customer.id,
     });
