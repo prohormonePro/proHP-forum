@@ -238,6 +238,24 @@ export default function Home() {
         </div>
       </div>
 
+
+      {/* ── Travis Image Placeholder ── */}
+      <div className="prohp-card p-5 mb-8">
+        <div className="w-full max-w-md mx-auto aspect-[4/5] rounded-xl border-2 border-dashed border-[var(--border-subtle)] flex items-center justify-center bg-[var(--surface-elevated)]/40">
+          <p className="text-xs text-[var(--text-muted)] italic">Travis image placeholder</p>
+        </div>
+      </div>
+
+      {/* ── About Travis ── */}
+      <div className="prohp-card p-5 mb-8">
+        <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">About Travis</h3>
+        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+          I built ProHormonePro to cut through hype and give people straight answers. Real-world context,
+          real risk discussion, real receipts. The goal here is simple: make this the place where people
+          can learn, verify, and make better decisions without getting sold fantasy.
+        </p>
+      </div>
+
       {/* ── Consultation CTA ── */}
       <div className="prohp-card p-5 mb-8">
         <div className="flex items-start justify-between">
@@ -268,20 +286,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── Founding Member Banner ── */}
-      {!user && (
-        <div className="rounded-xl p-5 mb-8 border border-amber-500/15 bg-amber-500/[0.04]">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="tier-badge tier-founding">Founding Member</span>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] mb-3">
-            First 1,000 members get a permanent Founding Member badge. No gimmick. You showed up before anyone else did.
-          </p>
-          <Link to="/register" className="prohp-btn-primary text-xs">
-            Claim Your Spot
-          </Link>
-        </div>
-      )}
+
     </div>
   );
 }

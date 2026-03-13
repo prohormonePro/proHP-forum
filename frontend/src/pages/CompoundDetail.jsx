@@ -674,8 +674,9 @@ export default function CompoundDetail() {
               </form>
               ) : gate_state === "lead" ? (
               <div className="border-t border-white/[0.04] pt-4 text-center">
-                <p className="text-xs text-slate-400 mb-3">Join Inner Circle to join the discussion.</p>
-                <UpgradeButton variant="primary" className="!w-auto !px-5 !py-2.5 !text-xs !rounded-lg !shadow-none">Join Inner Circle</UpgradeButton>
+                <p className="text-xs text-slate-400">
+                  <a href="/login" className="text-prohp-400 hover:text-prohp-300">Log in</a> to join the conversation.
+                </p>
               </div>
             ) : (
               <div className="border-t border-white/[0.04] pt-4 text-center">
