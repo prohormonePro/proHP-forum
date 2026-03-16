@@ -762,7 +762,7 @@ export default function CompoundDetail() {
               Community Intel
             </h3>
 
-            {user && user.tier === 'inner_circle' ? (
+            {user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (
               <div>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                   <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
