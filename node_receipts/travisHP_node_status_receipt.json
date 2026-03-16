@@ -1,0 +1,21 @@
+{
+  "utc": "2026-03-15T07:31:37.922501+00:00",
+  "host": "TRAVISHP",
+  "user": "Travis",
+  "trio": {
+    "stage_manifest.json": "6937c3cbe429cbc9",
+    "SOVEREIGN_MEMORY.md": "a0321ae8757b0496",
+    "ORGANISM_VOICE_CODEX.md": "321a050666d348ab"
+  },
+  "runtime": {
+    "operator_console.py": true,
+    "telegram_bridge.py": true,
+    "delivery_gate.py": true,
+    "bot_reentry_gate.py": true,
+    "honest_seal.py": true,
+    "surface_verifier.py": true
+  },
+  "manifest_total": 580,
+  "manifest_sealed": 563,
+  "anchor": "E3592DC3"
+}

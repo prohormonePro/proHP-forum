@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const stripeWebhookHandler = require('./handlers/webhooksStripe');
 const cookieParser = require('cookie-parser');
+const communityComments = require('./routes/communityComments');
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
@@ -77,6 +78,7 @@ app.use('/api/stripe', require('./routes/stripe'));
 app.use('/api/claim-account', require('./routes/claim'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/leads', require('./routes/leads'));
+app.use('/api/community-comments', communityComments);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });

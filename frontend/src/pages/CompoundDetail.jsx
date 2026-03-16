@@ -45,6 +45,30 @@ function extractYouTubeId(input) {
 function YouTubeEmbed({ videoId, title, className }) {
   if (!videoId) return null;
   var src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=0&autoplay=0&playsinline=1';
+
+// === STAGE_764: Community Intel State ===
+  const [communityStats, setCommunityStats] = useState(null);
+  const [communityComments, setCommunityComments] = useState([]);
+  const [communityLoading, setCommunityLoading] = useState(false);
+
+  useEffect(() => {
+    if (!compound?.name) return;
+    const apiBase = import.meta.env.VITE_API_URL || '';
+    const encoded = encodeURIComponent(compound.name);
+    setCommunityLoading(true);
+    Promise.all([
+      fetch(`${apiBase}/api/community-comments/stats?compound=${encoded}`).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(`${apiBase}/api/community-comments?compound=${encoded}&limit=5&sort=likes`).then(r => r.ok ? r.json() : null).catch(() => null),
+    ])
+      .then(([stats, comments]) => {
+        setCommunityStats(stats);
+        setCommunityComments(comments?.comments || []);
+      })
+      .catch(() => { setCommunityStats(null); setCommunityComments([]); })
+      .finally(() => setCommunityLoading(false));
+  }, [compound?.name]);
+  // === END STAGE_764 State ===
+
   return (
     <iframe
       src={src}
@@ -732,8 +756,61 @@ export default function CompoundDetail() {
           </div>
         </div>
       ) : null}
+
+{/* === STAGE_764: Community Intel Section === */}
+        {communityStats && communityStats.total > 0 && (
+          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(34,157,216,.06)', borderRadius: '12px', border: '1px solid rgba(34,157,216,.15)' }}>
+            <h3 style={{ color: '#229DD8', fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span role="img" aria-label="intel">&#x1F4E1;</span> Community Intel
+            </h3>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Total Reports</span>
+                <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.total}</div>
+              </div>
+              {communityStats.side_effects > 0 && (
+                <div style={{ background: 'rgba(255,107,107,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                  <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Side Effect Reports</span>
+                  <div style={{ color: '#ff6b6b', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.side_effects}</div>
+                </div>
+              )}
+            </div>
+            {communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                {communityStats.top_side_effects.slice(0, 6).map((se, i) => (
+                  <span key={i} style={{ background: 'rgba(255,107,107,.1)', border: '1px solid rgba(255,107,107,.25)', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.75rem', color: '#ff6b6b' }}>
+                    {se.effect} ({se.count})
+                  </span>
+                ))}
+              </div>
+            )}
+            {communityComments.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h4 style={{ color: '#ccc', fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Top Community Comments</h4>
+                {communityComments.map((c, i) => (
+                  <div key={c.id || i} style={{ background: 'rgba(255,255,255,.04)', borderRadius: '8px', padding: '0.75rem 1rem', border: '1px solid rgba(255,255,255,.06)' }}>
+                    <div style={{ color: '#e0e0e0', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: '0.5rem' }}>
+                      {c.content && c.content.length > 280 ? c.content.slice(0, 280) + '\u2026' : c.content}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: '#888' }}>
+                      <span>{c.author || 'Anonymous'}</span>
+                      <span style={{ color: '#229DD8' }}>{'\uD83D\uDC4D'} {c.likes || 0}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <a
+              href={`/community-intel?compound=${encodeURIComponent(compound.name)}`}
+              style={{ display: 'inline-block', marginTop: '1rem', color: '#229DD8', fontSize: '0.875rem', textDecoration: 'none', borderBottom: '1px solid rgba(34,157,216,.3)' }}
+            >
+              View all community data &rarr;
+            </a>
+          </div>
+        )}
+        {/* === END STAGE_764 === */}
+
     </div>
   );
 }
- 
-

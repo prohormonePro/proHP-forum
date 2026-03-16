@@ -18,6 +18,7 @@ import UserProfile from './pages/UserProfile';
 
 import ClaimAccountPage from "./pages/ClaimAccountPage";
 import SearchPage from "./pages/SearchPage";
+import CommunityIntel from "./pages/CommunityIntel";
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const loading = useAuthStore((s) => s.loading);
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/u/:username" element={<UserProfile />} />
+            <Route path="/community-intel" element={<CommunityIntel />} />
           </Routes>
         </main>
       </div>
