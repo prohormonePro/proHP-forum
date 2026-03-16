@@ -13,3 +13,4 @@ frontend/src/App.jsx.bak_*
 *.v3.bak
 *.v4.bak
 frontend/public/videos/welcome_placeholder.mp4
+runtime_bundle/\nnode_receipts/

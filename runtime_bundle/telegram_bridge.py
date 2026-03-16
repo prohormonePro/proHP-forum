@@ -28,7 +28,7 @@ BASE = Path(__file__).parent
 PY = str(BASE / ".venv" / "Scripts" / "python.exe")
 sys.path.insert(0, str(BASE))
 
-BOT_TOKEN = os.environ.get("SOVEREIGN_TELEGRAM_TOKEN", "8368903740:AAEfeD25MWWibzyv8zQJbBTtZEm7ERvo4Ns")
+BOT_TOKEN = os.environ.get("SOVEREIGN_TELEGRAM_TOKEN", "8368903740:AAGACSeBpK3LNuTYAKXJ96obnUzOeeSt7ks")
 API_BASE = "https://api.telegram.org/bot" + BOT_TOKEN
 
 OPERATOR_CHAT_FILE = BASE / "state" / "telegram_chat_id.json"
