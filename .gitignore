@@ -1,16 +1,18 @@
-node_modules/
-dist/
-build/
-.next/
-*.log
-.env
 
-# ignore local backups
-frontend/src/App.jsx.bak_*
 *.bak
-*.bak_*
 *.bak.*
+*.bak_*
+build/
+dist/
+.env
+frontend/public/videos/welcome_placeholder.mp4
+frontend/src/App.jsx.bak_*
+# ignore local backups
+*.log
+.next/
+node_modules/
+node_receipts/
+runtime_bundle/
+runtime_bundle/\nnode_receipts/
 *.v3.bak
 *.v4.bak
-frontend/public/videos/welcome_placeholder.mp4
-runtime_bundle/\nnode_receipts/
