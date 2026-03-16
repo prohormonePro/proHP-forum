@@ -810,16 +810,38 @@ export default function CompoundDetail() {
                 </a>
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '1rem' }}>
-                <p style={{ color: '#ccc', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                  {communityStats.total} community reports available for this compound
-                </p>
-                <p style={{ color: '#888', fontSize: '0.8rem', marginBottom: '1rem' }}>
-                  Side effect clustering, dosage patterns, and real user notes
-                </p>
-                <a href="/register" className="prohp-btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1.5rem', borderRadius: '8px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                  Unlock Community Intel
-                </a>
+              <div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                  <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                    <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Total Reports</span>
+                    <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.total}</div>
+                  </div>
+                  {communityStats.with_side_effects > 0 && (
+                    <div style={{ background: 'rgba(255,107,107,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                      <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Side Effect Reports</span>
+                      <div style={{ color: '#ff6b6b', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.with_side_effects}</div>
+                    </div>
+                  )}
+                </div>
+                {communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    {communityStats.top_side_effects.slice(0, 6).map(function(se, i) {
+                      return (
+                        <span key={i} style={{ background: 'rgba(255,107,107,.1)', border: '1px solid rgba(255,107,107,.25)', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.75rem', color: '#ff6b6b' }}>
+                          {se.effect} ({se.count})
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                <div style={{ textAlign: 'center', padding: '1rem 0', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+                  <p style={{ color: '#ccc', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                    Unlock full community intel: top comments, dosage patterns, and detailed reports
+                  </p>
+                  <a href="/register" className="prohp-btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1.5rem', borderRadius: '8px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                    Unlock Community Intel
+                  </a>
+                </div>
               </div>
             )}
           </div>
