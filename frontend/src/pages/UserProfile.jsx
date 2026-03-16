@@ -49,6 +49,19 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="profile-container">
+
+        {/* === STAGE_832: Community Intel CTA === */}
+        <a href="/community-intel" style={{ display: 'block', marginBottom: '1.5rem', padding: '1.25rem', background: 'linear-gradient(135deg, rgba(34,157,216,.12) 0%, rgba(34,157,216,.04) 100%)', borderRadius: '12px', border: '1px solid rgba(34,157,216,.2)', textDecoration: 'none', transition: 'border-color 0.2s' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ color: '#229DD8', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.25rem' }}>Community Intel</div>
+              <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Real user reports, side effects, and dosage data from 12,500+ YouTube comments</div>
+            </div>
+            <div style={{ color: '#229DD8', fontSize: '1.2rem', flexShrink: 0, marginLeft: '1rem' }}>&#8594;</div>
+          </div>
+        </a>
+        {/* === END STAGE_832 === */}
+
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-prohp-500"></div>
         </div>
