@@ -68,7 +68,7 @@ export default function CompoundsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search compounds..."
+            placeholder="Search"
             className="prohp-input pl-9 text-xs"
           />
         </div>
@@ -79,9 +79,9 @@ export default function CompoundsPage() {
           className="bg-slate-900/60 border border-white/[0.06] rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-prohp-500/30 transition-colors"
           aria-label="Sort compounds"
         >
-          <option value="">Name (A-Z)</option>
+          <option value="">Most Popular</option>
           <option value="risk">Risk (High first)</option>
-          <option value="category">Category</option>
+          <option value="name_asc">Name (A-Z)</option>
         </select>
 
         <div className="flex gap-1.5 flex-wrap">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import BackButton from '../components/layout/BackButton';
 
 const API = import.meta.env.VITE_API_URL || '';
 
@@ -37,6 +38,7 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-md mx-auto py-16 px-4 animate-fade-in">
+        <BackButton />
       <div className="text-center mb-8">
         <h1 className="text-2xl font-extrabold text-white mb-3">Join the Inner Circle.</h1>
         <p className="text-sm text-slate-400 leading-relaxed">

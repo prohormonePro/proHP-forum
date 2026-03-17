@@ -35,7 +35,7 @@ export default function CyclesPage() {
           <Dumbbell className="w-10 h-10 text-[#229DD8] mx-auto mb-4" />
           <div className="text-white text-lg font-bold mb-2">Cycle Logs are Inner Circle only</div>
           <p className="text-sm text-slate-400 mb-5">Real protocols. Real bloodwork. Real mistakes. Posted by dudes actually under the bar.</p>
-          <a href="/compounds" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] px-6 py-3 text-sm font-bold text-white hover:from-[#1b87bc] hover:to-[#166e9c] transition-all shadow-lg">
+          <a href="/register" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] px-6 py-3 text-sm font-bold text-white hover:from-[#1b87bc] hover:to-[#166e9c] transition-all shadow-lg">
             Join Inner Circle
           </a>
         </div>

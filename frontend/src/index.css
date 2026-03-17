@@ -1,0 +1,6 @@
+
+/* Mobile overflow fix — Stage 1049 */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}

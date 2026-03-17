@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/auth';
+import BackButton from '../components/layout/BackButton';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -26,6 +27,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto py-16 px-4 animate-fade-in">
+        <BackButton />
       <div className="text-center mb-10">
         <h1 className="text-2xl font-extrabold text-white mb-2">Welcome back.</h1>
         <p className="text-sm text-slate-400">Log in to access your Inner Circle membership, threads, and cycle logs.</p>

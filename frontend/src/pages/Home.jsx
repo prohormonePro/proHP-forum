@@ -234,7 +234,7 @@ export default function Home() {
           <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">
             "Just got my bloodwork back after following your RAD protocol. Numbers are exactly where you said they'd be. Respect."
           </p>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1">&mdash; Dylan M., YouTube comment</p>
+          <p className="text-[10px] text-[var(--text-muted)] mt-1">- Dylan M., YouTube comment</p>
         </div>
       </div>
 
@@ -261,7 +261,7 @@ export default function Home() {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
-              1-on-1 consultation &mdash; $500
+              1-on-1 consultation - $500
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-md">
               Your stack, your goals, your questions. Real talk, no script, receipts included.
@@ -290,3 +290,24 @@ export default function Home() {
     </div>
   );
 }
+
+      {/* ── Cycle Logs + Inner Circle CTA — Stage 1055 ── */}
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="prohp-card p-6">
+          <h2 className="text-lg font-bold mb-2">Community Cycle Logs</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-4">
+            Real protocols. Real bloodwork. Real results. See what the community is running and how they respond.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a href="/r/cycle-logs" className="prohp-btn-primary text-sm text-center">
+              Browse Cycle Logs
+            </a>
+            <a href="/register" className="prohp-btn-ghost text-sm text-center">
+              Join Inner Circle for Full Access
+            </a>
+          </div>
+          <p className="text-[10px] text-[var(--text-secondary)] mt-3">
+            Inner Circle members get full cycle log access, compound deep dives, and community intel.
+          </p>
+        </div>
+      </div>
