@@ -121,15 +121,15 @@ export default function CompoundsPage() {
             </div>
           ))
         ) : (
-          data?.compounds?.map((c) => (
+          data?.compounds?.filter(c => c.slug !== '1-andro' && c.slug !== '4-andro').map((c) => (
             <Link
               key={c.slug}
               to={`/compounds/${c.slug}`}
               className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group"
             >
               <div className="flex items-center gap-3">
-                      {c.image_url ? (
-                        <img src={c.image_url} alt={c.name} className="w-10 h-10 object-contain rounded flex-shrink-0" />
+                      {true ? (
+                        <img src={`/images/compounds/${c.slug}.png`} alt={c.name} className="w-10 h-10 object-contain rounded flex-shrink-0" onError={(e) => { e.target.style.display = "none"; e.target.nextSibling && (e.target.nextSibling.style.display = "flex"); }} />
                       ) : (
                         <div className="w-10 h-10 rounded bg-[var(--prohp-blue)]/10 flex items-center justify-center text-[var(--prohp-blue)] text-xs font-bold flex-shrink-0">
                           {c.name?.charAt(0) || '?'}

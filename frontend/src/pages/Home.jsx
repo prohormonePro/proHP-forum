@@ -198,22 +198,33 @@ export default function Home() {
         })}
       </div>
 
-      {/* ── Cycle Logs + Inner Circle CTA — Stage 1055 ── */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="prohp-card p-6">
-          <h2 className="text-lg font-bold mb-2">Community Cycle Logs</h2>
-          <p className="text-sm text-[var(--text-secondary)] mb-4">
+      {/* ── Cycle Logs + Inner Circle CTA ── */}
+      <div className="max-w-5xl mx-auto px-4 pt-2 pb-6">
+        <div className="prohp-card p-5">
+          <h2 className="text-base font-bold mb-1.5">Community Cycle Logs</h2>
+          <p className="text-xs text-[var(--text-secondary)] mb-4">
             Real protocols. Real bloodwork. Real results. See what the community is running and how they respond.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a href="/r/cycle-logs" className="prohp-btn-primary text-sm text-center">
-              Browse Cycle Logs
-            </a>
-            <a href="/register" className="prohp-btn-ghost text-sm text-center">
-              Join Inner Circle for Full Access
-            </a>
-          </div>
-          <p className="text-[10px] text-[var(--text-secondary)] mt-3">
+          {user && (user.tier === 'inner_circle' || user.tier === 'admin') ? (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link to="/cycles" className="prohp-btn-primary text-xs text-center">
+                Log Your Cycle
+              </Link>
+              <Link to="/r/lab" className="prohp-btn-ghost text-xs text-center">
+                Browse Community Cycle Logs
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link to="/r/lab" className="prohp-btn-primary text-xs text-center">
+                Browse Community Cycle Logs
+              </Link>
+              <Link to="/register" className="prohp-btn-ghost text-xs text-center">
+                Join Inner Circle for Full Access
+              </Link>
+            </div>
+          )}
+          <p className="text-[9px] text-[var(--text-secondary)] mt-2.5">
             Inner Circle members get full cycle log access, compound deep dives, and community intel.
           </p>
         </div>
