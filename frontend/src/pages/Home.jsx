@@ -69,6 +69,27 @@ export default function Home() {
 
       <WelcomeVideo />
 
+      {/* ── Encyclopedia Teaser ── */}
+      <Link
+        to="/compounds"
+        className="prohp-card flex items-center justify-between p-4 mb-8 group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[var(--prohp-glow)] flex items-center justify-center">
+            <FlaskConical className="w-4 h-4 text-[var(--prohp-blue)]" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--prohp-blue)] transition-colors">
+              Compound Encyclopedia
+            </div>
+            <div className="text-[11px] text-[var(--text-muted)]">
+              52 compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
+            </div>
+          </div>
+        </div>
+        <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--prohp-blue)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+      </Link>
+
       {/* ── Room Cards ── */}
       <div className="stagger space-y-3 mb-8">
         {rooms.map((room) => {
@@ -177,27 +198,26 @@ export default function Home() {
         })}
       </div>
 
-      {/* ── Encyclopedia Teaser ── */}
-      <Link
-        to="/compounds"
-        className="prohp-card flex items-center justify-between p-4 mb-8 group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[var(--prohp-glow)] flex items-center justify-center">
-            <FlaskConical className="w-4 h-4 text-[var(--prohp-blue)]" />
+      {/* ── Cycle Logs + Inner Circle CTA — Stage 1055 ── */}
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="prohp-card p-6">
+          <h2 className="text-lg font-bold mb-2">Community Cycle Logs</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-4">
+            Real protocols. Real bloodwork. Real results. See what the community is running and how they respond.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a href="/r/cycle-logs" className="prohp-btn-primary text-sm text-center">
+              Browse Cycle Logs
+            </a>
+            <a href="/register" className="prohp-btn-ghost text-sm text-center">
+              Join Inner Circle for Full Access
+            </a>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--prohp-blue)] transition-colors">
-              Compound Encyclopedia
-            </div>
-            <div className="text-[11px] text-[var(--text-muted)]">
-              52 compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
-            </div>
-          </div>
+          <p className="text-[10px] text-[var(--text-secondary)] mt-3">
+            Inner Circle members get full cycle log access, compound deep dives, and community intel.
+          </p>
         </div>
-        <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--prohp-blue)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-      </Link>
-
+      </div>
       {/* ── Social Proof Strip ── */}
       <div className="prohp-card p-5 mb-4">
         <div className="flex items-center gap-2 mb-4">
@@ -290,24 +310,3 @@ export default function Home() {
     </div>
   );
 }
-
-      {/* ── Cycle Logs + Inner Circle CTA — Stage 1055 ── */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="prohp-card p-6">
-          <h2 className="text-lg font-bold mb-2">Community Cycle Logs</h2>
-          <p className="text-sm text-[var(--text-secondary)] mb-4">
-            Real protocols. Real bloodwork. Real results. See what the community is running and how they respond.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a href="/r/cycle-logs" className="prohp-btn-primary text-sm text-center">
-              Browse Cycle Logs
-            </a>
-            <a href="/register" className="prohp-btn-ghost text-sm text-center">
-              Join Inner Circle for Full Access
-            </a>
-          </div>
-          <p className="text-[10px] text-[var(--text-secondary)] mt-3">
-            Inner Circle members get full cycle log access, compound deep dives, and community intel.
-          </p>
-        </div>
-      </div>
