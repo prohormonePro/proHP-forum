@@ -69,7 +69,7 @@ export default function CompoundsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="prohp-input pl-9 text-xs"
+            className="prohp-input pl-9 text-sm w-full sm:w-64"
           />
         </div>
 
@@ -128,7 +128,14 @@ export default function CompoundsPage() {
               className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
+                      {c.image_url ? (
+                        <img src={c.image_url} alt={c.name} className="w-10 h-10 object-contain rounded flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded bg-[var(--prohp-blue)]/10 flex items-center justify-center text-[var(--prohp-blue)] text-xs font-bold flex-shrink-0">
+                          {c.name?.charAt(0) || '?'}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-bold text-slate-200 group-hover:text-prohp-400 transition-colors">
                       {c.name}
