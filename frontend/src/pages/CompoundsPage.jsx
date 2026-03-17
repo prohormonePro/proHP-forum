@@ -69,14 +69,14 @@ export default function CompoundsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="prohp-input pl-9 text-sm w-full sm:w-64"
+            className="prohp-input pl-8 text-xs h-8 w-full sm:w-48 rounded-md"
           />
         </div>
 
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="bg-slate-900/60 border border-white/[0.06] rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-prohp-500/30 transition-colors"
+          className="bg-slate-900/60 border border-white/[0.06] rounded-md px-2.5 py-1 h-8 text-xs text-slate-300 focus:outline-none focus:border-prohp-500/30 transition-colors"
           aria-label="Sort compounds"
         >
           <option value="">Most Popular</option>
