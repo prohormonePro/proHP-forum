@@ -848,6 +848,16 @@ export default function CompoundDetail() {
         )}
         {/* === END STAGE_764 === */}
 
+
+          {/* Back to top — Stage 1123 */}
+          <div className="flex justify-center mt-8 mb-4">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-xs text-slate-500 hover:text-[var(--prohp-blue)] transition-colors"
+            >
+              ↑ Back to top
+            </button>
+          </div>
     </div>
   );
 }
