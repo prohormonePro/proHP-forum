@@ -43,7 +43,8 @@ export default function CompoundsPage() {
       if (sort === 'risk') { params.push('sort=risk'); params.push('dir=desc'); }
       else if (sort === 'category') { params.push('sort=category'); params.push('dir=asc'); }
       const qs = params.length ? '?' + params.join('&') : '';
-      return api.get('/api/compounds' + qs);
+      const sep = qs ? '&' : '?';
+            return api.get('/api/compounds' + qs + sep + 'limit=100');
     },
   });
 
