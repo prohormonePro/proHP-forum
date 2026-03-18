@@ -122,7 +122,7 @@ export default function CompoundsPage() {
             </div>
           ))
         ) : (
-          data?.compounds?.filter(c => c.slug !== '1-andro' && c.slug !== '4-andro').map((c) => (
+          data?.compounds?.map((c) => (
             <Link
               key={c.slug}
               to={`/compounds/${c.slug}`}
