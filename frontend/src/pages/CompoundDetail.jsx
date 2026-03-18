@@ -440,6 +440,31 @@ export default function CompoundDetail() {
               <ExternalLink className="w-3.5 h-3.5" />
               Get it here to support the encyclopedia. Appreciate you, brother.
             </a>
+
+      {/* Discount Code Display -- Stage 1308 / PL-017 */}
+      {compound.public_discount_code && compound.product_url && (
+        <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-4 mt-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-emerald-400 text-sm font-semibold">Discount Available</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <code className="bg-slate-800 text-emerald-300 px-3 py-1.5 rounded-lg text-sm font-mono font-bold tracking-wider">
+              {gate_state === 'member' && compound.member_discount_code ? compound.member_discount_code : compound.public_discount_code}
+            </code>
+            <span className="text-slate-400 text-sm">
+              {gate_state === 'member' && compound.member_discount_code
+                ? 'Exclusive Inner Circle discount'
+                : 'Use at checkout'}
+            </span>
+          </div>
+          {compound.product_price && (
+            <p className="text-xs text-slate-500 mt-2">
+              Apply to your order at the product page.
+              {gate_state !== 'member' && ' Inner Circle members get exclusive deeper discounts.'}
+            </p>
+          )}
+        </div>
+      )}
             {compound.product_price && Number(compound.product_price) > 0 ? (function() {
               var price = parseFloat(compound.product_price);
               var pubCode = compound.public_discount_code;
