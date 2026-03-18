@@ -205,9 +205,9 @@ function GateCTA({ gate_state, upgrade_cta }) {
         </a>
       ) : (
         <div className="mt-2">
-          <UpgradeButton variant="primary" className="!w-auto !px-5 !py-2.5 !text-xs !rounded-lg !shadow-none">
+          <Link to="/register" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-5 py-2.5 text-xs font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">
             Unlock Inner Circle
-          </UpgradeButton>
+          </Link>
         </div>
       )}
     </div>
@@ -592,9 +592,9 @@ export default function CompoundDetail() {
             <span className="text-sm font-bold text-slate-100">Want the full breakdown?</span>
           </div>
           <p className="text-[13px] text-slate-400 mb-4">Dosing protocols, stacking logic, PCT, bloodwork markers.</p>
-          <UpgradeButton variant="primary" className="!w-auto !px-5 !py-2.5 !text-xs !rounded-lg !shadow-none">
+          <Link to="/register" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-5 py-2.5 text-xs font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">
             Unlock Inner Circle
-          </UpgradeButton>
+          </Link>
         </div>
       ) : null}
 
