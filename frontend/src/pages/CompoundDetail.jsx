@@ -6,7 +6,7 @@ import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import GrepGate from '../components/GrepGate';
 import BackButton from '../components/layout/BackButton';
-import UpgradeButton from '../components/UpgradeButton';
+// import UpgradeButton removed - all CTAs now use Link to /register
 import useAuthStore from '../stores/auth';
 
 function getSessionInt(key, fallback) {
