@@ -156,9 +156,9 @@ function JoinModal({ open, onClose }) {
             <span className="text-3xl font-extrabold text-slate-100">$19</span>
             <span className="text-sm text-slate-400 ml-1">/ month</span>
           </div>
-          <button className="prohp-btn-primary w-full text-center block py-3 text-sm font-bold opacity-50 cursor-not-allowed" onClick={function(e) { e.preventDefault(); }}>
+          <Link to="/register" className="prohp-btn-primary w-full text-center block py-3 text-sm font-bold">
             Join Inner Circle
-          </button>
+          </Link>
           <div className="mt-3 text-center text-[11px] text-slate-500">
             First 1,000 members get a permanent Founding Member badge.
           </div>
