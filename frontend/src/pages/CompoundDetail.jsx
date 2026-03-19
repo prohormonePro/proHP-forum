@@ -438,7 +438,7 @@ export default function CompoundDetail() {
               className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              Get it here to support the encyclopedia. Appreciate you, brother.
+              Support the encyclopedia
             </a>
 
       {/* Discount Code Display -- Stage 1308 / PL-017 */}
@@ -456,6 +456,7 @@ export default function CompoundDetail() {
                 ? 'Exclusive Inner Circle discount'
                 : 'Use at checkout'}
             </span>
+            <a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 transition-colors shadow-md"><ExternalLink className="w-3.5 h-3.5" />Buy Now</a>
           </div>
           {compound.product_price && (
             <p className="text-xs text-slate-500 mt-2">
