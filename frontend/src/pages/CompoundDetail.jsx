@@ -383,7 +383,7 @@ export default function CompoundDetail() {
             <div className="flex flex-wrap items-center gap-2">
               {compound.risk_tier ? (
                 <span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>
-                  Risk: {compound.risk_tier}
+                  Risk: {compound.risk_tier ? compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase() : ''}
                 </span>
               ) : null}
               {compound.category ? (
