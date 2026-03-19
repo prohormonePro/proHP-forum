@@ -63,7 +63,7 @@ export default function CompoundsPage() {
         <p className="text-sm text-slate-400">86+ compounds. Every one reviewed. Proof over hype.</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 overflow-x-auto">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
@@ -85,7 +85,7 @@ export default function CompoundsPage() {
           <option value="name_asc">Name (A-Z)</option>
         </select>
 
-        <div className="flex gap-1.5 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap overflow-x-auto pb-1">
           <button
             onClick={() => setCategory('')}
             className={`text-[10px] font-bold px-2.5 py-1.5 rounded-md transition-colors ${
