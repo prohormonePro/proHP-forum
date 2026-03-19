@@ -740,6 +740,77 @@ export default function CompoundDetail() {
       
 <div className="prohp-card p-6 mb-4">
         <div className="flex items-center justify-between mb-3">
+                {communityComments.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <h4 style={{ color: '#ccc', fontSize: '0.8rem', fontWeight: 500, margin: 0 }}>Top Community Comments</h4>
+                    {communityComments.map(function(c, i) {
+                      return (
+                        <div key={c.id || i} style={{ background: 'rgba(255,255,255,.04)', borderRadius: '8px', padding: '0.75rem 1rem', border: '1px solid rgba(255,255,255,.06)' }}>
+                          <div style={{ color: '#e0e0e0', fontSize: '0.8rem', lineHeight: 1.5, marginBottom: '0.5rem' }}>
+                            {c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#888' }}>
+                            <span>{c.author || 'Anonymous'}</span>
+                            <span style={{ color: '#229DD8' }}>{c.likes || 0} likes</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <a href={'/community-intel?compound=' + encodeURIComponent(compound.name)} style={{ display: 'inline-block', marginTop: '1rem', color: '#229DD8', fontSize: '0.8rem', textDecoration: 'none' }}>
+                  View all community data
+                </a>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                  <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                    <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Total Reports</span>
+                    <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.total}</div>
+                  </div>
+                  {communityStats.with_side_effects > 0 && (
+                    <div style={{ background: 'rgba(255,107,107,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                      <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Side Effect Reports</span>
+                      <div style={{ color: '#ff6b6b', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.with_side_effects}</div>
+                    </div>
+                  )}
+                </div>
+                {communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    {communityStats.top_side_effects.slice(0, 6).map(function(se, i) {
+                      return (
+                        <span key={i} style={{ background: 'rgba(255,107,107,.1)', border: '1px solid rgba(255,107,107,.25)', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.75rem', color: '#ff6b6b' }}>
+                          {se.effect} ({se.count})
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                <div style={{ textAlign: 'center', padding: '1rem 0', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+                  <p style={{ color: '#ccc', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                    Unlock full community intel: top comments, dosage patterns, and detailed reports
+                  </p>
+                  <a href="/register" className="prohp-btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1.5rem', borderRadius: '8px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                    Unlock Community Intel
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {/* === END STAGE_764 === */}
+
+
+          {/* Back to top — Stage 1123 */}
+          <div className="flex justify-center mt-8 mb-4">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-xs text-slate-500 hover:text-[var(--prohp-blue)] transition-colors"
+            >
+              ↑ Back to top
+            </button>
+          </div>
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-slate-400" />
             <div className="text-sm font-semibold text-slate-200">Related Threads</div>
@@ -813,77 +884,6 @@ export default function CompoundDetail() {
                     })}
                   </div>
                 )}
-                {communityComments.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <h4 style={{ color: '#ccc', fontSize: '0.8rem', fontWeight: 500, margin: 0 }}>Top Community Comments</h4>
-                    {communityComments.map(function(c, i) {
-                      return (
-                        <div key={c.id || i} style={{ background: 'rgba(255,255,255,.04)', borderRadius: '8px', padding: '0.75rem 1rem', border: '1px solid rgba(255,255,255,.06)' }}>
-                          <div style={{ color: '#e0e0e0', fontSize: '0.8rem', lineHeight: 1.5, marginBottom: '0.5rem' }}>
-                            {c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#888' }}>
-                            <span>{c.author || 'Anonymous'}</span>
-                            <span style={{ color: '#229DD8' }}>{c.likes || 0} likes</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-                <a href={'/community-intel?compound=' + encodeURIComponent(compound.name)} style={{ display: 'inline-block', marginTop: '1rem', color: '#229DD8', fontSize: '0.8rem', textDecoration: 'none' }}>
-                  View all community data
-                </a>
-              </div>
-            ) : (
-              <div>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                  <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
-                    <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Total Reports</span>
-                    <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.total}</div>
-                  </div>
-                  {communityStats.with_side_effects > 0 && (
-                    <div style={{ background: 'rgba(255,107,107,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
-                      <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Side Effect Reports</span>
-                      <div style={{ color: '#ff6b6b', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.with_side_effects}</div>
-                    </div>
-                  )}
-                </div>
-                {communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                    {communityStats.top_side_effects.slice(0, 6).map(function(se, i) {
-                      return (
-                        <span key={i} style={{ background: 'rgba(255,107,107,.1)', border: '1px solid rgba(255,107,107,.25)', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.75rem', color: '#ff6b6b' }}>
-                          {se.effect} ({se.count})
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-                <div style={{ textAlign: 'center', padding: '1rem 0', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-                  <p style={{ color: '#ccc', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-                    Unlock full community intel: top comments, dosage patterns, and detailed reports
-                  </p>
-                  <a href="/register" className="prohp-btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1.5rem', borderRadius: '8px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                    Unlock Community Intel
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        {/* === END STAGE_764 === */}
-
-
-          {/* Back to top — Stage 1123 */}
-          <div className="flex justify-center mt-8 mb-4">
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="text-xs text-slate-500 hover:text-[var(--prohp-blue)] transition-colors"
-            >
-              ↑ Back to top
-            </button>
-          </div>
     </div>
   );
 }
