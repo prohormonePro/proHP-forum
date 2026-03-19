@@ -94,7 +94,7 @@ export default function UserProfile() {
     <div className="profile-container">
       <BackButton fallback="/" />
       {/* Profile Header */}
-      <div className="bg-slate-900 rounded-lg p-6 mb-6">
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-slate-900 rounded-lg p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
 
         {/* === STAGE_832: Community Intel CTA === */}
