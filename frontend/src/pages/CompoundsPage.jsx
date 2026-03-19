@@ -130,7 +130,7 @@ export default function CompoundsPage() {
             >
               <div className="flex items-center gap-3">
                       {true ? (
-                        <img src={`/images/compounds/${c.slug}.png`} alt={c.name} className="w-14 h-14 object-contain rounded-lg flex-shrink-0" onError={(e) => { e.target.style.display = "none"; e.target.nextSibling && (e.target.nextSibling.style.display = "flex"); }} />
+                        <img src={`/images/compounds/${c.slug}.png`} alt={c.name} className="object-cover w-14 h-14 object-contain rounded-lg flex-shrink-0" onError={(e) => { e.target.style.display = "none"; e.target.nextSibling && (e.target.nextSibling.style.display = "flex"); }} />
                       ) : (
                         <div className="w-14 h-14 rounded-lg bg-[var(--prohp-blue)]/10 flex items-center justify-center text-[var(--prohp-blue)] text-xs font-bold flex-shrink-0">
                           {c.name?.charAt(0) || '?'}
