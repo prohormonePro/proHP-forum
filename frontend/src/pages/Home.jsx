@@ -59,7 +59,8 @@ export default function Home() {
               <Link to="/compounds" className="prohp-btn-primary text-sm">
                 Start Here
               </Link>
-              <Link to="/r/general" className="prohp-btn-ghost text-sm">
+              <Link to="/r/general" className="prohp-btn-ghost text-sm inline-flex items-center gap-2">
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
                 Browse the Forum
               </Link>
             </div>
