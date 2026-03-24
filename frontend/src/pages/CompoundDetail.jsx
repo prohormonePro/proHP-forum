@@ -441,31 +441,93 @@ export default function CompoundDetail() {
               Support the encyclopedia
             </a>
 
-            {/* Discount Code Display -- Stage 1308 / PL-017 */}
-      {compound.public_discount_code && compound.product_url && (
-        <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-4 mt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-emerald-400 text-sm font-semibold">Discount Available</span>
+      {/* Discount Code Display -- Stage 2079: vendor-aware logic */}
+      {compound.public_discount_code && compound.product_url && (function() {
+        var isSoma = (compound.product_url || '').toLowerCase().indexOf('somachem') !== -1;
+
+        if (isSoma) {
+          /* SOMA CHEMS: TRAVISD = 20% flat, same for all tiers, no price math, no IC upsell */
+          return (
+            <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-4 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-emerald-400 text-sm font-semibold">Discount Available</span>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <code className="bg-slate-800 text-emerald-300 px-3 py-1.5 rounded-lg text-sm font-mono font-bold tracking-wider">
+                  TRAVISD
+                </code>
+                <span className="text-slate-400 text-sm">20% off &mdash; use at checkout</span>
+                <a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 transition-colors shadow-md">
+                  <ExternalLink className="w-3.5 h-3.5" />Buy Now
+                </a>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">Apply to your order at the product page.</p>
+            </div>
+          );
+        }
+
+        /* TOTAL NUTRITION (default): TRAVISD 10% public, rotating PROHPMM/YY 20% IC */
+        var now = new Date();
+        var mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+        var yy = String(now.getUTCFullYear()).slice(-2);
+        var activeMemCode = 'PROHP' + mm + yy;
+        var price = compound.product_price ? parseFloat(compound.product_price) : 0;
+        var hasPrice = price > 0;
+
+        return (
+          <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-4 mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-emerald-400 text-sm font-semibold">Discount Available</span>
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <code className="bg-slate-800 text-emerald-300 px-3 py-1.5 rounded-lg text-sm font-mono font-bold tracking-wider">
+                {gate_state === 'member' ? activeMemCode : 'TRAVISD'}
+              </code>
+              <span className="text-slate-400 text-sm">
+                {gate_state === 'member' ? '20% off \u2014 Inner Circle exclusive' : '10% off \u2014 use at checkout'}
+              </span>
+              <a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 transition-colors shadow-md">
+                <ExternalLink className="w-3.5 h-3.5" />Buy Now
+              </a>
+            </div>
+            {hasPrice ? (
+              <div className="mt-3 space-y-2">
+                {gate_state !== 'member' ? (
+                  <div className="text-xs text-slate-400">
+                    <span className="text-slate-300 font-semibold">{"Use code TRAVISD"}</span>{" for 10% off. "}
+                    {"Retail $" + price.toFixed(2)}{" \u2192 "}
+                    <span className="text-emerald-400 font-semibold">{"$" + (price * 0.9).toFixed(2)}</span>
+                    {" (save $" + (price * 0.1).toFixed(2) + ")"}
+                  </div>
+                ) : (
+                  <div className="text-xs bg-[rgba(34,157,216,0.06)] border border-[rgba(34,157,216,0.15)] rounded-lg p-3">
+                    <div className="text-slate-300 font-semibold mb-1">{"Your Inner Circle code " + activeMemCode + " saves 20%"}</div>
+                    <div className="text-slate-400">
+                      {"Retail $" + price.toFixed(2)}{" \u2192 "}
+                      <span className="text-[#229DD8] font-semibold">{"$" + (price * 0.8).toFixed(2)}</span>
+                      {" (save $" + (price * 0.2).toFixed(2) + ")"}
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-1">
+                      {"That is $" + (price * 0.1).toFixed(2) + " more per bottle than the public code. Your membership pays for itself."}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 mt-2">
+                {"Apply to your order at the product page."}
+              </p>
+            )}
+            {gate_state !== 'member' && (
+              <div className="mt-2 text-[11px] text-slate-500">
+                Inner Circle members get 20% off.
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-3">
-            <code className="bg-slate-800 text-emerald-300 px-3 py-1.5 rounded-lg text-sm font-mono font-bold tracking-wider">
-              {gate_state === 'member' && compound.member_discount_code ? compound.member_discount_code : compound.public_discount_code}
-            </code>
-            <span className="text-slate-400 text-sm">
-              {gate_state === 'member' && compound.member_discount_code
-                ? 'Exclusive Inner Circle discount'
-                : 'Use at checkout'}
-            </span>
-            <a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 transition-colors shadow-md"><ExternalLink className="w-3.5 h-3.5" />Buy Now</a>
+        );
+      })()}
           </div>
-          {compound.product_price && (
-            <p className="text-xs text-slate-500 mt-2">
-              Apply to your order at the product page.
-              {gate_state !== 'member' && ' Inner Circle members get exclusive deeper discounts.'}
-            </p>
-          )}
-        </div>
-      )}        ) : null}
+        ) : null}
 
         {compound.benefits ? (
           <div className="text-sm text-slate-400 mt-3">
@@ -699,6 +761,79 @@ export default function CompoundDetail() {
       
 <div className="prohp-card p-6 mb-4">
         <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-slate-400" />
+            <div className="text-sm font-semibold text-slate-200">Related Threads</div>
+          </div>
+          <Link to="/rooms/library" className="text-xs text-slate-500 hover:text-prohp-400 transition-colors">Library</Link>
+        </div>
+        {relatedThreads.length ? (
+          <div className="flex flex-col gap-2">
+            {relatedThreads.map(function(t) {
+              return (
+                <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
+                  <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
+                  <div className="mt-1 text-[11px] text-slate-500">{t.reply_count} replies</div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-sm text-slate-400">No related threads yet.</div>
+        )}
+      </div>
+
+      {relatedCycles.length ? (
+        <div className="prohp-card p-6">
+          <div className="text-sm font-semibold text-slate-200 mb-3">Related Cycles</div>
+          <div className="flex flex-col gap-2">
+            {relatedCycles.map(function(c) {
+              return (
+                <div key={c.id} className="prohp-card p-3">
+                  <div className="text-[13px] font-semibold text-slate-200">{c.title}</div>
+                  <div className="mt-1 text-[12px] text-slate-400">
+                    {c.status ? 'Status: ' + c.status : ''}
+                    {c.duration_weeks ? ' \u2014 ' + c.duration_weeks + ' weeks' : ''}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+        {/* === STAGE_764: Community Intel Section === */}
+        {communityStats && communityStats.total > 0 && (
+          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(34,157,216,.06)', borderRadius: '12px', border: '1px solid rgba(34,157,216,.15)' }}>
+            <h3 style={{ color: '#229DD8', fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              Community Intel
+            </h3>
+
+            {user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (
+              <div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                  <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                    <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Total Reports</span>
+                    <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.total}</div>
+                  </div>
+                  {communityStats.with_side_effects > 0 && (
+                    <div style={{ background: 'rgba(255,107,107,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
+                      <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Side Effect Reports</span>
+                      <div style={{ color: '#ff6b6b', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.with_side_effects}</div>
+                    </div>
+                  )}
+                </div>
+                {communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    {communityStats.top_side_effects.slice(0, 6).map(function(se, i) {
+                      return (
+                        <span key={i} style={{ background: 'rgba(255,107,107,.1)', border: '1px solid rgba(255,107,107,.25)', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.75rem', color: '#ff6b6b' }}>
+                          {se.effect} ({se.count})
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
                 {communityComments.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <h4 style={{ color: '#ccc', fontSize: '0.8rem', fontWeight: 500, margin: 0 }}>Top Community Comments</h4>
@@ -770,79 +905,6 @@ export default function CompoundDetail() {
               ↑ Back to top
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-slate-400" />
-            <div className="text-sm font-semibold text-slate-200">Related Threads</div>
-          </div>
-          <Link to="/rooms/library" className="text-xs text-slate-500 hover:text-prohp-400 transition-colors">Library</Link>
-        </div>
-        {relatedThreads.length ? (
-          <div className="flex flex-col gap-2">
-            {relatedThreads.map(function(t) {
-              return (
-                <Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors">
-                  <div className="text-[13px] font-semibold text-slate-200">{t.title}</div>
-                  <div className="mt-1 text-[11px] text-slate-500">{t.reply_count} replies</div>
-                </Link>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-sm text-slate-400">No related threads yet.</div>
-        )}
-      </div>
-
-      {relatedCycles.length ? (
-        <div className="prohp-card p-6">
-          <div className="text-sm font-semibold text-slate-200 mb-3">Related Cycles</div>
-          <div className="flex flex-col gap-2">
-            {relatedCycles.map(function(c) {
-              return (
-                <div key={c.id} className="prohp-card p-3">
-                  <div className="text-[13px] font-semibold text-slate-200">{c.title}</div>
-                  <div className="mt-1 text-[12px] text-slate-400">
-                    {c.status ? 'Status: ' + c.status : ''}
-                    {c.duration_weeks ? ' â”¬â•– ' + c.duration_weeks + ' weeks' : ''}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
-        {/* === STAGE_764: Community Intel Section === */}
-        {communityStats && communityStats.total > 0 && (
-          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(34,157,216,.06)', borderRadius: '12px', border: '1px solid rgba(34,157,216,.15)' }}>
-            <h3 style={{ color: '#229DD8', fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              Community Intel
-            </h3>
-
-            {user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (
-              <div>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                  <div style={{ background: 'rgba(34,157,216,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
-                    <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Total Reports</span>
-                    <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.total}</div>
-                  </div>
-                  {communityStats.with_side_effects > 0 && (
-                    <div style={{ background: 'rgba(255,107,107,.12)', borderRadius: '8px', padding: '0.5rem 1rem' }}>
-                      <span style={{ color: '#aaa', fontSize: '0.75rem' }}>Side Effect Reports</span>
-                      <div style={{ color: '#ff6b6b', fontSize: '1.25rem', fontWeight: 600 }}>{communityStats.with_side_effects}</div>
-                    </div>
-                  )}
-                </div>
-                {communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                    {communityStats.top_side_effects.slice(0, 6).map(function(se, i) {
-                      return (
-                        <span key={i} style={{ background: 'rgba(255,107,107,.1)', border: '1px solid rgba(255,107,107,.25)', borderRadius: '999px', padding: '0.25rem 0.75rem', fontSize: '0.75rem', color: '#ff6b6b' }}>
-                          {se.effect} ({se.count})
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
     </div>
   );
 }
