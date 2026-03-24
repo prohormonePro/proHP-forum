@@ -441,7 +441,7 @@ export default function CompoundDetail() {
               Support the encyclopedia
             </a>
 
-      {/* Discount Code Display -- Stage 1308 / PL-017 */}
+            {/* Discount Code Display -- Stage 1308 / PL-017 */}
       {compound.public_discount_code && compound.product_url && (
         <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-4 mt-4">
           <div className="flex items-center gap-2 mb-2">
@@ -465,48 +465,7 @@ export default function CompoundDetail() {
             </p>
           )}
         </div>
-      )}
-            {compound.product_price && Number(compound.product_price) > 0 ? (function() {
-              var price = parseFloat(compound.product_price);
-              var pubCode = compound.public_discount_code;
-              var memCode = compound.member_discount_code;
-              var now = new Date();
-              var mm = String(now.getUTCMonth() + 1).padStart(2, '0');
-              var yy = String(now.getUTCFullYear()).slice(-2);
-              var activeMemCode = 'PROHP' + mm + yy;
-              var pubPrice = (price * 0.9).toFixed(2);
-              var pubSave = (price * 0.1).toFixed(2);
-              var memPrice = (price * 0.8).toFixed(2);
-              var memSave = (price * 0.2).toFixed(2);
-              var extraSave = (price * 0.1).toFixed(2);
-              return (
-                <div className="mt-3 space-y-2">
-                  {pubCode ? (
-                    <div className="text-xs text-slate-400">
-                      <span className="text-slate-300 font-semibold">{"Use code " + pubCode}</span>{" for 10% off. "}
-                      {"Retail $" + price.toFixed(2)}{" → "}
-                      <span className="text-emerald-400 font-semibold">{"$" + pubPrice}</span>
-                      {" (save $" + pubSave + ")"}
-                    </div>
-                  ) : null}
-                  {gate_state === "member" ? (
-                    <div className="text-xs bg-[rgba(34,157,216,0.06)] border border-[rgba(34,157,216,0.15)] rounded-lg p-3">
-                      <div className="text-slate-300 font-semibold mb-1">{"Your Inner Circle code " + activeMemCode + " saves 20%"}</div>
-                      <div className="text-slate-400">
-                        {"Retail $" + price.toFixed(2)}{" → "}
-                        <span className="text-[#229DD8] font-semibold">{"$" + memPrice}</span>
-                        {" (save $" + memSave + ")"}
-                      </div>
-                      <div className="text-[11px] text-slate-500 mt-1">
-                        {"That is $" + extraSave + " more per bottle than the public code. Your membership pays for itself."}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })() : null}
-          </div>
-        ) : null}
+      )}        ) : null}
 
         {compound.benefits ? (
           <div className="text-sm text-slate-400 mt-3">
