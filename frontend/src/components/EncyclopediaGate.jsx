@@ -144,7 +144,7 @@ export default function EncyclopediaGate({ onUnlock }) {
       <div className="relative z-10 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 py-12 lg:py-16">
         <form
           onSubmit={handleSubmit}
-          className="bg-[rgba(15,23,42,0.55)] md:bg-[rgba(15,23,42,0.75)] backdrop-blur-2xl backdrop-brightness-[0.65] md:backdrop-brightness-[0.4] border border-white/[0.08] ring-1 ring-inset ring-white/[0.05] rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
+          className="bg-[rgba(15,23,42,0.40)] md:bg-[rgba(15,23,42,0.75)] backdrop-blur-2xl backdrop-brightness-[0.85] md:backdrop-brightness-[0.4] border border-white/[0.08] ring-1 ring-inset ring-white/[0.05] rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
         >
           <div className="mb-5 text-center">
             <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.9)" }}>I searched{'\u2026'} found nothing.</div>
