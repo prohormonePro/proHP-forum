@@ -100,7 +100,7 @@ export default function UserProfile() {
             {TIER_NAMES[user.tier] || user.tier}
           </span>
         </div>
-        {(new Date(user.created_at) < new Date(" 2026-04-01)) && (
+        {(new Date(user.created_at) < new Date("2026-04-01")) && (
           <span
             style={{
               display: 'inline-block',
