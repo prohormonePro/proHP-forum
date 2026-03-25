@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const API = import.meta.env.VITE_API_URL || '';
 
@@ -15,6 +15,7 @@ export default function EncyclopediaGate({ onUnlock }) {
   const [isDesktop, setIsDesktop] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -95,10 +96,11 @@ export default function EncyclopediaGate({ onUnlock }) {
           muted
           loop
           playsInline
+          ref={videoRef}
           preload="auto"
           className={`absolute inset-0 w-full h-full object-cover object-[center_32%] transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
           style={{ filter: 'brightness(0.52) contrast(1.06) saturate(0.92)' }}
-          onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.25; }}
+          onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.10; }}
           onError={() => { setVideoFailed(true); setVideoReady(false); }}
           onStalled={() => setTimeout(() => { if (!videoReady) { setVideoFailed(true); } }, 8000)}
         >
