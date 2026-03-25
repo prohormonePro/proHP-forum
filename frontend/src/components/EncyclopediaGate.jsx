@@ -100,7 +100,7 @@ export default function EncyclopediaGate({ onUnlock }) {
           preload="auto"
           className={`absolute inset-0 w-full h-full object-cover object-[center_32%] transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
           style={{ filter: 'brightness(0.42) contrast(1.18) saturate(0.75) blur(1.5px) hue-rotate(15deg)' }}
-          onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.15; }}
+          onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.07; }}
           onError={() => { setVideoFailed(true); setVideoReady(false); }}
           onStalled={() => setTimeout(() => { if (!videoReady) { setVideoFailed(true); } }, 8000)}
         >
@@ -134,7 +134,7 @@ export default function EncyclopediaGate({ onUnlock }) {
           }}
         />
         <style>{`@keyframes grain { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-2%,-3%)} 30%{transform:translate(3%,1%)} 50%{transform:translate(-1%,3%)} 70%{transform:translate(2%,-2%)} 90%{transform:translate(-3%,1%)} }`}</style>
-        {/* LAYER 6: Corner vignette — pulls eye to center */}
+        {/* LAYER 6: Corner vignette â€” pulls eye to center */}
         <div className="absolute inset-0 pointer-events-none"
           style={{
             background: 'radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, rgba(0,0,0,.55) 100%)',
@@ -143,10 +143,10 @@ export default function EncyclopediaGate({ onUnlock }) {
       )}
 
       {/* FORM */}
-      <div className="relative z-10 max-w-md w-full mx-auto px-4 py-12">
+      <div className="relative z-10 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 py-12 lg:py-16">
         <form
           onSubmit={handleSubmit}
-          className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
+          className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
         >
           <div className="mb-5 text-center">
             <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]">I searched{'\u2026'} found nothing.</div>
