@@ -66,7 +66,7 @@ export default function EncyclopediaGate({ onUnlock }) {
     }
   }
 
-  const showVideo = isDesktop && !videoFailed;
+  const showVideo = !videoFailed;
   const videoPlaying = showVideo && videoReady;
 
   return (
@@ -108,7 +108,7 @@ export default function EncyclopediaGate({ onUnlock }) {
         </video>
       )}
       {/* STAGE_100: Fallback when video fails on desktop */}
-      {videoFailed && isDesktop && (
+      {videoFailed && (
         <div className="absolute inset-0" style={{
           background: 'radial-gradient(ellipse at 50% 35%, rgba(30,30,40,1) 0%, rgba(10,10,15,1) 70%)',
         }} />
