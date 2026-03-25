@@ -35,7 +35,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen overflow-x-hidden max-w-[100vw] bg-slate-950">
       <Navbar />
       <div className="flex max-w-7xl mx-auto">
         <Sidebar />
