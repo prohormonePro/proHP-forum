@@ -117,7 +117,7 @@ export default function EncyclopediaGate({ onUnlock }) {
       {/* LAYER 4: Cinematic overlays ONLY when video is actually visible */}
       {videoPlaying && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/28 to-black/85" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-black/60" />
           <div
             className="absolute inset-0"
             style={{
