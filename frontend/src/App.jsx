@@ -20,6 +20,7 @@ import ClaimAccountPage from "./pages/ClaimAccountPage";
 import SearchPage from "./pages/SearchPage";
 import CommunityIntel from "./pages/CommunityIntel";
 import ConsultationPage from './pages/ConsultationPage';
+import ScrollToTopButton from './components/ScrollToTopButton';
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const loading = useAuthStore((s) => s.loading);
