@@ -100,7 +100,30 @@ export default function UserProfile() {
             {TIER_NAMES[user.tier] || user.tier}
           </span>
         </div>
-        <p className="text-slate-400 text-sm">Joined: {joinDate}</p>
+        {(user.is_founding_member || user.id <= 1000) && (
+          <span
+            style={{
+              display: 'inline-block',
+              marginTop: '0.35rem',
+              marginBottom: '0.25rem',
+              padding: '0.15rem 0.6rem',
+              fontSize: '0.7rem',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              color: '#229DD8',
+              border: '1px solid rgba(34,157,216,.35)',
+              borderRadius: '9999px',
+              background: 'rgba(34,157,216,.08)',
+              textTransform: 'uppercase',
+            }}
+          >
+            Founding Member
+          </span>
+        )}
+        <p className="text-slate-400 text-sm" style={{ marginTop: '0.25rem' }}>Joined: {joinDate}</p>
+        <p style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '0.35rem' }}>
+          We search for proof, above the hype.
+        </p>
       </div>
 
       {/* Community Intel CTA — compact, full-width below header */}
