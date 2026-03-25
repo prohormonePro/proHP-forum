@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import BackButton from '../components/layout/BackButton';
 import './UserProfile.css';
@@ -49,8 +49,6 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="profile-container">
-
-
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-prohp-500"></div>
         </div>
@@ -93,29 +91,34 @@ export default function UserProfile() {
   return (
     <div className="profile-container">
       <BackButton fallback="/" />
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-slate-900 rounded-lg p-6 mb-6">
-        <div className="flex items-center gap-4 mb-4">
 
-        {/* === STAGE_832: Community Intel CTA === */}
-        <a href="/community-intel" className="prohp-card" style={{ display: 'block', marginBottom: '1.5rem', padding: '1.25rem', textDecoration: 'none', transition: 'border-color 0.2s', borderColor: 'rgba(34,157,216,.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ color: '#229DD8', fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.25rem' }}>Community Intel</div>
-              <div style={{ color: '#aaa', fontSize: '0.8rem' }}>Real user reports, side effects, and dosage data from 12,500+ YouTube comments</div>
-            </div>
-            <div style={{ color: '#229DD8', fontSize: '1.2rem', flexShrink: 0, marginLeft: '1rem' }}>&#8594;</div>
-          </div>
-        </a>
-        {/* === END STAGE_832 === */}
-
+      {/* Profile Header — username + badge centered */}
+      <div className="bg-slate-900 rounded-lg p-6 mb-4 text-center">
+        <div className="flex items-center justify-center gap-3 mb-2 flex-wrap">
           <h1 className="text-3xl font-bold text-slate-200">{user.username}</h1>
           <span className={`tier-badge tier-${user.tier}`}>
             {TIER_NAMES[user.tier] || user.tier}
           </span>
         </div>
-        <p className="text-slate-400">Joined: {joinDate}</p>
+        <p className="text-slate-400 text-sm">Joined: {joinDate}</p>
       </div>
+
+      {/* Community Intel CTA — compact, full-width below header */}
+      <Link
+        to="/community-intel"
+        className="prohp-card block mb-6 no-underline"
+        style={{ padding: '0.75rem 1rem', textDecoration: 'none', borderColor: 'rgba(34,157,216,.2)', transition: 'border-color 0.2s' }}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: '#229DD8', fontSize: '0.85rem', fontWeight: 600 }}>Community Intel</div>
+            <div className="text-slate-500 text-xs" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Real user reports &amp; dosage data from 12,500+ YouTube comments
+            </div>
+          </div>
+          <div style={{ color: '#229DD8', fontSize: '1.1rem', flexShrink: 0 }}>&#8594;</div>
+        </div>
+      </Link>
 
       {/* Recent Activity */}
       <div className="grid md:grid-cols-2 gap-6">
