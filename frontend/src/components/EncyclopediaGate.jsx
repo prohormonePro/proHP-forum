@@ -124,33 +124,33 @@ export default function EncyclopediaGate({ onUnlock }) {
               background: 'radial-gradient(ellipse at 50% 42%, transparent 40%, rgba(0,0,0,.60) 100%)',
             }}
           />
+          {/* LAYER 5: Film grain texture */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+              backgroundSize: '128px 128px',
+              animation: 'grain 0.5s steps(6) infinite',
+            }}
+          />
+          <style>{`@keyframes grain { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-2%,-3%)} 30%{transform:translate(3%,1%)} 50%{transform:translate(-1%,3%)} 70%{transform:translate(2%,-2%)} 90%{transform:translate(-3%,1%)} }`}</style>
+          {/* LAYER 6: Corner vignette */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, rgba(0,0,0,.55) 100%)',
+            }}
+          />
         </>
-        {/* LAYER 5: Film grain texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            backgroundSize: '128px 128px',
-            animation: 'grain 0.5s steps(6) infinite',
-          }}
-        />
-        <style>{`@keyframes grain { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-2%,-3%)} 30%{transform:translate(3%,1%)} 50%{transform:translate(-1%,3%)} 70%{transform:translate(2%,-2%)} 90%{transform:translate(-3%,1%)} }`}</style>
-        {/* LAYER 6: Corner vignette â€” pulls eye to center */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, rgba(0,0,0,.55) 100%)',
-          }}
-        />
       )}
 
       {/* FORM */}
       <div className="relative z-10 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 py-12 lg:py-16">
         <form
           onSubmit={handleSubmit}
-          className="bg-black/55 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
+          className="bg-[rgba(15,23,42,0.75)] backdrop-blur-2xl backdrop-brightness-[0.4] border border-white/[0.08] ring-1 ring-inset ring-white/[0.05] rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
         >
           <div className="mb-5 text-center">
-            <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]">I searched{'\u2026'} found nothing.</div>
-            <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-3">So I built it.</div>
+            <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.9)" }}>I searched{'\u2026'} found nothing.</div>
+            <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-3" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>So I built it.</div>
             <div className="text-sm font-semibold text-white/80 mb-2">
               Every benefit. Every side effect. For <span className="text-white font-black">EVERY</span> prohormone.
             </div>
