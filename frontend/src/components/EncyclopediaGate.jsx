@@ -99,7 +99,7 @@ export default function EncyclopediaGate({ onUnlock }) {
           ref={videoRef}
           preload="auto"
           className={`absolute inset-0 w-full h-full object-cover object-[center_32%] transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
-          style={{ filter: 'brightness(0.42) contrast(1.18) saturate(0.75) blur(1.5px) hue-rotate(15deg)' }}
+          style={{ filter: isDesktop ? 'brightness(0.42) contrast(1.18) saturate(0.75) blur(1.5px) hue-rotate(15deg)' : 'brightness(0.70) contrast(1.10) saturate(0.80) blur(1px)' }}
           onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.07; }}
           onError={() => { setVideoFailed(true); setVideoReady(false); }}
           onStalled={() => setTimeout(() => { if (!videoReady) { setVideoFailed(true); } }, 8000)}
