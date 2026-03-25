@@ -146,7 +146,7 @@ export default function EncyclopediaGate({ onUnlock }) {
       <div className="relative z-10 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 py-12 lg:py-16">
         <form
           onSubmit={handleSubmit}
-          className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
+          className="bg-black/55 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
         >
           <div className="mb-5 text-center">
             <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]">I searched{'\u2026'} found nothing.</div>
