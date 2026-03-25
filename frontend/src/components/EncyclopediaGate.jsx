@@ -82,7 +82,7 @@ export default function EncyclopediaGate({ onUnlock }) {
 
       {/* LAYER 2: Subtle texture so mobile isn't flat */}
       <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-10"
         style={{
           background: 'radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.08) 0%, transparent 42%)',
           mixBlendMode: 'overlay',
@@ -99,7 +99,7 @@ export default function EncyclopediaGate({ onUnlock }) {
           ref={videoRef}
           preload="auto"
           className={`absolute inset-0 w-full h-full object-cover object-[center_32%] transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
-          style={{ filter: 'brightness(0.92) contrast(1.06) saturate(0.92)' }}
+          style={{ filter: 'brightness(0.42) contrast(1.18) saturate(0.75) blur(1.5px) hue-rotate(15deg)' }}
           onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.15; }}
           onError={() => { setVideoFailed(true); setVideoReady(false); }}
           onStalled={() => setTimeout(() => { if (!videoReady) { setVideoFailed(true); } }, 8000)}
@@ -117,21 +117,36 @@ export default function EncyclopediaGate({ onUnlock }) {
       {/* LAYER 4: Cinematic overlays ONLY when video is actually visible */}
       {videoPlaying && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/35 to-black/90" />
           <div
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(ellipse at 50% 42%, transparent 54%, rgba(0,0,0,.32) 100%)',
+              background: 'radial-gradient(ellipse at 50% 42%, transparent 40%, rgba(0,0,0,.60) 100%)',
             }}
           />
         </>
+        {/* LAYER 5: Film grain texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundSize: '128px 128px',
+            animation: 'grain 0.5s steps(6) infinite',
+          }}
+        />
+        <style>{`@keyframes grain { 0%,100%{transform:translate(0,0)} 10%{transform:translate(-2%,-3%)} 30%{transform:translate(3%,1%)} 50%{transform:translate(-1%,3%)} 70%{transform:translate(2%,-2%)} 90%{transform:translate(-3%,1%)} }`}</style>
+        {/* LAYER 6: Corner vignette — pulls eye to center */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, rgba(0,0,0,.55) 100%)',
+          }}
+        />
       )}
 
       {/* FORM */}
       <div className="relative z-10 max-w-md w-full mx-auto px-4 py-12">
         <form
           onSubmit={handleSubmit}
-          className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_18px_60px_rgba(0,0,0,.55)]"
+          className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
         >
           <div className="mb-5 text-center">
             <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]">I searched{'\u2026'} found nothing.</div>
@@ -156,7 +171,7 @@ export default function EncyclopediaGate({ onUnlock }) {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_3px_rgba(34,157,216,.25)] focus:bg-black/40 outline-none transition-all"
+              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_4px_rgba(34,157,216,.35)] focus:bg-black/40 outline-none transition-all"
             />
             <input
               type="text"
@@ -166,7 +181,7 @@ export default function EncyclopediaGate({ onUnlock }) {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_3px_rgba(34,157,216,.25)] focus:bg-black/40 outline-none transition-all"
+              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_4px_rgba(34,157,216,.35)] focus:bg-black/40 outline-none transition-all"
             />
           </div>
 
@@ -189,7 +204,7 @@ export default function EncyclopediaGate({ onUnlock }) {
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_3px_rgba(34,157,216,.25)] focus:bg-black/40 outline-none transition-all mb-5"
+            className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_4px_rgba(34,157,216,.35)] focus:bg-black/40 outline-none transition-all mb-5"
           />
 
           <button
