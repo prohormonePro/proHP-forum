@@ -126,7 +126,7 @@ export default function CompoundsPage() {
             <Link
               key={c.slug}
               to={`/compounds/${c.slug}`}
-              className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group w-full overflow-hidden"
+              className="prohp-card px-4 py-4 hover:bg-slate-800/40 transition-colors group w-full overflow-hidden"
             >
               <div className="flex items-center gap-3">
                       {true ? (
