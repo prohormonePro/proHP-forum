@@ -21,6 +21,7 @@ import SearchPage from "./pages/SearchPage";
 import CommunityIntel from "./pages/CommunityIntel";
 import ConsultationPage from './pages/ConsultationPage';
 import ScrollToTopButton from './components/ScrollToTopButton';
+import ScrollToTop from './components/ScrollToTop';
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const loading = useAuthStore((s) => s.loading);
@@ -38,6 +39,7 @@ export default function App() {
   return (
     <div className="min-h-screen overflow-x-hidden max-w-[100vw] bg-slate-950">
       <Navbar />
+      <ScrollToTop />
       <div className="flex max-w-7xl mx-auto">
         <Sidebar />
         <main className="flex-1 min-w-0 px-4 py-6 lg:px-8">
