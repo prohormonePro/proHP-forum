@@ -293,7 +293,7 @@ export default function Home() {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
-              1-on-1 consultation - $500
+              1-on-1 consultation - {user && (user.tier === 'inner_circle' || user.tier === 'admin') ? '$400' : '$500'}
             </h3>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-md">
               Your stack, your goals, your questions. Real talk, no script, receipts included.
