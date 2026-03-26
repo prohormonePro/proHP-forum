@@ -38,7 +38,7 @@ export default function ConsultationPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <BackButton />
 
-        <h1 className="text-2xl font-bold mt-6 mb-1">$500 1-on-1 Consultation</h1>
+        <h1 className="text-2xl font-bold mt-6 mb-1">1-on-1 Consultation</h1>
         <p className="text-base text-[var(--prohp-blue)] font-medium mb-4">
           Need real one-on-one help? Book a consult.
         </p>
