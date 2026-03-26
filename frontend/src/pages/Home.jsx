@@ -301,9 +301,12 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-2 flex-shrink-0 ml-4">
             <Link
-              to=" /consultation\n className=prohp-btn-primary text-xs\n >
- Book a Consultation
- </Link>
+            <Link
+              to="/consultation"
+              className="prohp-btn-primary text-xs"
+            >
+              Book a Consultation
+            </Link>
             <Link
               to="/r/general"
               className="text-[10px] text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors text-right"
