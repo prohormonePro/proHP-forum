@@ -126,7 +126,7 @@ export default function CompoundsPage() {
             <Link
               key={c.slug}
               to={`/compounds/${c.slug}`}
-              className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group"
+              className="prohp-card px-4 py-3 hover:bg-slate-800/40 transition-colors group w-full overflow-hidden"
             >
               <div className="flex items-center gap-3">
                       {true ? (
@@ -148,7 +148,6 @@ export default function CompoundsPage() {
                       {CATEGORY_LABELS[c.category] || c.category}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 truncate">{c.summary}</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-slate-700 group-hover:text-prohp-400 transition-colors flex-shrink-0" />
               </div>
