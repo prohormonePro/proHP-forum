@@ -138,7 +138,7 @@ export default function CompoundsPage() {
                       )}
                       <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold text-slate-200 group-hover:text-prohp-400 transition-colors">
+                    <span className="text-lg font-semibold text-slate-200 group-hover:text-prohp-400 transition-colors">
                       {c.name}
                     </span>
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded risk-${c.risk_tier}`}>
