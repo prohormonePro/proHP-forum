@@ -300,14 +300,10 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col gap-2 flex-shrink-0 ml-4">
-            <a
-              href="https://prohormonepro.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="prohp-btn-primary text-xs"
-            >
-              Book a Consultation
-            </a>
+            <Link
+              to=" /consultation\n className=prohp-btn-primary text-xs\n >
+ Book a Consultation
+ </Link>
             <Link
               to="/r/general"
               className="text-[10px] text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors text-right"
