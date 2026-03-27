@@ -142,7 +142,7 @@ export default function CompoundsPage() {
                       {c.name}
                     </span>
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded risk-${c.risk_tier}`}>
-                      {c.risk_tier}
+                      Risk: {c.risk_tier}
                     </span>
                     <span className="text-[9px] font-semibold text-slate-600 bg-slate-800/60 px-1.5 py-0.5 rounded">
                       {CATEGORY_LABELS[c.category] || c.category}
