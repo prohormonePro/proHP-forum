@@ -271,11 +271,12 @@ export default function Home() {
       </div>
 
 
-      {/* ── Travis Image Placeholder ── */}
-      <div className="prohp-card p-5 mb-8">
-        <div className="w-full max-w-md mx-auto aspect-[4/5] rounded-xl border-2 border-dashed border-[var(--border-subtle)] flex items-center justify-center bg-[var(--surface-elevated)]/40">
-          <p className="text-xs text-[var(--text-muted)] italic">Travis image placeholder</p>
-        </div>
+      {/* Travis Image */}
+      <div className=" prohp-card p-5 mb-8>
+ <div className=w-full max-w-md mx-auto rounded-xl overflow-hidden>
+ <img src=/images/travis.jpg alt=Travis Dillard className=w-full h-auto rounded-xl object-cover />
+ </div>
+ </div>
       </div>
 
       {/* ── About Travis ── */}
