@@ -272,13 +272,11 @@ export default function Home() {
 
 
       {/* Travis Image */}
-      <div className=" prohp-card p-5 mb-8>
- <div className=w-full max-w-md mx-auto rounded-xl overflow-hidden>
+      <div className="prohp-card p-5 mb-8">
+        <div className="w-full max-w-md mx-auto rounded-xl overflow-hidden">
           <img src="/images/travis.jpg" alt="Travis Dillard" className="w-full h-auto rounded-xl object-cover" />
- </div>
- </div>
+        </div>
       </div>
-
       {/* ── About Travis ── */}
       <div className="prohp-card p-5 mb-8">
         <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">About Travis</h3>
