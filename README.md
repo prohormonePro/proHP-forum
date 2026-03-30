@@ -1,62 +1,97 @@
 # ProHP Forum
 
-The compound encyclopedia that talks back.
+**The compound encyclopedia that talks back.**
 
-86+ compounds reviewed. 2M+ YouTube views. 200+ one-on-one consultations. 130+ community discussions seeded from real users. Three full consultation case files with bloodwork analysis. Risk first, receipts required.
+105 compounds. 1,919 sealed stages. 6 autonomous deploys. One operator.
 
-Built by [Travis Dillard](https://youtube.com/@ProHormonePro). Live at [forum.prohormonepro.com](https://forum.prohormonepro.com).
+Built by [Travis Dillard](https://youtube.com/@ProHormonePro) with 17 years of hormone experience, 600+ coaching clients, and an autonomous AI swarm that deploys code to production without a human touching the terminal.
 
----
-
-## Why This Exists
-
-There are maybe three supplement forums on the entire internet, and none of them are built around prohormones. The ones that exist are general fitness boards where compound discussion gets buried under protein powder reviews and workout splits. Nobody is structuring real cycle data. Nobody is tying bloodwork to dosing protocols. Nobody is making users prove what they claim.
-
-ProHP Forum is the first platform built specifically for the prohormone and SARM community with structured evidence at the center. Every compound gets a risk tier before you see a single benefit. Every compound page then layers three forms of evidence: consultation case files, structured experience reports, and community discussion. Together they create a living record of how compounds actually perform in the real world.
-
-Every cycle log requires structure: compound, dose, duration, bloodwork markers, sides, weekly updates. Every consultation case file includes real lab values and real outcomes.
-
-First commit hit GitHub on February 14, 2026. Eighteen days later: 86+ compounds, 94 discussion threads, 130 seeded posts, structured cycle logs, Stripe payments live, and an autonomous AI swarm deploying code to production.
-
-The rule is simple. Proof over hype. If you can't back it up, don't post it.
+Live at [forum.prohormonepro.com](https://forum.prohormonepro.com).
 
 ---
 
-## What's Inside
+## What This Is
 
-**Compound Encyclopedia.** 86+ compounds with risk tier, hair loss profile, mechanism breakdown, side effects, and dosing protocols. Each compound page contains three layers of evidence: consultation case files, structured experience reports, and community discussion. That stack creates a living record of how compounds actually perform in the real world.
+ProHP Forum is the first compound encyclopedia built on lived experience instead of marketing copy.
 
-**Cycle Logs.** Structured logs with weekly updates in The Lab. Not "I took this and got big." Actual compound, actual dose, actual duration, actual bloodwork, actual sides. Weekly check-ins. This is where proof lives.
+Every entry was written from video transcripts, personal bloodwork, coaching conversations, and clinical literature. Not scraped. Not generated. Substrate from a man who ran EpiAndro without a test base in 2017, got shut down for six months, and is honest enough to tell you what happened so you do not make the same mistake.
 
-**Three-State Access.** Window shoppers see the risk tier and YouTube video. Leads (email captured) see the mechanism and side effects. Inner Circle members ($19/mo) see everything: full articles, dosing protocols, nutrition labels, 20% discount codes, and the ability to post. The API enforces what you see. The frontend just renders it.
+105 compounds. Each one cross-referenced to every related compound through wiki-style hyperlinks. Click Ostarine, read about suppression, click through to Enclomiphene for PCT, discover the COMT pathway, realize the anxiety you felt on RAD-140 was pharmacology not weakness, click through to Magnesium, to P5P, to the mitochondrial stack. Every page feeds every other page. The ouroboros.
 
-**Community Discussion.** 130+ posts migrated from Common Ninja with original timestamps and reply threading. 94 compound discussion threads. Andriol alone has 34 posts with nested replies covering AI use, stacking, estrogen management, and real cycle results.
+The rule is simple: **Proof Over Hype.** If you cannot back it up, do not post it.
+
+---
+
+## The Encyclopedia
+
+105 compounds across 8 categories: SARMs, prohormones, peptides, SERMs, aromatase inhibitors, natural compounds, ancillaries, and educational entries (COMT pathway, TRT protocol).
+
+Every compound page includes:
+
+- **Risk Profile** with 6 animated bars: Suppression, Liver Stress, Hair Loss, Water Retention, Cholesterol Impact, Mood/Anxiety. Per-compound values from Travis's experience and clinical data. Suppression explained inline at moderate+. COMT mechanism explained at high+.
+- **Legal Status** badge: Active (green), Banned (red), Grey Market (yellow). Four compounds carry the Banned badge (1-AD, 1-Testosterone, Androdiol, Superdrol) from the 2004/2014 Anabolic Steroid Acts. S-23 carries Grey Market.
+- **Half-life bar** with dosage range for at-a-glance dosing.
+- **Test Base section** (suppressive compounds only): OTC options (Andriol, Sustanon 250, Brutal 4ce) hyperlinked. TRT dose adjustments when applicable. Non-negotiable.
+- **Must-Have Ancillaries** tiered by need: Daily Essentials (Vitamin D, Fish Oil, Magnesium, Zinc), On-Cycle Liver Support (TUDCA + NAC for methylated), COMT Support (Mag + Zinc + P5P + CoQ10 for DHT compounds), Estrogen Management (Arimistane for 4-Andro), PCT (Arimiplex / Enclomiphene). All hyperlinked.
+- **Mechanism deep-dive** with HTML hyperlinks rendering as clickable cross-references.
+- **Dosing protocols** from Travis's personal runs and community data.
+- **Side effects** with severity context and mitigation links.
+- **Bloodwork panel** with pre-built Ulta Lab Tests cart link (Before / During / Post-PCT).
+- **Cycle Log CTA** linking to The Lab for structured experience reports.
+- **Community Discussion** with voting, threading, and verdict badges. Capped at 5 inline with full thread link.
+- **Community Intel** aggregating YouTube comment data: total reports, side effect frequency, top community comments.
+- **Source References** (Vitamin D: 9 studies, Zinc: 6 studies, YK-11: 4 studies, Tongkat Ali: 7 studies).
+- **Discount codes**: TRAVISD 10% public, rotating PROHPMM/YY 20% Inner Circle exclusive. Vendor-aware (Soma Chems 20% flat, Total Nutrition Houston tiered).
+
+Compounds with no video show a "Not covered yet" block with a request button instead.
+
+---
+
+## What Makes It Different
+
+**The COMT Pathway.** An educational entry explaining why androgenic compounds cause anxiety. DHT slows the COMT enzyme, catecholamines accumulate, fight-or-flight activates. This thread connects RAD-140 to Dymethazine to Winstrol to Pink Magic to Superstrol-7 (where it gets neutralized through 7-Hydroxy DHEA cortisol antagonism). Nobody else documents this.
+
+**The Mitochondrial Stack.** Six compounds, six pages, six different receptor systems cross-referenced: SLU-PP-332 builds mitochondria, Methylene Blue donates electrons, MOTS-C delivers nutrients, CoQ10 carries electrons between complexes, NMN provides NAD+, Creatine recycles ATP. The full energy infrastructure.
+
+**The SARM Hierarchy.** Documented across 7 pages: Ostarine (entry) < S-4 (mid, hair safe) < LGD-4033 (mass) < RAD-140 (strength) < RAD-150 (esterified) < YK-11 (extreme, myostatin) < S-23 (ceiling, male contraceptive territory). A reader enters at any point and navigates up or down based on experience and risk tolerance.
+
+**The GLP-1 Ladder.** Three tiers: Slimgovy (natural, OTC) > Semaglutide (pharmaceutical) > Retatrutide (triple-action research peptide). Each links to the others with context.
+
+**Liver Toxicity Ranking.** Every compound in the encyclopedia ranked: Extreme (M1T, M-Sten, Epistane, Trenavar) > High (Halotestin, DMZ) > Moderate (Dymethazine, Winstrol, SARMs) > Low (Sustanon, Andriol, Chosen 1) > Minimal (Equipoise, Deca, non-methylated). Cross-referenced from the TUDCA page.
+
+**Vitamin D as Secosteroid Hormone.** Rewritten from Dr. Stasha Gominac's research (Baylor/Harvard neurology). Sleep architecture via brainstem acetylcholine production. Dose-dependent gene expression (50/500/2,000 genes at 2K/5K/10K IU). B vitamin paradox warning. 9 source references. The deepest Vitamin D page on the internet that is not behind a paywall.
+
+**Travis's Bloodwork.** Andriol: 821 to 1,298 ng/dL testosterone over 12 weeks. LH and FSH doubled (should be impossible on a prohormone). Zero liver stress. Zero lipid changes. 120 community members ran it simultaneously. TRT: 175mg sweet spot at 815 ng/dL without needing an AI. Fertility protocol: 5M to 25M sperm in 3 months. All published. All verifiable.
 
 ---
 
 ## The Access Model
 
-| Who You Are | What You See | What You Can Do |
-|---|---|---|
-| Window Shopper | Name, risk tier, category, YouTube video, product image | Browse, watch |
-| Lead | + mechanism, side effects, benefits, article preview, comments (read) | Search, read discussions |
-| Inner Circle | + full articles, dosing, nutrition labels, 20% discount, cycle logs | Post, comment, log cycles, full access |
+| Tier | What You See | What You Can Do |
+|------|-------------|-----------------|
+| **Window** | Name, risk tier, category, video, product image, discount code | Browse, watch |
+| **Lead** (email) | + mechanism, side effects, benefits, article preview, comments (read) | Search, read discussions |
+| **Inner Circle** ($19/mo) | + full articles, dosing, nutrition labels, 20% discount, cycle logs, bloodwork CTA | Post, comment, log cycles, full access |
 
-State is enforced at the API layer. Frontend renders what the API returns. No client-side gating.
+Enforced at the API layer. Frontend renders what the API returns.
 
 ---
 
-## What This Is Not
+## The Build System: SOVEREIGN_L5
 
-No sourcing in threads or comments. No "where do I buy" posts. Vetted sourcing links live in the Encyclopedia. If a compound doesn't have a link, it means no source has been vetted yet. That's intentional.
+This forum is built and deployed by an autonomous AI swarm called SOVEREIGN_L5.
 
-No reckless coaching. If someone has two years or less under the bar, the compounds will still be here when they're ready.
+1,919+ sealed stages. 6 autonomous deploys proven. 70+ Python modules. Three machines (travisHP primary, srv2 production, G14 fallback).
 
-No hype. If you can't back it up, don't post it. If a manufacturer claims something, say so. "They're calling it X" is different than "X does Y."
+The swarm takes a text message on Telegram, compiles a deployment contract, hydrates the target file via SSH recon, dispatches to Claude Opus 4.6 for code generation, runs DeepSeek observation, achieves three-node consensus, extracts patches, dry-run merges, SCPs to production, builds, verifies routes, and auto-seals the stage. Zero human intervention.
 
-This isn't a marketplace. It's a research library that happens to have a comment section.
+Key milestones: Stage 104 (first AUTO_DEPLOY), 250 (sovereignty), 486 (fully autonomous gate), 1022 (Camden owner-away mode), 2103 (FIRST autonomous deploy), 2131 (6th autonomous deploy, full Iron Man stack).
 
-Violations are removed. Repeat offenders are banned.
+The mutation engine pipeline: extract > gate > dry-run > SCP > build > verify > DEPLOYED. Safety rails: forbidden file gate (App.jsx/index.js blocked for FULL_FILE), fence restorer (DOM-wrapped lines rejoined), prose trim (builder explanatory text stripped), whitespace-tolerant anchor matching, rollback engine, failure memory.
+
+Crown commands via Telegram: mint, approve, dispatch, halt, resume, drop, status. Camden (the bot) runs the pipeline. Travis approves or overrides.
+
+Infrastructure bands A through H: all complete. The organism fixes itself (Band E), thinks before it acts (Band F), runs without its operator (Band G), and remembers every failure and success (Band H).
 
 ---
 
@@ -64,43 +99,38 @@ Violations are removed. Repeat offenders are banned.
 
 | Layer | Tech |
 |-------|------|
-| Frontend | React 18, Vite, Tailwind CSS, Zustand, TanStack Query |
-| Backend | Node.js, Express, JWT auth |
-| Database | PostgreSQL 16 |
-| Payments | Stripe Checkout + Webhooks (live) |
+| Frontend | React 18, Vite 6, Tailwind CSS, Zustand, TanStack Query |
+| Backend | Node.js, Express, JWT auth (access + refresh) |
+| Database | PostgreSQL 16 (40+ columns on compounds table) |
+| Payments | Stripe Checkout + Webhooks |
 | Hosting | Ubuntu 24.04, dedicated servers |
-| Deploy | SOVEREIGN_L5 autonomous AI swarm + surgical hotfixes, all git-tagged |
-
-**Servers:** srv2 (107.152.45.184, production) · srv1 (135.148.32.108, staging)
-
-**Process:** Backend via systemd (`prohp-forum`). Frontend is Vite static build served by nginx.
+| Deploy | SOVEREIGN_L5 autonomous swarm + manual hotfixes, all git-tagged |
+| AI Nodes | Claude Opus 4.6 (builder), DeepSeek (observer), GPT (auditor) |
 
 ---
 
-## How It Gets Built
+## Database: Compounds Table
 
-This forum is built and deployed by an autonomous AI swarm called SOVEREIGN_L5. Two Claude Opus 4.6 instances co-build and co-audit every stage. GPT 5.3 acts as the recursive forecaster, auditing the current stage while architecting the next. Three-node consensus required before anything hits production.
+40+ columns including:
 
-The swarm doesn't ask permission. It processes payloads, writes code, reviews code, deploys to srv2, and generates INTEL receipts with SHA256 integrity traces. Every deployment is git-tagged. Every stage has a receipt.
+| Field | Type | Purpose |
+|-------|------|---------|
+| slug | TEXT | URL identifier |
+| name, company, category | TEXT | Identity |
+| risk_tier | TEXT | low / moderate / high / extreme |
+| legal_status | TEXT | active / banned / grey_market |
+| summary, mechanism, benefits, side_effects, dosing | TEXT | Encyclopedia content (HTML hyperlinks) |
+| article_content, article_preview | TEXT | Gated long-form content |
+| suppression_level, liver_level, hair_loss_level, water_retention_level, cholesterol_level, mood_level | INTEGER 0-5 | Risk meter bars |
+| half_life, dosage_range | TEXT | Quick-view dosing |
+| youtube_video_id, youtube_url | TEXT | Video embed |
+| product_url, buy_link, public_discount_code | TEXT | Commerce |
+| nutrition_label_url, product_image_url | TEXT | Visual assets |
+| thread_id | UUID FK | Links to community discussion |
+| is_published | BOOLEAN | Publication gate |
 
-No manual builds. No copy-paste deploys. The builder builds the builder.
-
-```
-Payload → inbox/
-  → Watcher (650ms poll, auto-restart)
-  → Seeker (SSH discovery: DB schema, routes, file state)
-  → Generator (writes code)
-  → Critic (reviews)
-  → Judge (approves or blocks)
-  → Mechanical gates (complexity classifier, contract chain, scope allowlist)
-  → Executioner (SSH deploy via payload bridge)
-  → Swarm Applier (denylist + secret scan + atomic commit + SWARM tag + push)
-  → INTEL receipt with SHA256 trace → outbox/
-```
-
-**Safety rails:** Denylist blocks destructive commands. Secret scan prevents credential leakage. Scope allowlist restricts file access. Complexity classifier (S/M/L/X) auto-elevates on large payloads. Contract chain (C0: language, C1: file scope, C2: build safety, C3: secret exposure) validates every deploy. Write-once guards prevent duplicate INTEL sections. SWARM tags provide immutable provenance.
-
-**Surgical patch rule:** Never overwrite `index.js` or `App.jsx` in full. Two-line additions only (one import, one route mount). Full rewrites drop helmet config and middleware.
+Category constraint: sarm, prohormone, peptide, serm, ai, natural, ancillary, other.
+Risk tier constraint: low, moderate, high, extreme.
 
 ---
 
@@ -109,154 +139,104 @@ Payload → inbox/
 ```
 prohp-forum/
 ├── backend/src/
-│   ├── index.js              # Express entry point
+│   ├── index.js              # Express entry, middleware, Stripe webhook
 │   ├── config/db.js          # PostgreSQL pool
 │   ├── middleware/auth.js     # JWT auth + tier gates
 │   └── routes/
-│       ├── auth.js            # Login, register, refresh
-│       ├── claim.js           # Stripe → account creation
-│       ├── compounds.js       # Encyclopedia API (3-state gating)
-│       ├── cycles.js          # Cycle logs
-│       ├── leads.js           # Email capture
+│       ├── auth.js            # Login, register, refresh, logout
+│       ├── claim.js           # Post-Stripe account creation
+│       ├── compounds.js       # Encyclopedia API (3-state field gating)
+│       ├── cycles.js          # Cycle logs + weekly updates
+│       ├── leads.js           # Email capture + lead cookie
 │       ├── rooms.js           # Forum rooms
-│       ├── stripe.js          # Checkout + webhooks
-│       └── threads.js         # Threads + posts
+│       ├── stripe.js          # Checkout sessions + webhooks
+│       ├── threads.js         # Threads + posts + search
+│       └── users.js           # Public profiles
 ├── frontend/src/
-│   ├── App.jsx                # Router + layout
-│   ├── stores/auth.js         # Zustand auth (_setTokens, hasTier, isAdmin)
-│   ├── hooks/api.js           # API client
-│   ├── components/            # EncyclopediaGate, GrepGate, UpgradeButton, etc.
-│   └── pages/                 # CompoundsPage, CompoundDetail, ThreadPage, etc.
-├── docs/intel/stages/         # Deployment receipts
-├── _outbox/                   # INTEL mirror for swarm sync
+│   ├── App.jsx                # Router + layout + ScrollToTop
+│   ├── stores/auth.js         # Zustand (_setTokens, hasTier, isAdmin)
+│   ├── hooks/api.js           # API client with JWT refresh
+│   ├── components/
+│   │   ├── EncyclopediaGate.jsx  # Cinematic landing with responsive video
+│   │   ├── GrepGate.jsx          # Inline compound search
+│   │   ├── MarkdownRenderer.jsx  # Content rendering
+│   │   └── layout/               # BackButton, ScrollToTopButton
+│   └── pages/
+│       ├── CompoundsPage.jsx     # Encyclopedia grid with filters
+│       ├── CompoundDetail.jsx    # V3: Risk Meter, Test Base, Ancillaries
+│       ├── ThreadPage.jsx        # Discussion with voting + verdicts
+│       ├── CyclesPage.jsx        # The Lab
+│       ├── CycleLogDetail.jsx    # Individual cycle with weekly updates
+│       ├── UserProfile.jsx       # Public profile + founding badge
+│       └── SearchPage.jsx        # Full-text search
 └── README.md
 ```
-
-**Import paths (canonical):**
-
-| What | Correct | Wrong |
-|------|---------|-------|
-| DB pool | `require('../config/db')` | `require('../db')` |
-| Auth middleware | `require('../middleware/auth')` | anything else |
-| Auth store | `from '../stores/auth'` | `from './stores/auth'` |
 
 ---
 
 ## Auth Architecture
 
-**Middleware:** `authenticate` (requires JWT), `optionalAuth` (attaches user if present), `requireTier(tier)`, `requireAdmin`.
-
 **Tiers:** `free` (0), `inner_circle` (1), `admin` (2). Canonical. No aliases.
 
-**Tokens:** Access JWT in Zustand memory (15m TTL). Refresh token as SHA256 hash in DB (7d TTL). Lead cookie `prohp_lead_access` (httpOnly, JWT with `{lead: true, email}`).
+**Gate states on compound pages:** `window` (no cookie, no auth), `lead` (email captured, JWT cookie), `member` (authenticated Inner Circle or admin).
 
-**Critical:** The auth store setter is `_setTokens()`. Not `setToken`. Not `setTokens`. Not `setUser`.
+**Tokens:** Access JWT in Zustand memory (15m TTL). Refresh token as SHA256 hash in DB (7d TTL). Lead cookie `prohp_lead_access` (httpOnly JWT).
 
-**Lead self-healing:** If a lead cookie is missing `email`, backend clears it and returns `{action: 'recapture'}`. Frontend routes back to `/compounds` for re-entry.
-
----
-
-## User Flows
-
-**YouTube → Compound Page → Lead → Inner Circle.** Someone watches a video, clicks the description link, lands on the compound detail page. Sees risk tier and video (window). Enters email (lead). Reads mechanism and side effects. Sees article preview and discount comparison. Joins Inner Circle via Stripe. Claims account. Full access unlocked.
-
-**Cycle Logging.** Inner Circle member goes to The Lab (`/cycles`). Logs compound, dose, duration, description. System auto-creates a linked discussion thread. Weekly updates posted as comments. Other members reply with advice and similar experiences.
-
-**Compound Gating (STAGE_271).** API enforces field-level access. `pick()` function filters compound fields by gate state. Window gets title + video. Lead gets mechanism + side effects. Member gets everything including dosing and full articles.
+**Critical:** Auth store setter is `_setTokens()`. Column is `password_hash`, not `password`.
 
 ---
 
-## Database (Key Tables)
+## The Encyclopedia Marathon
 
-**users** — UUID PK, email (unique), username (unique, 3-20 chars), `password_hash` (bcrypt 12, column is NOT called `password`), tier, stripe_customer_id, stripe_subscription_id, subscription_status.
+March 27-30, 2026. Four days. Four batches. 105 compound SQL files deployed to production.
 
-**compounds** — UUID PK, slug, name, category, risk_tier, mechanism, side_effects, dosing, youtube_url, hair_loss fields, thread_id (FK to threads), product_url, product_price, public_discount_code, company, is_published.
+Every video transcript Travis has ever published was ingested. Every product label parsed. Every mechanism cross-referenced. Every study cited with author, year, title, and journal.
 
-**threads** — UUID PK, room_id, author_id, title, body. Linked via compounds.thread_id and cycle_logs.thread_id.
+The Frankenstein Codex V2 governs all content: direct, warm, no hype. Opens "Hey brother." Risk before recommendation. Closes "Stay swole, Travis." Forbidden words: AMAZING, guaranteed, revolutionary, synergy, biohack.
 
-**posts** — UUID PK, thread_id, author_id, body, parent_id (nested replies), score, is_best_answer (verdict).
-
-**audit_log** — columns: `action` (NOT `event_type`), `meta` (JSONB, NOT `metadata`).
-
-Column names are canonical. Swarm payloads must match exactly.
-
----
-
-## Environment
-
-```
-DATABASE_URL=postgresql://prohp:***@127.0.0.1:5432/prohp_forum
-JWT_SECRET / JWT_REFRESH_SECRET
-STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET
-STRIPE_PREMIUM_PRICE_ID / STRIPE_INNER_CIRCLE_PRICE_ID
-```
-
-Both Stripe price env vars are set. Route has a fallback chain handling both names.
+Quality seal: **E3592DC3** stamped on every deliverable.
 
 ---
 
 ## Deployment History
 
-First commit: February 14, 2026. 94+ stages sealed in 18 days.
+First commit: February 14, 2026.
 
-| Milestone | What |
-|-----------|------|
-| 215 | Forum API MVP, systemd, PostgreSQL, nginx, 50 compounds |
-| 271 | API-enforced compound detail gating (3-state) |
-| 271b + 266 | Frontend CTAs + Stripe key fix + admin reset |
-| HOTFIX_STRIPE | Stripe e2e checkout verified |
-| 031 | Cycle log creation + form |
-| 033 | Thread comments |
-| 037 | Swarm payload bridge + code-first stream selection |
-| 039 | Contract chain + complexity classifier |
-| 043 | Compound schema expansion (product URLs, prices, discounts) |
-| 045 | Compound article gating |
-| CONTENT_SEED | 130 posts, 94 threads, 42 product URLs seeded |
-| COMPOUND_THREAD_PIPE | thread_id exposed in API (d4cd417) |
+| Stage | What |
+|-------|------|
+| 104 | First AUTO_DEPLOY |
+| 250 | Sovereignty declared |
+| 486 | Fully autonomous gate |
+| 1022 | Camden owner-away mode |
+| 2097 | First proof run (manual apply) |
+| 2103 | FIRST autonomous deploy (zero human) |
+| 2131 | 6th autonomous deploy (full Iron Man stack) |
+| 2132 | DB deploy path (Camden runs SQL) |
+| 2134 | Whitespace-tolerant anchor matching |
+| 2136 | CompoundDetail V2 (reordered sections, bloodwork CTA, cycle log CTA) |
+| 2137 | CompoundDetail V3 (Risk Meter, Test Base, Ancillaries, Legal Status) |
+| DEPLOY | 105 compound SQLs to production. buy_link column. 7 schema fixes. |
 
-Full receipts in `docs/intel/stages/` and `_outbox/`.
-
-**Git chain:** `974b347` → `54b3be5` → `ddc60af` → `7800378` → `81be4d0` → `b5a59be` → `787a6de` → `f833e53` → `8183314` → `94eff80` → `d4cd417`
-
-**Public repo:** [github.com/prohormonePro/proHP-forum](https://github.com/prohormonePro/proHP-forum)
+Git HEAD: `5f38179` (fix: Mood/COMT renamed to Mood/Anxiety)
 
 ---
 
-## Roadmap
+## Roadmap (Post-Launch)
 
-Features in active development or queued for pre-launch (March 31, 2026):
-
-**YouTube Comment Search.** 7,100+ YouTube comments will be imported into a searchable database. Search by compound, video, or keyword. Five searches on the same compound triggers a banner: "Still looking? Ask the forum." Turns passive YouTube viewers into active forum participants.
-
-**Compound Page Discussion Pipe.** Each compound's discussion thread rendered inline on the compound detail page. 130+ seeded posts become visible the moment this ships. Currently in progress.
-
-**Case Files + Experience Reports.** Three full consultation case files with bloodwork analysis, and 25 structured experience reports from form submissions. Badged, searchable, Grepper-indexed. Three layers of compound evidence on every page.
-
-**Stack Builder.** AI-powered compound stacking tool built on ProHP YouTube content. Inner Circle members get 1-2 builds per month. Higher tiers get unlimited with rate limiting.
-
----
-
-## Current Backlog
-
-| # | Item | Status |
-|---|------|--------|
-| 001 | Sidebar read/write gate bug | QUEUED |
-| 002 | Kill outbound Watch links | QUEUED |
-| 003 | Dylan M quote → real screenshot | QUEUED |
-| 004 | DB credential rotation (post-launch) | QUEUED |
-| 008 | Swarm preflight gate (schema discovery) | QUEUED |
-| 013 | Founding member badge + 30% discount | QUEUED |
-| 016 | Verdict toggle (can't unselect/reassign) | QUEUED |
-| 046a | Library search + sort + pagination | SEALED |
-| 046b | Compound page discussion thread pipe | SEALED |
-| 047 | Night Goggles ASCII auditor | QUEUED |
-| — | Top nav (sidebar h3 structure) | FIXED |
-| 047 | Quote cleanup (no-op, data clean) | SEALED |
-| 049 | Broadcaster v2 | OPERATIONAL |
-| — | YouTube comment search (7,100+ comments) | PRE-LAUNCH |
-| — | Softr comment parity (Jan-Mar 2026 gap) | LAUNCH BLOCKER |
-
-Phase 2 (post-launch): IG DM import, compound intelligence graph, experience reports aggregation, personal avatars from Stripe.
+| Feature | Status |
+|---------|--------|
+| Cycle Timeline visual component | NEXT |
+| Source References UI component | NEXT |
+| ProHP Badge system (Verified / Conditional / Caution) | QUEUED |
+| Compound-specific bloodwork panels (3 Ulta Labs cart links per category) | QUEUED |
+| Wiki hyperlink pass on all pre-protocol compounds | QUEUED |
+| Product label / pill count section | QUEUED |
+| Bidirectional links (detail page to discussion page) | QUEUED |
+| Search bar overhaul (detail pages ranked first) | QUEUED |
+| Risk meter values for remaining 80+ compounds | QUEUED |
+| Restorative section (TB-500, BPC-157, Melanotan II) | QUEUED |
+| Stack Builder (AI-powered compound stacking) | PHASE 2 |
+| YouTube comment search (7,100+ comments) | PHASE 2 |
 
 ---
 
@@ -268,25 +248,43 @@ Phase 2 (post-launch): IG DM import, compound intelligence graph, experience rep
 | Glow | `rgba(34, 157, 216, 0.12)` |
 | Button Class | `prohp-btn-primary` |
 | Tagline | Proof Over Hype |
+| Quality Seal | E3592DC3 |
+| Voice Code | Frankenstein Codex V2 |
 
 ---
 
-## Related Projects
+## What This Is Not
 
-**[sovereign-seal](https://github.com/prohormonePro/sovereign-seal)** — Deterministic governance layer for autonomous AI agents. [PyPI](https://pypi.org/project/sovereign-seal/0.1.0/)
+Not a marketplace. Not a sourcing board. Not a place where manufacturers buy placement.
 
-**ProHP VSO** — VA disability claims automation at [prohpvso.com](https://prohpvso.com)
+Vetted sourcing links live in the Encyclopedia. If a compound does not have a link, no source has been vetted. That is intentional.
 
-**USPTO 63/907,226** — Sovereign Spine System, cryptographic verification architecture
+No reckless coaching. If someone has two years or less under the bar, the compounds will still be here when they are ready.
+
+No hype. If a manufacturer claims something, say so. "They are calling it X" is different than "X does Y."
+
+This is a research library that happens to have a comment section and a community that demands receipts.
 
 ---
 
 ## Security
 
-Secrets live in `.env` only. Never in payloads, docs, tickets, or commit messages.
+Secrets live in `.env` only. Never in payloads, docs, tickets, or commit messages. Forbidden file gate blocks destructive writes to App.jsx and index.js. Secret scan prevents credential leakage in commits. Denylist blocks destructive SSH commands.
 
 ---
 
-Three layers of compound evidence: consultation case files, structured experience reports, and community discussion. That's the knowledge stack nobody else has — and the reason this encyclopedia talks back.
+## Related Projects
 
-*Built by Travis Dillard · [ProHormonePro](https://youtube.com/@ProHormonePro) · Anchor: E3592DC3*
+**[sovereign-seal](https://github.com/prohormonePro/sovereign-seal)** - Deterministic governance layer for autonomous AI agents. [PyPI](https://pypi.org/project/sovereign-seal/0.1.0/)
+
+**ProHP VSO** - VA disability claims automation at [prohpvso.com](https://prohpvso.com)
+
+**USPTO 63/907,226** - Sovereign Spine System, cryptographic verification architecture
+
+---
+
+105 compounds. 1,919 stages. 6 autonomous deploys. 17 years of lived experience turned into a living encyclopedia where every page feeds every other page and every hyperlink is a doorway into understanding that did not exist before this week.
+
+Three layers of compound evidence: clinical literature, personal bloodwork, and community data. That is the knowledge stack nobody else has. That is why this encyclopedia talks back.
+
+*Built by Travis Dillard. Proof Over Hype. E3592DC3.*
