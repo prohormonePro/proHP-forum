@@ -215,7 +215,7 @@ function RiskMeter({ compound }) {
     { key: 'hair', label: 'Hair Loss', level: levels.hair },
     { key: 'water', label: 'Water Retention', level: levels.water },
     { key: 'cholesterol', label: 'Cholesterol', level: levels.cholesterol },
-    { key: 'mood', label: 'Mood / COMT', level: levels.mood, note: levels.mood >= 3 },
+    { key: 'mood', label: 'Mood / Anxiety', level: levels.mood, note: levels.mood >= 3 },
   ];
 
   return (
