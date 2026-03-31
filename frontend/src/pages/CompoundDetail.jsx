@@ -43,28 +43,53 @@ function renderHtml(text) {
   return text;
 }
 
-/* BENEFITS: Check-icon list, each benefit is a card */
+/* BENEFITS: Pills for short, 2-col cards for long */
 function BenefitsRenderer({ content }) {
   if (!content) return null;
   var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
   if (blocks.length <= 1) blocks = content.split(/\n/).filter(function(b) { return b.trim(); });
+
+  var pills = [];
+  var cards = [];
+  blocks.forEach(function(block) {
+    var text = block.trim();
+    if (!text) return;
+    if (text.length < 80 && text.indexOf('\n') === -1) {
+      pills.push(text);
+    } else {
+      cards.push(text);
+    }
+  });
+
   return (
-    <div className="space-y-2">
-      {blocks.map(function(block, i) {
-        var text = block.trim();
-        if (!text) return null;
-        return (
-          <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-emerald-900/[0.06] border border-emerald-700/10">
-            <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-            <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(text)}</div>
-          </div>
-        );
-      })}
+    <div>
+      {pills.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {pills.map(function(pill, i) {
+            return (
+              <span key={'p' + i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300">
+                <Check className="w-3 h-3" />{renderHtml(pill)}
+              </span>
+            );
+          })}
+        </div>
+      )}
+      {cards.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {cards.map(function(card, i) {
+            return (
+              <div key={'c' + i} className="p-3 rounded-lg bg-emerald-900/[0.05] border-t-2 border-emerald-500/30 border border-emerald-700/10">
+                <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(card)}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
-/* MECHANISM: Collapsible with section headers detected */
+/* MECHANISM: Magazine lede + collapsible + centered section headers */
 function MechanismRenderer({ content }) {
   var [expanded, setExpanded] = useState(false);
   if (!content) return null;
@@ -76,20 +101,30 @@ function MechanismRenderer({ content }) {
 
   return (
     <div>
-      <div className="space-y-4">
+      <div className="space-y-5">
         {visible.map(function(para, i) {
           var lines = para.split('\n');
           var firstLine = lines[0] || '';
 
-          /* Check if this paragraph starts with a section header */
           if (isHeader(firstLine)) {
             var headerText = firstLine.replace(/:$/, '').trim();
             var bodyLines = lines.slice(1).join('\n').trim();
             return (
-              <div key={i}>
-                <div className="text-xs font-bold text-prohp-400 uppercase tracking-wider mb-2 mt-2">{headerText}</div>
+              <div key={i} className="mt-2">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-prohp-400/20 to-transparent" />
+                  <span className="text-[11px] font-bold text-prohp-400 uppercase tracking-widest">{headerText}</span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-prohp-400/20 to-transparent" />
+                </div>
                 {bodyLines && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(bodyLines)}</div>}
               </div>
+            );
+          }
+
+          /* First paragraph = lede (larger text) */
+          if (i === 0) {
+            return (
+              <div key={i} className="text-[15px] text-slate-200 leading-relaxed font-medium">{renderHtml(para)}</div>
             );
           }
 
@@ -102,7 +137,7 @@ function MechanismRenderer({ content }) {
       {needsCollapse && (
         <button
           onClick={function() { setExpanded(!expanded); }}
-          className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-prohp-400 hover:text-prohp-300 transition-colors"
+          className="mt-5 w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-prohp-400 hover:text-prohp-300 transition-colors rounded-lg hover:bg-prohp-400/[0.04]"
         >
           {expanded ? (<><ChevronUp className="w-3.5 h-3.5" /> Show less</>) : (<><ChevronDown className="w-3.5 h-3.5" /> Read full mechanism ({paragraphs.length - previewCount} more sections)</>)}
         </button>
@@ -160,8 +195,9 @@ function DosingRenderer({ content }) {
         var isStack = /^(mild|moderate|hardcore|best|ultimate|cutting|bulking|joint|recomp|stacks)/i.test(firstLine);
         if (isStack) {
           return (
-            <div key={i} className="bg-slate-800/40 border border-white/5 rounded-lg p-3">
-              <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div>
+            <div key={i} className="bg-slate-800/50 border border-prohp-400/10 rounded-lg p-3">
+              <div className="text-sm text-slate-200 leading-relaxed font-medium">{renderHtml(firstLine)}</div>
+              {lines.length > 1 && <div className="text-[13px] text-slate-400 leading-relaxed mt-1">{renderHtml(lines.slice(1).join('\n'))}</div>}
             </div>
           );
         }
@@ -186,32 +222,53 @@ function DosingRenderer({ content }) {
   );
 }
 
-/* SIDE EFFECTS: Each effect in its own warning card, severe first */
+/* SIDE EFFECTS: 2-column split - severe left, mild right */
 function SideEffectsRenderer({ content }) {
   if (!content) return null;
   var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
   if (blocks.length <= 1) blocks = content.split(/\n/).filter(function(b) { return b.trim() && b.trim().length > 10; });
 
-  /* Sort severe effects first */
-  var sorted = blocks.map(function(block) {
+  var severe = [];
+  var mild = [];
+  blocks.forEach(function(block) {
     var text = block.trim();
+    if (!text) return;
     var isSevere = /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA|heart|cardiac|death/i.test(text);
-    return { text: text, severe: isSevere };
-  }).sort(function(a, b) { return (b.severe ? 1 : 0) - (a.severe ? 1 : 0); });
+    if (isSevere) { severe.push(text); } else { mild.push(text); }
+  });
 
+  function renderCard(text, isSevere, i) {
+    var borderColor = isSevere ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
+    var dotColor = isSevere ? 'bg-red-500' : 'bg-yellow-500';
+    return (
+      <div key={i} className={'flex items-start gap-2.5 p-3 rounded-lg border ' + borderColor}>
+        <div className={'w-2 h-2 rounded-full mt-1.5 shrink-0 ' + dotColor} />
+        <div className="text-[13px] text-slate-300 leading-relaxed">{renderHtml(text)}</div>
+      </div>
+    );
+  }
+
+  /* If both columns have content, 2-col on desktop */
+  if (severe.length > 0 && mild.length > 0) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Watch Closely</div>
+          {severe.map(function(t, i) { return renderCard(t, true, 's' + i); })}
+        </div>
+        <div className="space-y-2">
+          <div className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider mb-1">Be Aware</div>
+          {mild.map(function(t, i) { return renderCard(t, false, 'm' + i); })}
+        </div>
+      </div>
+    );
+  }
+
+  /* Single column fallback */
+  var all = severe.concat(mild);
   return (
     <div className="space-y-2">
-      {sorted.map(function(item, i) {
-        if (!item.text) return null;
-        var borderColor = item.severe ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
-        var dotColor = item.severe ? 'bg-red-500' : 'bg-yellow-500';
-        return (
-          <div key={i} className={'flex items-start gap-3 p-3 rounded-lg border ' + borderColor}>
-            <div className={'w-2 h-2 rounded-full mt-1.5 shrink-0 ' + dotColor} />
-            <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(item.text)}</div>
-          </div>
-        );
-      })}
+      {all.map(function(t, i) { return renderCard(t, severe.indexOf(t) !== -1, i); })}
     </div>
   );
 }
@@ -332,10 +389,10 @@ function RiskMeter({ compound }) {
   ];
 
   return (
-    <div className="prohp-card p-5 mb-4 border border-white/5">
-      <div className="flex items-center gap-2 mb-4">
-        <Shield className="w-4 h-4 text-prohp-400" />
-        <span className="text-sm font-bold text-slate-200">Risk Profile</span>
+    <div className="prohp-card p-6 mb-4 border border-prohp-400/20" style={{ boxShadow: '0 0 30px rgba(34, 157, 216, 0.08), 0 4px 20px rgba(0,0,0,0.3)' }}>
+      <div className="flex items-center gap-2 mb-5">
+        <Shield className="w-5 h-5 text-prohp-400" />
+        <span className="text-base font-bold text-slate-100">Risk Profile</span>
         {!hasDbValues && <span className="text-[9px] text-slate-600 ml-auto">Estimated from category</span>}
       </div>
       <div className="space-y-3">
@@ -412,7 +469,24 @@ function AncillariesSection({ compound }) {
 
 function HalfLifeBar({ halfLife, dosageRange }) {
   if (!halfLife && !dosageRange) return null;
-  return (<div className="prohp-card p-4 mb-4 flex flex-wrap items-center gap-4 border border-white/5">{halfLife && (<div className="flex items-center gap-2"><Clock className="w-4 h-4 text-prohp-400" /><span className="text-xs text-slate-400">Half-life:</span><span className="text-xs font-bold text-slate-200">{halfLife}</span></div>)}{dosageRange && (<div className="flex items-center gap-2"><Beaker className="w-4 h-4 text-prohp-400" /><span className="text-xs text-slate-400">Dose:</span><span className="text-xs font-bold text-slate-200">{dosageRange}</span></div>)}</div>);
+  return (
+    <div className="grid grid-cols-2 gap-3 mb-4">
+      {halfLife && (
+        <div className="prohp-card p-4 border border-white/5 text-center">
+          <Clock className="w-5 h-5 text-prohp-400 mx-auto mb-2" />
+          <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Half-life</div>
+          <div className="text-lg font-bold text-slate-100">{halfLife}</div>
+        </div>
+      )}
+      {dosageRange && (
+        <div className="prohp-card p-4 border border-white/5 text-center">
+          <Beaker className="w-5 h-5 text-prohp-400 mx-auto mb-2" />
+          <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Dose</div>
+          <div className="text-sm font-bold text-slate-100 leading-snug">{dosageRange}</div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function BloodworkCTA() {
@@ -554,18 +628,26 @@ export default function CompoundDetail() {
       {/* ═══ 3. HALF-LIFE BAR ═══ */}
       <HalfLifeBar halfLife={compound.half_life} dosageRange={compound.dosage_range} />
 
-      {/* ═══ 4. BENEFITS (card list, not wall) ═══ */}
+      {/* ═══ 4. BENEFITS ═══ */}
       {compound.benefits && (
         <div className="prohp-card p-6 mb-4">
-          <div className="text-sm font-semibold text-slate-200 mb-3">Benefits</div>
+          <div className="flex items-center gap-3 mb-4">
+            <Check className="w-4 h-4 text-emerald-400" />
+            <span className="text-sm font-bold text-slate-200">Benefits</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-emerald-700/30 to-transparent" />
+          </div>
           <BenefitsRenderer content={compound.benefits} />
         </div>
       )}
 
-      {/* ═══ 5. MECHANISM (collapsible with headers) ═══ */}
+      {/* ═══ 5. MECHANISM ═══ */}
       {compound.mechanism && (
         <div className="prohp-card p-6 mb-4">
-          <div className="text-sm font-semibold text-slate-200 mb-3">Mechanism</div>
+          <div className="flex items-center gap-3 mb-4">
+            <Beaker className="w-4 h-4 text-prohp-400" />
+            <span className="text-sm font-bold text-slate-200">Mechanism</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-prohp-400/30 to-transparent" />
+          </div>
           <MechanismRenderer content={compound.mechanism} />
         </div>
       )}
@@ -579,18 +661,26 @@ export default function CompoundDetail() {
       {/* ═══ 8. VIDEO ═══ */}
       {videoId && (<div className="prohp-card p-5 mb-4"><div className="flex items-center gap-2 mb-3"><Youtube className="w-4 h-4 text-red-500" /><span className="text-sm font-semibold text-slate-200">{compound.name} - Video Breakdown</span></div><div className="aspect-video rounded-lg overflow-hidden bg-black/30 border border-white/5"><YouTubeEmbed videoId={videoId} title={compound.name + ' breakdown'} className="w-full h-full" /></div></div>)}
 
-      {/* ═══ 9. DOSING (structured) ═══ */}
+      {/* ═══ 9. DOSING ═══ */}
       {compound.dosing && (
         <div className="prohp-card p-6 mb-4">
-          <div className="text-sm font-semibold text-slate-200 mb-3">Dosing</div>
+          <div className="flex items-center gap-3 mb-4">
+            <Clock className="w-4 h-4 text-prohp-400" />
+            <span className="text-sm font-bold text-slate-200">Dosing Protocol</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-prohp-400/30 to-transparent" />
+          </div>
           <DosingRenderer content={dosingForDisplay} />
         </div>
       )}
 
-      {/* ═══ 10. SIDE EFFECTS (cards) ═══ */}
+      {/* ═══ 10. SIDE EFFECTS ═══ */}
       {compound.side_effects && (
         <div className="prohp-card p-6 mb-4">
-          <div className="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-1"><AlertTriangle className="w-4 h-4 text-yellow-500" /> Side Effects</div>
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle className="w-4 h-4 text-red-400" />
+            <span className="text-sm font-bold text-slate-200">Side Effects</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-red-700/30 to-transparent" />
+          </div>
           <SideEffectsRenderer content={compound.side_effects} />
         </div>
       )}
