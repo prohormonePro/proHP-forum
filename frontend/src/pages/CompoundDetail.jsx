@@ -495,7 +495,7 @@ function BloodworkCTA() {
 }
 
 function CycleLogCTA({ compoundName }) {
-  return (<div className="prohp-card p-5 mb-4 border border-emerald-700/20 bg-emerald-900/[0.06]"><div className="text-sm font-bold text-slate-200 mb-2">Have you run {compoundName}?</div><p className="text-xs text-slate-400 mb-3">Log your cycle. We will give you in-the-trenches feedback.</p><div className="flex flex-wrap gap-3"><Link to="/cycles" className="prohp-btn-primary text-xs inline-flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Start a Cycle Log</Link><Link to="/rooms/lab" className="text-xs text-slate-400 hover:text-prohp-400 transition-colors inline-flex items-center gap-1">Your log appears publicly in The Lab &rarr;</Link></div></div>);
+  return (<div className="prohp-card p-5 mb-4 border border-emerald-700/20 bg-emerald-900/[0.06]"><div className="text-sm font-bold text-slate-200 mb-2">Have you run {compoundName}?</div><p className="text-xs text-slate-400 mb-3">Log your cycle. We will give you in-the-trenches feedback.</p><div className="flex flex-wrap gap-3"><Link to="/cycles" className="prohp-btn-primary text-xs inline-flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Start a Cycle Log</Link><Link to="/r/lab" className="text-xs text-slate-400 hover:text-prohp-400 transition-colors inline-flex items-center gap-1">Your log appears publicly in The Lab &rarr;</Link></div></div>);
 }
 
 function GateCTA({ gate_state, upgrade_cta }) {
