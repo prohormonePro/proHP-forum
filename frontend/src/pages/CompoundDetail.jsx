@@ -601,26 +601,29 @@ export default function CompoundDetail() {
             {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
           {/* Hero staging area */}
-          <div className="relative flex items-center justify-center" style={{ marginTop: '-24px', marginBottom: '-50px', zIndex: 10 }}>
-            <div className="relative flex items-center justify-center">
-              {/* Backlight glow */}
-              <div className="absolute" style={{ width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(14,165,233,0.10) 0%, rgba(14,165,233,0.04) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-              {compound.slug && (
-                <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.parentElement.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '280px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 25px 50px rgba(0,0,0,0.6)) drop-shadow(0 8px 16px rgba(0,0,0,0.4))' }} />
-              )}
-              {/* Frosted glass button overlapping bottle */}
-              {videoId && (
-                <button type="button" onClick={function() { setVideoOpen(true); }} className="absolute z-20 inline-flex items-center gap-2 text-xs font-bold transition-all duration-200" style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)', background: 'rgba(14, 165, 233, 0.12)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(14, 165, 233, 0.6)', borderRadius: '12px', padding: '10px 20px', color: '#0EA5E9', boxShadow: '0 0 20px rgba(14,165,233,0.15), 0 4px 12px rgba(0,0,0,0.3)' }} onMouseEnter={function(e) { e.target.style.background = '#0EA5E9'; e.target.style.color = '#0f1117'; e.target.style.transform = 'translateX(-50%) scale(1.05)'; e.target.style.boxShadow = '0 0 30px rgba(14,165,233,0.4), 0 4px 20px rgba(0,0,0,0.4)'; }} onMouseLeave={function(e) { e.target.style.background = 'rgba(14, 165, 233, 0.12)'; e.target.style.color = '#0EA5E9'; e.target.style.transform = 'translateX(-50%)'; e.target.style.boxShadow = '0 0 20px rgba(14,165,233,0.15), 0 4px 12px rgba(0,0,0,0.3)'; }}>
-                  <Youtube className="w-4 h-4" /> Watch breakdown
-                </button>
-              )}
-            </div>
+          <div className="relative flex items-center justify-center" style={{ marginTop: '-16px', marginBottom: '32px', zIndex: 10 }}>
+            {compound.slug && (
+              <div className="relative">
+                {/* Backlight */}
+                <div className="absolute" style={{ width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(14,165,233,0.09) 0%, rgba(14,165,233,0.03) 45%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+                {/* Bottle */}
+                <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.closest('[style*="zIndex"]').style.display = 'none'; }} alt={compound.name} className="relative z-10 mx-auto" style={{ height: '260px', width: 'auto', maxWidth: '240px', objectFit: 'contain', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5)) drop-shadow(0 6px 12px rgba(0,0,0,0.3))' }} />
+                {/* Anchor shadow */}
+                <div className="absolute z-0" style={{ bottom: '-8px', left: '50%', transform: 'translateX(-50%)', width: '120px', height: '16px', background: 'radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%)', borderRadius: '50%' }} />
+                {/* Frosted pill button */}
+                {videoId && (
+                  <button type="button" onClick={function() { setVideoOpen(true); }} className="absolute z-20" style={{ bottom: '15%', left: '50%', transform: 'translateX(-50%)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', whiteSpace: 'nowrap', padding: '10px 24px', borderRadius: '9999px', background: 'rgba(14, 165, 233, 0.10)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(14, 165, 233, 0.4)', color: '#0EA5E9', fontSize: '12px', fontWeight: '700', letterSpacing: '0.02em', textShadow: '0 0 8px rgba(14, 165, 233, 0.3)', boxShadow: '0 0 16px rgba(14,165,233,0.12), 0 4px 12px rgba(0,0,0,0.25)', cursor: 'pointer', transition: 'all 0.2s ease-in-out' }} onMouseEnter={function(e) { var s = e.currentTarget.style; s.background = '#0EA5E9'; s.color = '#0f1117'; s.textShadow = 'none'; s.transform = 'translateX(-50%) scale(1.05)'; s.boxShadow = '0 0 30px rgba(14,165,233,0.4), 0 4px 20px rgba(0,0,0,0.4)'; }} onMouseLeave={function(e) { var s = e.currentTarget.style; s.background = 'rgba(14, 165, 233, 0.10)'; s.color = '#0EA5E9'; s.textShadow = '0 0 8px rgba(14, 165, 233, 0.3)'; s.transform = 'translateX(-50%)'; s.boxShadow = '0 0 16px rgba(14,165,233,0.12), 0 4px 12px rgba(0,0,0,0.25)'; }}>
+                    <Youtube className="w-4 h-4" /> Watch breakdown
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Mobile: stacked */}
         <div className="md:hidden">
-          <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+          <h1 className="text-xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
           {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
@@ -630,11 +633,17 @@ export default function CompoundDetail() {
           </div>
           {compound.slug && (
             <div className="relative flex justify-center my-4">
-              <div className="absolute" style={{ width: '250px', height: '250px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }} />
-              <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '200px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.5))' }} />
+              <div className="absolute" style={{ width: '220px', height: '220px', background: 'radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }} />
+              <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '180px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.5))' }} />
             </div>
           )}
-          {videoId && (<div className="mb-3"><button type="button" onClick={function() { setVideoOpen(true); }} className="w-full inline-flex items-center justify-center gap-2 text-xs font-bold py-2.5 rounded-xl transition-all" style={{ background: 'rgba(14, 165, 233, 0.12)', backdropFilter: 'blur(12px)', border: '1px solid rgba(14, 165, 233, 0.6)', color: '#0EA5E9' }}><Youtube className="w-4 h-4" /> Watch breakdown</button></div>)}
+          {videoId && (
+            <div className="flex justify-center mb-3">
+              <button type="button" onClick={function() { setVideoOpen(true); }} className="inline-flex items-center justify-center gap-2" style={{ whiteSpace: 'nowrap', padding: '10px 24px', borderRadius: '9999px', background: 'rgba(14, 165, 233, 0.10)', backdropFilter: 'blur(14px)', border: '1px solid rgba(14, 165, 233, 0.4)', color: '#0EA5E9', fontSize: '12px', fontWeight: '700' }}>
+                <Youtube className="w-4 h-4" /> Watch breakdown
+              </button>
+            </div>
+          )}
           {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
         </div>
 
