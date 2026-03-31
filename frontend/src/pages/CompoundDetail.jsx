@@ -91,6 +91,11 @@ function BenefitsRenderer({ content }) {
     }
     if (type === 'pill') {
       var ct = text.replace(/^[-\u2022\u2013]\s*/, '');
+      /* "Best for X" gets special badge treatment */
+      var bestMatch = ct.match(/^Best\s+for\s+(.+)/i);
+      if (bestMatch) {
+        return (<div key={key} className="col-span-full p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-sm font-semibold text-slate-200">{renderHtml(bestMatch[1])}</span></div></div>);
+      }
       return (<span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300"><Check className="w-3 h-3" />{renderHtml(ct)}</span>);
     }
     return (<div key={key} className="p-3 rounded-lg bg-emerald-900/[0.04] border-l-2 border-emerald-500/30"><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(text)}</div></div>);
@@ -237,19 +242,21 @@ function SideEffectsRenderer({ content }) {
   blocks.forEach(function(block) {
     var text = block.trim();
     if (!text || text.length < 5) return;
-    var isSevere = /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA|heart|cardiac|death|METHYLATED|hepatotoxic|methyl/i.test(text);
+    var isPositive = /no liver|unaffected|no lipid|no creatinine|clean|well-tolerated|zero/i.test(text) && !/if|can|may|might|watch/i.test(text.slice(0, 30));
+    var isSevere = !isPositive && /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA|heart|cardiac|death|METHYLATED|hepatotoxic|methyl/i.test(text);
     var capsMatch = text.match(/^([A-Z][A-Z\s,/&]{2,40}):\s*([\s\S]+)/);
-    if (capsMatch) { items.push({ label: capsMatch[1].trim(), body: capsMatch[2].trim(), severe: true }); return; }
+    if (capsMatch) { items.push({ label: capsMatch[1].trim(), body: capsMatch[2].trim(), severe: true, positive: false }); return; }
     var dashIdx = text.indexOf(' - ');
-    if (dashIdx > 0 && dashIdx < 60) { items.push({ label: text.slice(0, dashIdx).trim(), body: text.slice(dashIdx + 3).trim(), severe: isSevere }); return; }
-    items.push({ label: null, body: text, severe: isSevere });
+    if (dashIdx > 0 && dashIdx < 60) { items.push({ label: text.slice(0, dashIdx).trim(), body: text.slice(dashIdx + 3).trim(), severe: isSevere, positive: isPositive }); return; }
+    items.push({ label: null, body: text, severe: isSevere, positive: isPositive });
   });
-  items.sort(function(a, b) { return (b.severe ? 1 : 0) - (a.severe ? 1 : 0); });
+  items.sort(function(a, b) { if (a.positive !== b.positive) return a.positive ? 1 : -1; return (b.severe ? 1 : 0) - (a.severe ? 1 : 0); });
   var severe = items.filter(function(it) { return it.severe; });
-  var mild = items.filter(function(it) { return !it.severe; });
+  var mild = items.filter(function(it) { return !it.severe && !it.positive; });
+  var positive = items.filter(function(it) { return it.positive; });
   function renderSECard(item, i) {
-    var bc = item.severe ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
-    var dc = item.severe ? 'bg-red-500' : 'bg-yellow-500';
+    var bc = item.positive ? 'border-emerald-700/20 bg-emerald-900/[0.04]' : item.severe ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
+    var dc = item.positive ? 'bg-emerald-500' : item.severe ? 'bg-red-500' : 'bg-yellow-500';
     return (<div key={i} className={'p-3 rounded-lg border ' + bc}><div className="flex items-start gap-2.5"><div className={'w-2 h-2 rounded-full mt-1.5 shrink-0 ' + dc} /><div>{item.label && <div className="text-xs font-bold text-slate-200 mb-0.5">{item.label}</div>}<div className="text-[13px] text-slate-300 leading-relaxed">{renderHtml(item.body)}</div></div></div></div>);
   }
   if (severe.length > 0 && mild.length > 0) {
@@ -467,7 +474,15 @@ function HalfLifeBar({ halfLife, dosageRange }) {
         <div className="prohp-card p-4 border border-white/5 text-center">
           <Beaker className="w-5 h-5 text-prohp-400 mx-auto mb-2" />
           <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Dose</div>
-          <div className="text-sm font-bold text-slate-100 leading-snug">{dosageRange}</div>
+          {(() => {
+            var parts = dosageRange.split(/[.!]\s+/);
+            var main = parts[0] || dosageRange;
+            var mgMatch = main.match(/\(([^)]+)\)/);
+            var pillText = mgMatch ? main.replace(mgMatch[0], '').trim() : main;
+            var mgText = mgMatch ? mgMatch[1] : null;
+            var subtext = parts.length > 1 ? parts.slice(1).join('. ').trim() : null;
+            return (<div><div className="text-base font-bold text-slate-100">{pillText}</div>{mgText && <div className="text-xs text-slate-400 mt-0.5">{mgText}</div>}{subtext && <div className="text-[11px] text-slate-500 mt-1 italic">{subtext}</div>}</div>);
+          })()}
         </div>
       )}
     </div>
@@ -739,12 +754,12 @@ export default function CompoundDetail() {
         </div>
       )}
 
+      {/* ═══ 17. COMMUNITY INTEL ═══ */}
+      {communityStats && communityStats.total > 0 && (<div className="prohp-card p-6 mb-4 border border-prohp-400/15 bg-prohp-400/[0.03]"><h3 className="text-sm font-bold text-prohp-400 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" /> Community Intel</h3><div className="flex gap-3 flex-wrap mb-4"><div className="bg-prohp-400/10 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Total Reports</span><div className="text-lg font-bold text-white">{communityStats.total}</div></div>{communityStats.with_side_effects > 0 && (<div className="bg-red-900/20 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Side Effect Reports</span><div className="text-lg font-bold text-red-400">{communityStats.with_side_effects}</div></div>)}</div>{communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (<div className="flex gap-2 flex-wrap mb-4">{communityStats.top_side_effects.slice(0, 6).map(function(se, i) { return (<span key={i} className="bg-red-900/15 border border-red-700/25 rounded-full px-3 py-1 text-[11px] text-red-400">{se.effect} ({se.count})</span>); })}</div>)}{user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (<div>{communityComments.length > 0 && (<div className="flex flex-col gap-2 mt-3"><h4 className="text-xs font-semibold text-slate-400">Top Community Comments</h4>{communityComments.map(function(c, i) { return (<div key={c.id || i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5"><div className="text-[13px] text-slate-300 leading-relaxed mb-2">{c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}</div><div className="flex justify-between text-[11px] text-slate-500"><span>{c.author || 'Anonymous'}</span><span className="text-prohp-400">{c.likes || 0} likes</span></div></div>); })}</div>)}</div>) : (<div className="text-center pt-3 border-t border-white/5"><p className="text-xs text-slate-400 mb-3">Unlock full community intel: top comments, dosage patterns, and detailed reports</p><Link to="/register" className="prohp-btn-primary text-xs px-4 py-2">Unlock Community Intel</Link></div>)}</div>)}
+
       {/* ═══ 16. RELATED ═══ */}
       <div className="prohp-card p-6 mb-4"><div className="flex items-center justify-between mb-3"><div className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-slate-400" /><div className="text-sm font-semibold text-slate-200">Related Threads</div></div><Link to="/rooms/library" className="text-xs text-slate-500 hover:text-prohp-400 transition-colors">Library</Link></div>{relatedThreads.length ? (<div className="flex flex-col gap-2">{relatedThreads.map(function(t) { return (<Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors"><div className="text-[13px] font-semibold text-slate-200">{t.title}</div><div className="mt-1 text-[11px] text-slate-500">{t.reply_count} replies</div></Link>); })}</div>) : (<div className="text-sm text-slate-400">No related threads yet.</div>)}</div>
       {relatedCycles.length > 0 && (<div className="prohp-card p-6 mb-4"><div className="text-sm font-semibold text-slate-200 mb-3">Related Cycles</div><div className="flex flex-col gap-2">{relatedCycles.map(function(c) { return (<div key={c.id} className="prohp-card p-3"><div className="text-[13px] font-semibold text-slate-200">{c.title}</div><div className="mt-1 text-[12px] text-slate-400">{c.status ? 'Status: ' + c.status : ''}{c.duration_weeks ? ' - ' + c.duration_weeks + ' weeks' : ''}</div></div>); })}</div></div>)}
-
-      {/* ═══ 17. COMMUNITY INTEL ═══ */}
-      {communityStats && communityStats.total > 0 && (<div className="prohp-card p-6 mb-4 border border-prohp-400/15 bg-prohp-400/[0.03]"><h3 className="text-sm font-bold text-prohp-400 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" /> Community Intel</h3><div className="flex gap-3 flex-wrap mb-4"><div className="bg-prohp-400/10 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Total Reports</span><div className="text-lg font-bold text-white">{communityStats.total}</div></div>{communityStats.with_side_effects > 0 && (<div className="bg-red-900/20 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Side Effect Reports</span><div className="text-lg font-bold text-red-400">{communityStats.with_side_effects}</div></div>)}</div>{communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (<div className="flex gap-2 flex-wrap mb-4">{communityStats.top_side_effects.slice(0, 6).map(function(se, i) { return (<span key={i} className="bg-red-900/15 border border-red-700/25 rounded-full px-3 py-1 text-[11px] text-red-400">{se.effect} ({se.count})</span>); })}</div>)}{user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (<div>{communityComments.length > 0 && (<div className="flex flex-col gap-2 mt-3"><h4 className="text-xs font-semibold text-slate-400">Top Community Comments</h4>{communityComments.map(function(c, i) { return (<div key={c.id || i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5"><div className="text-[13px] text-slate-300 leading-relaxed mb-2">{c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}</div><div className="flex justify-between text-[11px] text-slate-500"><span>{c.author || 'Anonymous'}</span><span className="text-prohp-400">{c.likes || 0} likes</span></div></div>); })}</div>)}</div>) : (<div className="text-center pt-3 border-t border-white/5"><p className="text-xs text-slate-400 mb-3">Unlock full community intel: top comments, dosage patterns, and detailed reports</p><Link to="/register" className="prohp-btn-primary text-xs px-4 py-2">Unlock Community Intel</Link></div>)}</div>)}
 
       {/* ═══ 18. FOOTER ═══ */}
       <div className="text-center py-6 mb-8"><div className="text-sm font-bold text-slate-300 mb-1">Proof Over Hype.</div><div className="text-xs text-slate-500">Track your bloodwork. Trust your body. Adjust accordingly.</div></div>
