@@ -87,14 +87,15 @@ function BenefitsRenderer({ content }) {
     }
     if (type === 'dashlist') {
       var dLines = text.split('\n').filter(function(l) { return l.trim(); });
-      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); var bm = c.match(/^Best\s+for\s+(.+)/i); if (bm) { return (<div key={j} className="p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20 mt-1"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-sm font-semibold text-slate-200">{renderHtml(bm[1])}</span></div></div>); } return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
+      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); var bm = c.match(/^Best\s+for\s+(.+)/i); if (bm) { var bfRaw = bm[1]; var bfParen = bfRaw.indexOf('('); var bfPeriod = bfRaw.indexOf('.'); var bfSplit = bfParen > 0 ? bfParen : bfPeriod > 0 ? bfPeriod : -1; var bfKeyword = bfSplit > 0 ? bfRaw.slice(0, bfSplit).trim() : bfRaw.trim(); var bfSub = bfSplit > 0 ? bfRaw.slice(bfSplit).replace(/^[(.]+\s*/, '').replace(/[)]+$/, '').trim() : ''; bfKeyword = bfKeyword.charAt(0).toUpperCase() + bfKeyword.slice(1); return (<div key={j} className="p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20 mt-1"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-base font-bold text-slate-100">{bfKeyword}</span></div>{bfSub && <div className="text-[12px] text-slate-400 mt-1">{bfSub}</div>}</div>); } return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
     }
     if (type === 'pill') {
       var ct = text.replace(/^[-\u2022\u2013]\s*/, '');
       /* "Best for X" gets special badge treatment */
       var bestMatch = ct.match(/^Best\s+for\s+(.+)/i);
       if (bestMatch) {
-        return (<div key={key} className="col-span-full p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-sm font-semibold text-slate-200">{renderHtml(bestMatch[1])}</span></div></div>);
+        var bfR = bestMatch[1]; var bfP = bfR.indexOf('('); var bfD = bfR.indexOf('.'); var bfS = bfP > 0 ? bfP : bfD > 0 ? bfD : -1; var bfK = bfS > 0 ? bfR.slice(0, bfS).trim() : bfR.trim(); var bfSb = bfS > 0 ? bfR.slice(bfS).replace(/^[(.]+\s*/, '').replace(/[)]+$/, '').trim() : ''; bfK = bfK.charAt(0).toUpperCase() + bfK.slice(1);
+        return (<div key={key} className="col-span-full p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-base font-bold text-slate-100">{bfK}</span></div>{bfSb && <div className="text-[12px] text-slate-400 mt-1">{bfSb}</div>}</div>);
       }
       return (<span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300"><Check className="w-3 h-3" />{renderHtml(ct)}</span>);
     }
@@ -213,7 +214,7 @@ function DosingRenderer({ content }) {
 
   return (
     <div className="space-y-4">
-      {normalBlocks.map(function(block, i) { return renderDosingBlock(block, i); })}
+      {normalBlocks.filter(function(b) { return !/^Best\s+for\s/im.test(b.trim()); }).map(function(block, i) { return renderDosingBlock(block, i); })}
       {stackBlocks.length > 0 && (
         <div className="prohp-card p-4 border border-prohp-400/10 bg-prohp-400/[0.02]">
           <div className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider mb-3">Recommended Stacks</div>
