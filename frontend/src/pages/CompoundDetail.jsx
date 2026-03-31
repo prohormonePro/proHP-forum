@@ -604,15 +604,15 @@ export default function CompoundDetail() {
             </div>
             {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
-          {compound.product_image_url && (
+          {compound.slug {compound.product_image_url && ({compound.product_image_url && ( (
             <div className="hidden md:block shrink-0">
-              <img src={compound.product_image_url} alt={compound.name} className="rounded-xl w-32 h-auto object-contain" />
+              <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = "none"; }} alt={compound.name} className="rounded-xl w-32 h-auto object-contain" />
             </div>
           )}
         </div>
-        {compound.product_image_url && (
+        {compound.slug {compound.product_image_url && ({compound.product_image_url && ( (
           <div className="mb-4 md:hidden">
-            <img src={compound.product_image_url} alt={compound.name} className="rounded-xl max-h-36 object-contain mx-auto" />
+            <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = "none"; }} alt={compound.name} className="rounded-xl max-h-36 object-contain mx-auto" />
           </div>
         )}
         {compound.product_url && (<div className="mt-3 pt-3 border-t border-white/5"><a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"><ExternalLink className="w-3.5 h-3.5" /> Support the encyclopedia</a><DiscountSection compound={compound} gate_state={gate_state} /></div>)}
