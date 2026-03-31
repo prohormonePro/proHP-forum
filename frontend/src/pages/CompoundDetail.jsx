@@ -43,48 +43,79 @@ function renderHtml(text) {
   return text;
 }
 
-/* BENEFITS: Pills for short, 2-col cards for long */
+/* BENEFITS: Universal parser - pills, stat cards, check lists, prose cards */
 function BenefitsRenderer({ content }) {
   if (!content) return null;
-  var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
-  if (blocks.length <= 1) blocks = content.split(/\n/).filter(function(b) { return b.trim(); });
-
-  var pills = [];
-  var cards = [];
+  var clean = content.replace(/\u0093\u00c7\u00f3/g, '- ').replace(/\u0393\u00c7\u00f3/g, '- ');
+  var trimmed = clean.trim();
+  if (trimmed.indexOf('\n') === -1 && trimmed.split(',').length >= 3) {
+    var pills = trimmed.split(',').map(function(p) { return p.trim(); }).filter(Boolean);
+    return (<div className="flex flex-wrap gap-2">{pills.map(function(pill, i) { return (<span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300"><Check className="w-3 h-3" />{pill}</span>); })}</div>);
+  }
+  var blocks = clean.split(/\n\n+/).filter(function(b) { return b.trim(); });
+  var sections = [];
+  var currentSection = { header: null, items: [] };
   blocks.forEach(function(block) {
     var text = block.trim();
-    if (!text) return;
-    if (text.length < 80 && text.indexOf('\n') === -1) {
-      pills.push(text);
+    var sectionMatch = text.match(/^(Other benefits|Travis.s conclusion|Additional|Key findings|Summary)[:\s]/i);
+    if (sectionMatch) {
+      if (currentSection.items.length > 0) sections.push(currentSection);
+      var headerEnd = text.indexOf(':');
+      currentSection = { header: text.slice(0, headerEnd + 1).trim(), items: [] };
+      var rest = text.slice(headerEnd + 1).trim();
+      if (rest) currentSection.items.push(rest);
     } else {
-      cards.push(text);
+      currentSection.items.push(text);
     }
   });
+  if (currentSection.items.length > 0) sections.push(currentSection);
+
+  function classifyItem(text) {
+    var colonMatch = text.match(/^([A-Z][A-Za-z\s\/&]{2,30}):\s+(.+)/);
+    if (colonMatch && text.length < 200 && text.indexOf('\n') === -1) return 'stat';
+    var dLines = text.split('\n').filter(function(l) { return l.trim(); });
+    if (dLines.length > 1 && dLines.every(function(l) { return /^[-\u2022\u2013]\s/.test(l.trim()); })) return 'dashlist';
+    if (text.length < 100 && text.indexOf('\n') === -1) return 'pill';
+    return 'card';
+  }
+
+  function renderBenefitItem(text, key) {
+    var type = classifyItem(text);
+    if (type === 'stat') {
+      var cm = text.match(/^([A-Z][A-Za-z\s\/&]{2,30}):\s+(.+)/);
+      return (<div key={key} className="bg-slate-800/40 rounded-lg p-3 border border-white/5 text-center"><div className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider mb-1">{cm[1]}</div><div className="text-sm text-slate-200 font-semibold">{renderHtml(cm[2])}</div></div>);
+    }
+    if (type === 'dashlist') {
+      var dLines = text.split('\n').filter(function(l) { return l.trim(); });
+      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
+    }
+    if (type === 'pill') {
+      var ct = text.replace(/^[-\u2022\u2013]\s*/, '');
+      return (<span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300"><Check className="w-3 h-3" />{renderHtml(ct)}</span>);
+    }
+    return (<div key={key} className="p-3 rounded-lg bg-emerald-900/[0.04] border-l-2 border-emerald-500/30"><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(text)}</div></div>);
+  }
 
   return (
-    <div>
-      {pills.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {pills.map(function(pill, i) {
-            return (
-              <span key={'p' + i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300">
-                <Check className="w-3 h-3" />{renderHtml(pill)}
-              </span>
-            );
-          })}
-        </div>
-      )}
-      {cards.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {cards.map(function(card, i) {
-            return (
-              <div key={'c' + i} className="p-3 rounded-lg bg-emerald-900/[0.05] border-t-2 border-emerald-500/30 border border-emerald-700/10">
-                <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(card)}</div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+    <div className="space-y-4">
+      {sections.map(function(section, si) {
+        var pills = [];
+        var cards = [];
+        section.items.forEach(function(item, idx) {
+          var t = item.trim();
+          if (!t) return;
+          var type = classifyItem(t);
+          if (type === 'pill') { pills.push({ text: t, k: si + '-' + idx }); }
+          else { cards.push({ text: t, k: si + '-' + idx }); }
+        });
+        return (
+          <div key={si}>
+            {section.header && (<div className="flex items-center gap-3 mb-3 mt-2"><div className="flex-1 h-px bg-gradient-to-r from-emerald-700/30 to-transparent" /><span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{section.header.replace(/:$/, '')}</span><div className="flex-1 h-px bg-gradient-to-r from-transparent to-emerald-700/30" /></div>)}
+            {pills.length > 0 && (<div className="flex flex-wrap gap-2 mb-3">{pills.map(function(p) { return renderBenefitItem(p.text, 'p-' + p.k); })}</div>)}
+            {cards.length > 0 && (<div className="grid grid-cols-1 md:grid-cols-2 gap-3">{cards.map(function(c) { return renderBenefitItem(c.text, 'c-' + c.k); })}</div>)}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -93,184 +124,138 @@ function BenefitsRenderer({ content }) {
 function MechanismRenderer({ content }) {
   var [expanded, setExpanded] = useState(false);
   if (!content) return null;
-
   var paragraphs = content.split(/\n\n+/).filter(function(p) { return p.trim(); });
   var previewCount = 3;
   var needsCollapse = paragraphs.length > previewCount;
   var visible = expanded ? paragraphs : paragraphs.slice(0, previewCount);
-
   return (
     <div>
       <div className="space-y-5">
         {visible.map(function(para, i) {
           var lines = para.split('\n');
           var firstLine = lines[0] || '';
-
           if (isHeader(firstLine)) {
             var headerText = firstLine.replace(/:$/, '').trim();
             var bodyLines = lines.slice(1).join('\n').trim();
-            return (
-              <div key={i} className="mt-2">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-prohp-400/20 to-transparent" />
-                  <span className="text-[11px] font-bold text-prohp-400 uppercase tracking-widest">{headerText}</span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-prohp-400/20 to-transparent" />
-                </div>
-                {bodyLines && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(bodyLines)}</div>}
-              </div>
-            );
+            return (<div key={i} className="mt-2"><div className="flex items-center gap-3 mb-3"><div className="flex-1 h-px bg-gradient-to-r from-transparent via-prohp-400/20 to-transparent" /><span className="text-[11px] font-bold text-prohp-400 uppercase tracking-widest">{headerText}</span><div className="flex-1 h-px bg-gradient-to-r from-transparent via-prohp-400/20 to-transparent" /></div>{bodyLines && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(bodyLines)}</div>}</div>);
           }
-
-          /* First paragraph = lede (larger text) */
-          if (i === 0) {
-            return (
-              <div key={i} className="text-[15px] text-slate-200 leading-relaxed font-medium">{renderHtml(para)}</div>
-            );
-          }
-
-          return (
-            <div key={i} className="text-sm text-slate-300 leading-relaxed pl-3 border-l-2 border-slate-700/40">{renderHtml(para)}</div>
-          );
+          if (i === 0) return (<div key={i} className="text-[15px] text-slate-200 leading-relaxed font-medium">{renderHtml(para)}</div>);
+          return (<div key={i} className="text-sm text-slate-300 leading-relaxed pl-3 border-l-2 border-slate-700/40">{renderHtml(para)}</div>);
         })}
       </div>
+      {needsCollapse && (<button onClick={function() { setExpanded(!expanded); }} className="mt-5 w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-prohp-400 hover:text-prohp-300 transition-colors rounded-lg hover:bg-prohp-400/[0.04]">{expanded ? (<><ChevronUp className="w-3.5 h-3.5" /> Show less</>) : (<><ChevronDown className="w-3.5 h-3.5" /> Read full mechanism ({paragraphs.length - previewCount} more sections)</>)}</button>)}
+    </div>
+  );
+}
 
-      {needsCollapse && (
-        <button
-          onClick={function() { setExpanded(!expanded); }}
-          className="mt-5 w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-prohp-400 hover:text-prohp-300 transition-colors rounded-lg hover:bg-prohp-400/[0.04]"
-        >
-          {expanded ? (<><ChevronUp className="w-3.5 h-3.5" /> Show less</>) : (<><ChevronDown className="w-3.5 h-3.5" /> Read full mechanism ({paragraphs.length - previewCount} more sections)</>)}
-        </button>
+/* DOSING: Universal parser - weeks, tiers, protocols, stacks, PCT */
+function DosingRenderer({ content }) {
+  if (!content) return null;
+  var allBlocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
+  var stackBlocks = [];
+  var normalBlocks = [];
+  var inStacks = false;
+  allBlocks.forEach(function(block) {
+    var fl = block.split('\n')[0].trim();
+    if (/^stacks/i.test(fl)) {
+      inStacks = true;
+      block.split('\n').slice(1).filter(function(l) { return l.trim(); }).forEach(function(l) { stackBlocks.push(l.trim()); });
+      return;
+    }
+    if (inStacks && /^[-\u2022]\s/.test(fl)) { stackBlocks.push(block.trim()); return; }
+    if (inStacks && !/^[-\u2022]\s/.test(fl)) inStacks = false;
+    normalBlocks.push(block);
+  });
+
+  function renderDosingBlock(block, i) {
+    var lines = block.split('\n');
+    var fl = (lines[0] || '').trim();
+    if (isHeader(fl)) {
+      var ht = fl.replace(/:$/, '').trim();
+      var bl = lines.slice(1).join('\n').trim();
+      return (<div key={i}><div className="flex items-center gap-3 mb-2 mt-1"><div className="flex-1 h-px bg-gradient-to-r from-prohp-400/20 to-transparent" /><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-widest">{ht}</span><div className="flex-1 h-px bg-gradient-to-r from-transparent to-prohp-400/20" /></div>{bl && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(bl)}</div>}</div>);
+    }
+    if (/^(week|wk)\s*\d/i.test(fl)) {
+      return (<div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-prohp-400/[0.04] border border-prohp-400/10"><div className="w-2 h-2 rounded-full bg-prohp-400 mt-1.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div></div>);
+    }
+    var tierMatch = fl.match(/^(Beginner|Intermediate|Advanced|Sweet spot|Standard|Clinical|First-time)/i);
+    if (tierMatch) {
+      var tk = tierMatch[1].toLowerCase();
+      var ts = { 'beginner': ['border-emerald-500/20','bg-emerald-900/[0.06]','text-emerald-400'], 'first-time': ['border-emerald-500/20','bg-emerald-900/[0.06]','text-emerald-400'], 'standard': ['border-emerald-500/20','bg-emerald-900/[0.06]','text-emerald-400'], 'intermediate': ['border-yellow-500/20','bg-yellow-900/[0.06]','text-yellow-400'], 'sweet spot': ['border-prohp-400/20','bg-prohp-400/[0.06]','text-prohp-400'], 'clinical': ['border-yellow-500/20','bg-yellow-900/[0.06]','text-yellow-400'], 'advanced': ['border-orange-500/20','bg-orange-900/[0.06]','text-orange-400'] };
+      var s = ts[tk] || ['border-prohp-400/20','bg-prohp-400/[0.06]','text-prohp-400'];
+      return (<div key={i} className={'p-3 rounded-lg border ' + s[0] + ' ' + s[1]}><div className={'text-[10px] font-bold uppercase tracking-wider mb-1 ' + s[2]}>{tierMatch[1]}</div><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div></div>);
+    }
+    if (/^FOR\s/i.test(fl)) {
+      var pl = fl.replace(/:$/, '').trim();
+      var pb = lines.slice(1).join('\n').trim();
+      return (<div key={i} className="border-l-2 border-prohp-400/30 pl-4"><div className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider mb-2">{pl}</div>{pb && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(pb)}</div>}</div>);
+    }
+    if (/^(cycle|duration|length|bottles)/i.test(fl)) {
+      return (<div key={i} className="p-3 rounded-lg bg-slate-800/30 border border-white/5"><div className="flex items-center gap-2 mb-1"><Clock className="w-3.5 h-3.5 text-prohp-400" /><span className="text-xs font-bold text-slate-300">Cycle Info</span></div><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div></div>);
+    }
+    if (/^PCT/i.test(fl)) {
+      return (<div key={i} className="bg-red-900/[0.06] border border-red-700/15 rounded-lg p-3"><div className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Post-Cycle Therapy</div><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div></div>);
+    }
+    if (/^(COMT|comt)\s/i.test(fl)) {
+      return (<div key={i} className="bg-amber-900/[0.04] border border-amber-700/15 rounded-lg p-3"><div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">COMT Support</div><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div></div>);
+    }
+    var dl = lines.filter(function(l) { return l.trim(); });
+    if (dl.length > 1 && dl.every(function(l) { return /^[-\u2022]\s/.test(l.trim()); })) {
+      return (<div key={i} className="space-y-1.5">{dl.map(function(line, j) { var c = line.trim().replace(/^[-\u2022]\s*/, ''); return (<div key={j} className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-prohp-400 mt-2 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
+    }
+    return (<div key={i} className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div>);
+  }
+
+  return (
+    <div className="space-y-4">
+      {normalBlocks.map(function(block, i) { return renderDosingBlock(block, i); })}
+      {stackBlocks.length > 0 && (
+        <div className="prohp-card p-4 border border-prohp-400/10 bg-prohp-400/[0.02]">
+          <div className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider mb-3">Recommended Stacks</div>
+          <div className="space-y-3">
+            {stackBlocks.map(function(stack, si) {
+              var cl = stack.replace(/^[-\u2022]\s*/, '');
+              var lm = cl.match(/^([^(]+)\(([^)]+)\):\s*(.+)/);
+              if (lm) return (<div key={si} className="bg-slate-800/40 rounded-lg p-3 border border-white/5"><div className="text-xs font-bold text-slate-200 mb-0.5">{lm[1].trim()}</div><div className="text-[10px] text-slate-500 mb-1">{lm[2].trim()}</div><div className="text-[12px] text-slate-400 leading-relaxed">{renderHtml(lm[3].trim())}</div></div>);
+              var sm = cl.match(/^([^:]+):\s*(.+)/);
+              if (sm) return (<div key={si} className="bg-slate-800/40 rounded-lg p-3 border border-white/5"><div className="text-xs font-bold text-slate-200 mb-1">{sm[1].trim()}</div><div className="text-[12px] text-slate-400 leading-relaxed">{renderHtml(sm[2].trim())}</div></div>);
+              return (<div key={si} className="bg-slate-800/40 rounded-lg p-3 border border-white/5"><div className="text-sm text-slate-300">{renderHtml(cl)}</div></div>);
+            })}
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-/* DOSING: Structured with section headers + week cards + stack cards */
-function DosingRenderer({ content }) {
-  if (!content) return null;
-  var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
-
-  return (
-    <div className="space-y-4">
-      {blocks.map(function(block, i) {
-        var lines = block.split('\n');
-        var firstLine = (lines[0] || '').trim();
-
-        /* Section headers */
-        if (isHeader(firstLine)) {
-          var headerText = firstLine.replace(/:$/, '').trim();
-          var bodyLines = lines.slice(1).join('\n').trim();
-          return (
-            <div key={i} className="border-l-2 border-prohp-400/30 pl-4">
-              <div className="text-xs font-bold text-prohp-400 uppercase tracking-wider mb-2">{headerText}</div>
-              {bodyLines && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(bodyLines)}</div>}
-            </div>
-          );
-        }
-
-        /* Week/dosing timeline entries */
-        var isWeek = /^(week|wk)\s*\d/i.test(firstLine);
-        if (isWeek) {
-          return (
-            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-prohp-400/[0.04] border border-prohp-400/10">
-              <div className="w-1.5 h-1.5 rounded-full bg-prohp-400 mt-2 shrink-0" />
-              <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div>
-            </div>
-          );
-        }
-
-        /* Cycle length blocks */
-        var isCycle = /^(cycle|duration|length)/i.test(firstLine);
-        if (isCycle) {
-          return (
-            <div key={i} className="p-3 rounded-lg bg-slate-800/30 border border-white/5">
-              <div className="flex items-center gap-2 mb-1"><Clock className="w-3.5 h-3.5 text-prohp-400" /><span className="text-xs font-bold text-slate-300">Cycle Length</span></div>
-              <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(lines.slice(0).join('\n'))}</div>
-            </div>
-          );
-        }
-
-        /* Stack recommendations */
-        var isStack = /^(mild|moderate|hardcore|best|ultimate|cutting|bulking|joint|recomp|stacks)/i.test(firstLine);
-        if (isStack) {
-          return (
-            <div key={i} className="bg-slate-800/50 border border-prohp-400/10 rounded-lg p-3">
-              <div className="text-sm text-slate-200 leading-relaxed font-medium">{renderHtml(firstLine)}</div>
-              {lines.length > 1 && <div className="text-[13px] text-slate-400 leading-relaxed mt-1">{renderHtml(lines.slice(1).join('\n'))}</div>}
-            </div>
-          );
-        }
-
-        /* PCT blocks */
-        var isPCT = /^PCT/i.test(firstLine);
-        if (isPCT) {
-          return (
-            <div key={i} className="bg-red-900/[0.06] border border-red-700/15 rounded-lg p-3">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Post-Cycle Therapy</div>
-              <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(lines.slice(0).join('\n'))}</div>
-            </div>
-          );
-        }
-
-        /* Default paragraph */
-        return (
-          <div key={i} className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* SIDE EFFECTS: 2-column split - severe left, mild right */
+/* SIDE EFFECTS: Universal parser - ALL CAPS headers, dash labels, severity split */
 function SideEffectsRenderer({ content }) {
   if (!content) return null;
-  var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
-  if (blocks.length <= 1) blocks = content.split(/\n/).filter(function(b) { return b.trim() && b.trim().length > 10; });
-
-  var severe = [];
-  var mild = [];
+  var clean = content.replace(/\u0093\u00c7\u00f3/g, '- ').replace(/\u0393\u00c7\u00f3/g, '- ');
+  var blocks = clean.split(/\n\n+/).filter(function(b) { return b.trim(); });
+  var items = [];
   blocks.forEach(function(block) {
     var text = block.trim();
-    if (!text) return;
-    var isSevere = /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA|heart|cardiac|death/i.test(text);
-    if (isSevere) { severe.push(text); } else { mild.push(text); }
+    if (!text || text.length < 5) return;
+    var isSevere = /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA|heart|cardiac|death|METHYLATED|hepatotoxic|methyl/i.test(text);
+    var capsMatch = text.match(/^([A-Z][A-Z\s,/&]{2,40}):\s*([\s\S]+)/);
+    if (capsMatch) { items.push({ label: capsMatch[1].trim(), body: capsMatch[2].trim(), severe: true }); return; }
+    var dashIdx = text.indexOf(' - ');
+    if (dashIdx > 0 && dashIdx < 60) { items.push({ label: text.slice(0, dashIdx).trim(), body: text.slice(dashIdx + 3).trim(), severe: isSevere }); return; }
+    items.push({ label: null, body: text, severe: isSevere });
   });
-
-  function renderCard(text, isSevere, i) {
-    var borderColor = isSevere ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
-    var dotColor = isSevere ? 'bg-red-500' : 'bg-yellow-500';
-    return (
-      <div key={i} className={'flex items-start gap-2.5 p-3 rounded-lg border ' + borderColor}>
-        <div className={'w-2 h-2 rounded-full mt-1.5 shrink-0 ' + dotColor} />
-        <div className="text-[13px] text-slate-300 leading-relaxed">{renderHtml(text)}</div>
-      </div>
-    );
+  items.sort(function(a, b) { return (b.severe ? 1 : 0) - (a.severe ? 1 : 0); });
+  var severe = items.filter(function(it) { return it.severe; });
+  var mild = items.filter(function(it) { return !it.severe; });
+  function renderSECard(item, i) {
+    var bc = item.severe ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
+    var dc = item.severe ? 'bg-red-500' : 'bg-yellow-500';
+    return (<div key={i} className={'p-3 rounded-lg border ' + bc}><div className="flex items-start gap-2.5"><div className={'w-2 h-2 rounded-full mt-1.5 shrink-0 ' + dc} /><div>{item.label && <div className="text-xs font-bold text-slate-200 mb-0.5">{item.label}</div>}<div className="text-[13px] text-slate-300 leading-relaxed">{renderHtml(item.body)}</div></div></div></div>);
   }
-
-  /* If both columns have content, 2-col on desktop */
   if (severe.length > 0 && mild.length > 0) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Watch Closely</div>
-          {severe.map(function(t, i) { return renderCard(t, true, 's' + i); })}
-        </div>
-        <div className="space-y-2">
-          <div className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider mb-1">Be Aware</div>
-          {mild.map(function(t, i) { return renderCard(t, false, 'm' + i); })}
-        </div>
-      </div>
-    );
+    return (<div className="grid grid-cols-1 md:grid-cols-2 gap-3"><div className="space-y-2"><div className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Watch Closely</div>{severe.map(function(it, i) { return renderSECard(it, 's' + i); })}</div><div className="space-y-2"><div className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider mb-1">Be Aware</div>{mild.map(function(it, i) { return renderSECard(it, 'm' + i); })}</div></div>);
   }
-
-  /* Single column fallback */
-  var all = severe.concat(mild);
-  return (
-    <div className="space-y-2">
-      {all.map(function(t, i) { return renderCard(t, severe.indexOf(t) !== -1, i); })}
-    </div>
-  );
+  return (<div className="space-y-2">{items.map(function(it, i) { return renderSECard(it, i); })}</div>);
 }
 
 /* SOURCE REFERENCES: Parse from content text */
