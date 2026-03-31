@@ -98,7 +98,8 @@ router.get('/:slug', optionalAuth, async (req, res) => {
       'id','slug','name','category','risk_tier','trust_level','summary',
       'youtube_video_id','youtube_url','causes_hair_loss','hair_loss_severity',
       'company','is_published','created_at','updated_at','product_url',
-      'product_image_url','public_discount_code','product_price','thread_id','half_life','dosing'
+      'product_image_url','public_discount_code','product_price','thread_id','half_life','dosing',
+      'suppression_level','liver_level','hair_loss_level','water_retention_level','cholesterol_level','mood_level','legal_status'
     ];
     const LEAD_FIELDS = [...WINDOW_FIELDS,'mechanism','side_effects','benefits','compounds_list','article_preview'];
 
