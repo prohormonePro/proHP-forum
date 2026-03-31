@@ -604,13 +604,13 @@ export default function CompoundDetail() {
             </div>
             {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
-          {compound.slug {compound.product_image_url && ({compound.product_image_url && ( (
+            {compound.slug && (
             <div className="hidden md:block shrink-0">
               <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = "none"; }} alt={compound.name} className="rounded-xl w-32 h-auto object-contain" />
             </div>
           )}
         </div>
-        {compound.slug {compound.product_image_url && ({compound.product_image_url && ( (
+        {compound.slug && (
           <div className="mb-4 md:hidden">
             <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = "none"; }} alt={compound.name} className="rounded-xl max-h-36 object-contain mx-auto" />
           </div>
