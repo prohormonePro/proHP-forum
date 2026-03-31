@@ -794,7 +794,7 @@ export default function CompoundDetail() {
 
       {/* ═══ 18. FOOTER ═══ */}
       <div className="text-center py-6 mb-8"><div className="text-sm font-bold text-slate-300 mb-1">Proof Over Hype.</div><div className="text-xs text-slate-500">Track your bloodwork. Trust your body. Adjust accordingly.</div></div>
-      {showScrollTop && (<button onClick={function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="fixed z-[90] w-10 h-10 rounded-full bg-slate-800/90 backdrop-blur-sm border border-white/10 text-slate-400 hover:text-prohp-400 hover:border-prohp-400/30 transition-all shadow-lg flex items-center justify-center" style={{ bottom: '24px', left: '24px' }} aria-label="Back to top"><ArrowUp className="w-4 h-4" /></button>)}
+      {showScrollTop && (<button onClick={function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="fixed z-[90] w-12 h-12 rounded-full bg-slate-800/90 backdrop-blur-sm border border-white/10 text-slate-400 hover:text-prohp-400 hover:border-prohp-400/30 transition-all shadow-lg flex items-center justify-center" style={{ bottom: '80px', right: '24px' }} aria-label="Back to top"><ArrowUp className="w-5 h-5" /></button>)}
     </div>
   );
 }
