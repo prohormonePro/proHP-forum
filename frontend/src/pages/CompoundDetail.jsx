@@ -87,7 +87,7 @@ function BenefitsRenderer({ content }) {
     }
     if (type === 'dashlist') {
       var dLines = text.split('\n').filter(function(l) { return l.trim(); });
-      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
+      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); var bm = c.match(/^Best\s+for\s+(.+)/i); if (bm) { return (<div key={j} className="p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20 mt-1"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-sm font-semibold text-slate-200">{renderHtml(bm[1])}</span></div></div>); } return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
     }
     if (type === 'pill') {
       var ct = text.replace(/^[-\u2022\u2013]\s*/, '');
