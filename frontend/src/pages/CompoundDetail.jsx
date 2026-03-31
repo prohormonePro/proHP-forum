@@ -698,7 +698,7 @@ export default function CompoundDetail() {
       )}
 
       {/* ═══ 3. HALF-LIFE BAR ═══ */}
-      {gate_state !== "window" && <HalfLifeBar halfLife={compound.half_life} dosageRange={compound.dosage_range} />}
+      {gate_state === "member" && <HalfLifeBar halfLife={compound.half_life} dosageRange={compound.dosage_range} />}
 
       {/* ═══ 4. BENEFITS ═══ */}
       {compound.benefits && gate_state !== "window" && (
@@ -730,31 +730,6 @@ export default function CompoundDetail() {
       {/* ═══ 7. ANCILLARIES ═══ */}
       {gate_state === "member" && <AncillariesSection compound={compound} />}
 
-      {/* ═══ 8. VIDEO ═══ */}
-      {videoId && (<div className="prohp-card p-5 mb-4"><div className="flex items-center gap-2 mb-3"><Youtube className="w-4 h-4 text-red-500" /><span className="text-sm font-semibold text-slate-200">{compound.name} - Video Breakdown</span></div><div className="aspect-video rounded-lg overflow-hidden bg-black/30 border border-white/5"><YouTubeEmbed videoId={videoId} title={compound.name + ' breakdown'} className="w-full h-full" /></div></div>)}
-
-      
-      {gate_state === "lead" && (
-        <div className="prohp-card p-6 mb-4 border border-[rgba(34,157,216,0.2)] bg-[rgba(34,157,216,0.04)] text-center">
-          <Lock className="w-5 h-5 text-[#229DD8] mx-auto mb-2" />
-          <div className="text-sm font-bold text-slate-100 mb-1">Ready for the dosing protocol?</div>
-          <p className="text-[13px] text-slate-400 leading-relaxed mb-4">Exact doses, weekly timelines, stacking logic, PCT, and bloodwork panels. Everything you need to run this compound safely.</p>
-          <Link to="/register" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-5 py-2.5 text-xs font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">Unlock Inner Circle — $19/mo</Link>
-        </div>
-      )}
-
-      {/* ═══ 9. DOSING ═══ */}
-      {compound.dosing && gate_state === "member" && (
-        <div className="prohp-card p-6 mb-4">
-          <div className="flex items-center gap-3 mb-4">
-            <Clock className="w-4 h-4 text-prohp-400" />
-            <span className="text-sm font-bold text-slate-200">Dosing Protocol</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-prohp-400/30 to-transparent" />
-          </div>
-          <DosingRenderer content={dosingForDisplay} />
-        </div>
-      )}
-
       {/* ═══ 10. SIDE EFFECTS ═══ */}
       {compound.side_effects && gate_state !== "window" && (
         <div className="prohp-card p-6 mb-4">
@@ -772,9 +747,44 @@ export default function CompoundDetail() {
       {gate_state === "member" && compound.nutrition_label_url && (<Modal open={labelOpen} title={(compound.name || "Supplement") + " - Supplement Facts"} onClose={function() { setLabelOpen(false); }}><div className="flex items-center justify-center p-4"><img src={compound.nutrition_label_url} alt={(compound.name || "Supplement") + " supplement facts"} className="max-w-full max-h-[80vh] object-contain" /></div></Modal>)}
 
       {compound.hair_loss_explanation && (<div className="text-xs text-slate-400 italic mb-4 px-1">Hair loss note: {compound.hair_loss_explanation}</div>)}
-      {gate_state === "member" && compound.article_content && (<div className="prohp-card p-6 mb-4"><div className="text-sm font-semibold text-slate-200 mb-2">Full Breakdown</div><ContentBlock content={compound.article_content} /></div>)}
-      {gate_state === "lead" && compound.article_preview && (<div className="prohp-card p-6 mb-4 border border-[rgba(34,157,216,0.2)] bg-[rgba(34,157,216,0.04)]"><div className="text-sm font-semibold text-slate-200 mb-2">Full Breakdown Preview</div><p className="text-sm text-slate-300 leading-relaxed mb-4">{compound.article_preview}</p><div className="flex items-center gap-2 mb-2"><Lock className="w-4 h-4 text-[#229DD8]" /><span className="text-sm font-bold text-slate-100">Want the full breakdown?</span></div><p className="text-[13px] text-slate-400 mb-4">Dosing protocols, stacking logic, PCT, bloodwork markers.</p><Link to="/register" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-5 py-2.5 text-xs font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">Unlock Inner Circle</Link></div>)}
 
+      {gate_state === "lead" && (
+        <div className="prohp-card p-8 mb-4 border border-[rgba(34,157,216,0.25)] text-center" style={{ background: 'linear-gradient(180deg, rgba(14,165,233,0.06) 0%, rgba(14,165,233,0.02) 100%)' }}>
+          <Lock className="w-6 h-6 text-[#229DD8] mx-auto mb-3" />
+          <h3 className="text-lg font-extrabold text-slate-100 mb-2">Unlock the Complete Protocol</h3>
+          <p className="text-sm text-slate-400 leading-relaxed mb-4 max-w-md mx-auto">You know the benefits. You know the risks. Now get the exact week-by-week dosing, mandatory PCT, stacking logic, and bloodwork markers to run {compound.name} safely.</p>
+          <div className="flex flex-wrap justify-center gap-2 mb-5 text-[11px] text-slate-500">
+            <span className="px-3 py-1 rounded-full bg-slate-800/60 border border-white/5">Dosing protocols</span>
+            <span className="px-3 py-1 rounded-full bg-slate-800/60 border border-white/5">Stacking logic</span>
+            <span className="px-3 py-1 rounded-full bg-slate-800/60 border border-white/5">PCT timelines</span>
+            <span className="px-3 py-1 rounded-full bg-slate-800/60 border border-white/5">Bloodwork panels</span>
+            <span className="px-3 py-1 rounded-full bg-slate-800/60 border border-white/5">Ancillary stacks</span>
+          </div>
+          <Link to="/register" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-8 py-3 text-sm font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">Unlock Inner Circle &mdash; $19/mo</Link>
+          <div className="mt-3 text-[11px] text-slate-500">First 1,000 members get a permanent Founding Member badge.</div>
+        </div>
+      )}
+
+      {/* ═══ 8. VIDEO ═══ */}
+      {videoId && (<div className="prohp-card p-5 mb-4"><div className="flex items-center gap-2 mb-3"><Youtube className="w-4 h-4 text-red-500" /><span className="text-sm font-semibold text-slate-200">{compound.name} - Video Breakdown</span></div><div className="aspect-video rounded-lg overflow-hidden bg-black/30 border border-white/5"><YouTubeEmbed videoId={videoId} title={compound.name + ' breakdown'} className="w-full h-full" /></div></div>)}
+
+      
+      
+
+      {/* ═══ 9. DOSING ═══ */}
+      {compound.dosing && gate_state === "member" && (
+        <div className="prohp-card p-6 mb-4">
+          <div className="flex items-center gap-3 mb-4">
+            <Clock className="w-4 h-4 text-prohp-400" />
+            <span className="text-sm font-bold text-slate-200">Dosing Protocol</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-prohp-400/30 to-transparent" />
+          </div>
+          <DosingRenderer content={dosingForDisplay} />
+        </div>
+      )}
+
+      {gate_state === "member" && compound.article_content && (<div className="prohp-card p-6 mb-4"><div className="text-sm font-semibold text-slate-200 mb-2">Full Breakdown</div><ContentBlock content={compound.article_content} /></div>)}
+      
       {/* ═══ 11. SOURCE REFERENCES ═══ */}
       {gate_state === "member" && <SourceReferences content={compound.dosing} />}
 
@@ -787,7 +797,7 @@ export default function CompoundDetail() {
       {!videoId && compound && (<div className="prohp-card p-5 mb-4 border border-prohp-400/20 bg-prohp-400/[0.04] text-center"><div className="text-sm font-semibold text-slate-200 mb-2">This compound has not been covered yet.</div><p className="text-xs text-slate-400 mb-3">Want Travis to break it down? Drop a comment below and let him know.</p><button onClick={function() { var el = document.getElementById('community-discussion'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className="prohp-btn-primary text-xs">Request Coverage</button></div>)}
 
       {/* ═══ 14. SEARCH ═══ */}
-      <div className="mb-8">{compound && (<GrepGate excludeSlug={compound.slug || ""} autoQuery={compound.name} title={'Questions about ' + compound.name + '? Search the library.'} />)}</div>
+      <div className="mb-8">{compound && (<GrepGate excludeSlug={compound.slug || ""} autoQuery={compound.name} title={'Questions about ' + compound.name + '?'} />)}</div>
 
       {/* ═══ 15. COMMUNITY DISCUSSION ═══ */}
       {compound && compound.thread_id && (
@@ -806,7 +816,7 @@ export default function CompoundDetail() {
       )}
 
       {/* ═══ 17. COMMUNITY INTEL ═══ */}
-      {communityStats && communityStats.total > 0 && gate_state !== "window" && (<div className="prohp-card p-6 mb-4 border border-prohp-400/15 bg-prohp-400/[0.03]"><h3 className="text-sm font-bold text-prohp-400 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" /> Community Intel</h3><Link to="/community-intel" className="text-xs text-prohp-400 hover:text-prohp-300 transition-colors mb-3 inline-block">View full community data &rarr;</Link><div className="flex gap-3 flex-wrap mb-4"><div className="bg-prohp-400/10 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Total Reports</span><div className="text-lg font-bold text-white">{communityStats.total}</div></div>{communityStats.with_side_effects > 0 && (<div className="bg-red-900/20 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Side Effect Reports</span><div className="text-lg font-bold text-red-400">{communityStats.with_side_effects}</div></div>)}</div>{communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (<div className="flex gap-2 flex-wrap mb-4">{communityStats.top_side_effects.slice(0, 6).map(function(se, i) { return (<span key={i} className="bg-red-900/15 border border-red-700/25 rounded-full px-3 py-1 text-[11px] text-red-400">{se.effect} ({se.count})</span>); })}</div>)}{user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (<div>{communityComments.length > 0 && (<div className="flex flex-col gap-2 mt-3"><h4 className="text-xs font-semibold text-slate-400">Top Community Comments</h4>{communityComments.map(function(c, i) { return (<div key={c.id || i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5"><div className="text-[13px] text-slate-300 leading-relaxed mb-2">{c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}</div><div className="flex justify-between text-[11px] text-slate-500"><span>{c.author || 'Anonymous'}</span><span className="text-prohp-400">{c.likes || 0} likes</span></div></div>); })}</div>)}</div>) : (<div className="text-center pt-3 border-t border-white/5"><p className="text-xs text-slate-400 mb-3">Unlock full community intel: top comments, dosage patterns, and detailed reports</p><Link to="/register" className="prohp-btn-primary text-xs px-4 py-2">Unlock Community Intel</Link></div>)}</div>)}
+      {communityStats && communityStats.total > 0 && gate_state !== "window" && (<div className="prohp-card p-6 mb-4 border border-prohp-400/15 bg-prohp-400/[0.03]"><h3 className="text-sm font-bold text-prohp-400 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" /> Community Intel</h3><div className="flex gap-3 flex-wrap mb-4"><div className="bg-prohp-400/10 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Total Reports</span><div className="text-lg font-bold text-white">{communityStats.total}</div></div>{communityStats.with_side_effects > 0 && (<div className="bg-red-900/20 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Side Effect Reports</span><div className="text-lg font-bold text-red-400">{communityStats.with_side_effects}</div></div>)}</div>{communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (<div className="flex gap-2 flex-wrap mb-4">{communityStats.top_side_effects.slice(0, 6).map(function(se, i) { return (<span key={i} className="bg-red-900/15 border border-red-700/25 rounded-full px-3 py-1 text-[11px] text-red-400">{se.effect} ({se.count})</span>); })}</div>)}{user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (<div>{communityComments.length > 0 && (<div className="flex flex-col gap-2 mt-3"><h4 className="text-xs font-semibold text-slate-400">Top Community Comments</h4>{communityComments.map(function(c, i) { return (<div key={c.id || i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5"><div className="text-[13px] text-slate-300 leading-relaxed mb-2">{c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}</div><div className="flex justify-between text-[11px] text-slate-500"><span>{c.author || 'Anonymous'}</span><span className="text-prohp-400">{c.likes || 0} likes</span></div></div>); })}</div>)}</div>) : (<div className="text-center pt-3 border-t border-white/5"><p className="text-xs text-slate-400 mb-3">Unlock full community intel: top comments, dosage patterns, and detailed reports</p><Link to="/register" className="prohp-btn-primary text-xs px-4 py-2">Unlock Community Intel</Link></div>)}</div>)}
 
       {/* ═══ 16. RELATED ═══ */}
       <div className="prohp-card p-6 mb-4"><div className="flex items-center justify-between mb-3"><div className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-slate-400" /><div className="text-sm font-semibold text-slate-200">Related Threads</div></div><Link to="/rooms/library" className="text-xs text-slate-500 hover:text-prohp-400 transition-colors">Library</Link></div>{relatedThreads.length ? (<div className="flex flex-col gap-2">{relatedThreads.map(function(t) { return (<Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors"><div className="text-[13px] font-semibold text-slate-200">{t.title}</div><div className="mt-1 text-[11px] text-slate-500">{t.reply_count} replies</div></Link>); })}</div>) : (<div className="text-sm text-slate-400">No related threads yet.</div>)}</div>
