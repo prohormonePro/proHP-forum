@@ -44,7 +44,7 @@ function renderHtml(text) {
 }
 
 /* BENEFITS: Universal parser - pills, stat cards, check lists, prose cards */
-function BenefitsRenderer({ content }) {
+function BenefitsRenderer({ content, preview }) {
   if (!content) return null;
   var clean = content.replace(/\u0093\u00c7\u00f3/g, '- ').replace(/\u0393\u00c7\u00f3/g, '- ');
   var trimmed = clean.trim();
@@ -102,6 +102,28 @@ function BenefitsRenderer({ content }) {
     return (<div key={key} className="p-3 rounded-lg bg-emerald-900/[0.04] border-l-2 border-emerald-500/30"><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(text)}</div></div>);
   }
 
+  /* PREVIEW MODE: pills only, no cards, no section headers */
+  if (preview) {
+    var allPills = [];
+    sections.forEach(function(section) {
+      section.items.forEach(function(item, idx) {
+        var t = item.trim();
+        if (!t) return;
+        var type = classifyItem(t);
+        if (type === 'pill' || t.length < 60) {
+          var ct = t.replace(/^[-\u2022\u2013]\s*/, '');
+          allPills.push(ct);
+        }
+      });
+    });
+    if (allPills.length === 0) {
+      var first3 = [];
+      sections.forEach(function(s) { s.items.slice(0, 2).forEach(function(it) { var short = it.trim().split('.')[0].split(':')[0].trim(); if (short.length > 3 && short.length < 60) first3.push(short); }); });
+      allPills = first3.slice(0, 8);
+    }
+    return (<div><div className="flex flex-wrap justify-center gap-2">{allPills.slice(0, 10).map(function(pill, i) { return (<span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/20 border border-emerald-700/20 text-[12px] text-emerald-300"><Check className="w-3 h-3" />{pill}</span>); })}</div>{allPills.length > 10 && <div className="text-center mt-3 text-[11px] text-slate-500">+ {allPills.length - 10} more benefits for Inner Circle members</div>}</div>);
+  }
+
   return (
     <div className="space-y-4">
       {sections.map(function(section, si) {
@@ -127,10 +149,14 @@ function BenefitsRenderer({ content }) {
 }
 
 /* MECHANISM: Magazine lede + collapsible + centered section headers */
-function MechanismRenderer({ content }) {
+function MechanismRenderer({ content, preview }) {
   var [expanded, setExpanded] = useState(false);
   if (!content) return null;
   var paragraphs = content.split(/\n\n+/).filter(function(p) { return p.trim(); });
+  if (preview) {
+    var firstPara = paragraphs[0] || '';
+    return (<div><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(firstPara)}</div>{paragraphs.length > 1 && <div className="mt-3 text-center"><span className="text-[11px] text-slate-500 italic">Full mechanism breakdown available for Inner Circle members</span></div>}</div>);
+  }
   var previewCount = 3;
   var needsCollapse = paragraphs.length > previewCount;
   var visible = expanded ? paragraphs : paragraphs.slice(0, previewCount);
@@ -259,7 +285,7 @@ function DosingRenderer({ content }) {
 }
 
 /* SIDE EFFECTS: Universal parser - ALL CAPS headers, dash labels, severity split */
-function SideEffectsRenderer({ content }) {
+function SideEffectsRenderer({ content, preview }) {
   if (!content) return null;
   var clean = content.replace(/\u0093\u00c7\u00f3/g, '- ').replace(/\u0393\u00c7\u00f3/g, '- ');
   var blocks = clean.split(/\n\n+/).filter(function(b) { return b.trim(); });
@@ -279,6 +305,11 @@ function SideEffectsRenderer({ content }) {
   var severe = items.filter(function(it) { return it.severe; });
   var mild = items.filter(function(it) { return !it.severe && !it.positive; });
   var positive = items.filter(function(it) { return it.positive; });
+
+  if (preview) {
+    var labels = items.filter(function(it) { return it.label; }).map(function(it) { return it.label; }).slice(0, 5);
+    return (<div className="space-y-3"><div className="flex items-center gap-4 justify-center"><div className="text-center"><div className="text-2xl font-bold text-red-400">{severe.length}</div><div className="text-[10px] text-slate-500 uppercase tracking-wider">Watch Closely</div></div><div className="text-center"><div className="text-2xl font-bold text-yellow-400">{mild.length}</div><div className="text-[10px] text-slate-500 uppercase tracking-wider">Be Aware</div></div>{positive.length > 0 && <div className="text-center"><div className="text-2xl font-bold text-emerald-400">{positive.length}</div><div className="text-[10px] text-slate-500 uppercase tracking-wider">Clean</div></div>}</div>{labels.length > 0 && <div className="flex flex-wrap justify-center gap-2">{labels.map(function(l, i) { return (<span key={i} className="px-3 py-1 rounded-full bg-slate-800/60 border border-white/5 text-[11px] text-slate-400">{l}</span>); })}</div>}<div className="text-center mt-2"><span className="text-[11px] text-slate-500 italic">Detailed severity analysis for Inner Circle members</span></div></div>);
+  }
   function renderSECard(item, i) {
     var bc = item.positive ? 'border-emerald-700/20 bg-emerald-900/[0.04]' : item.severe ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
     var dc = item.positive ? 'bg-emerald-500' : item.severe ? 'bg-red-500' : 'bg-yellow-500';
@@ -708,7 +739,7 @@ export default function CompoundDetail() {
             <span className="text-sm font-bold text-slate-200">Benefits</span>
             <div className="flex-1 h-px bg-gradient-to-r from-emerald-700/30 to-transparent" />
           </div>
-          <BenefitsRenderer content={compound.benefits} />
+          <BenefitsRenderer content={compound.benefits} preview={gate_state === "lead"} />
         </div>
       )}
 
@@ -720,7 +751,7 @@ export default function CompoundDetail() {
             <span className="text-sm font-bold text-slate-200">Mechanism</span>
             <div className="flex-1 h-px bg-gradient-to-r from-prohp-400/30 to-transparent" />
           </div>
-          <MechanismRenderer content={compound.mechanism} />
+          <MechanismRenderer content={compound.mechanism} preview={gate_state === "lead"} />
         </div>
       )}
 
@@ -738,7 +769,7 @@ export default function CompoundDetail() {
             <span className="text-sm font-bold text-slate-200">Side Effects</span>
             <div className="flex-1 h-px bg-gradient-to-r from-red-700/30 to-transparent" />
           </div>
-          <SideEffectsRenderer content={compound.side_effects} />
+          <SideEffectsRenderer content={compound.side_effects} preview={gate_state === "lead"} />
         </div>
       )}
 

@@ -28,7 +28,7 @@ export default function SearchPage() {
         <form onSubmit={handleSearch} className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input type="text" value={input} onChange={(e) => setInput(e.target.value)}
-            placeholder="Search compounds, threads, discussions..."
+            placeholder="Search compounds, effects, logs..."
             className="w-full bg-slate-900/60 border border-white/[0.06] rounded-xl pl-10 pr-4 py-3 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-[#229DD8]/40 transition-colors"
             autoFocus />
         </form>
