@@ -87,7 +87,7 @@ function BenefitsRenderer({ content }) {
     }
     if (type === 'dashlist') {
       var dLines = text.split('\n').filter(function(l) { return l.trim(); });
-      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); var bm = c.match(/^Best\s+for\s+(.+)/i); if (bm) { var bfRaw = bm[1]; var bfParen = bfRaw.indexOf('('); var bfPeriod = bfRaw.indexOf('.'); var bfSplit = bfParen > 0 ? bfParen : bfPeriod > 0 ? bfPeriod : -1; var bfKeyword = bfSplit > 0 ? bfRaw.slice(0, bfSplit).trim() : bfRaw.trim(); var bfSub = bfSplit > 0 ? bfRaw.slice(bfSplit).replace(/^[(.]+\s*/, '').replace(/[)]+$/, '').trim() : ''; bfKeyword = bfKeyword.charAt(0).toUpperCase() + bfKeyword.slice(1); return (<div key={j} className="p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20 mt-1"><div className="flex items-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-base font-bold text-slate-100">{bfKeyword}</span></div>{bfSub && <div className="text-[12px] text-slate-400 mt-1">{bfSub}</div>}</div>); } return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
+      return (<div key={key} className="space-y-1.5">{dLines.map(function(line, j) { var c = line.trim().replace(/^[-\u2022\u2013]\s*/, ''); var bm = c.match(/^Best\s+for\s+(.+)/i); if (bm) { var bfRaw = bm[1]; var bfParen = bfRaw.indexOf('('); var bfPeriod = bfRaw.indexOf('.'); var bfSplit = bfParen > 0 ? bfParen : bfPeriod > 0 ? bfPeriod : -1; var bfKeyword = bfSplit > 0 ? bfRaw.slice(0, bfSplit).trim() : bfRaw.trim(); var bfSub = bfSplit > 0 ? bfRaw.slice(bfSplit).replace(/^[(.]+\s*/, '').replace(/[)]+$/, '').trim() : ''; bfKeyword = bfKeyword.charAt(0).toUpperCase() + bfKeyword.slice(1); return (<div key={j} className="p-3 rounded-lg bg-prohp-400/[0.06] border border-prohp-400/20 mt-1 text-center"><div className="flex items-center justify-center gap-2"><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-wider px-2 py-0.5 rounded bg-prohp-400/10">Best For</span><span className="text-base font-bold text-slate-100">{bfKeyword}</span></div>{bfSub && <div className="text-[12px] text-slate-400 mt-1">{bfSub}</div>}</div>); } return (<div key={j} className="flex items-start gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
     }
     if (type === 'pill') {
       var ct = text.replace(/^[-\u2022\u2013]\s*/, '');
@@ -117,7 +117,7 @@ function BenefitsRenderer({ content }) {
         return (
           <div key={si}>
             {section.header && (<div className="flex items-center gap-3 mb-3 mt-2"><div className="flex-1 h-px bg-gradient-to-r from-emerald-700/30 to-transparent" /><span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{section.header.replace(/:$/, '')}</span><div className="flex-1 h-px bg-gradient-to-r from-transparent to-emerald-700/30" /></div>)}
-            {pills.length > 0 && (<div className="flex flex-wrap gap-2 mb-3">{pills.map(function(p) { return renderBenefitItem(p.text, 'p-' + p.k); })}</div>)}
+            {pills.length > 0 && (<div className="flex flex-wrap justify-center gap-2 mb-3">{pills.map(function(p) { return renderBenefitItem(p.text, 'p-' + p.k); })}</div>)}
             {cards.length > 0 && (<div className="grid grid-cols-1 md:grid-cols-2 gap-3">{cards.map(function(c) { return renderBenefitItem(c.text, 'c-' + c.k); })}</div>)}
           </div>
         );
@@ -182,7 +182,25 @@ function DosingRenderer({ content }) {
       return (<div key={i}><div className="flex items-center gap-3 mb-2 mt-1"><div className="flex-1 h-px bg-gradient-to-r from-prohp-400/20 to-transparent" /><span className="text-[10px] font-bold text-prohp-400 uppercase tracking-widest">{ht}</span><div className="flex-1 h-px bg-gradient-to-r from-transparent to-prohp-400/20" /></div>{bl && <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(bl)}</div>}</div>);
     }
     if (/^(week|wk)\s*\d/i.test(fl)) {
-      return (<div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-prohp-400/[0.04] border border-prohp-400/10"><div className="w-2 h-2 rounded-full bg-prohp-400 mt-1.5 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div></div>);
+      var weekLabel = fl.match(/^((?:week|wk)\s*[\d+\-]+)/i);
+      var weekTitle = weekLabel ? weekLabel[1].trim() : fl.split(':')[0].trim();
+      var weekBody = fl.indexOf(':') > 0 ? fl.slice(fl.indexOf(':') + 1).trim() : '';
+      var weekExtra = lines.slice(1).join(' ').trim();
+      if (weekExtra) weekBody = weekBody ? weekBody + ' ' + weekExtra : weekExtra;
+      var weekDose = '';
+      var weekNote = weekBody;
+      var dotIdx = weekBody.indexOf('.');
+      if (dotIdx > 0 && dotIdx < 60) { weekDose = weekBody.slice(0, dotIdx).trim(); weekNote = weekBody.slice(dotIdx + 1).trim(); }
+      return (
+        <div key={i} className="p-3 rounded-lg bg-prohp-400/[0.04] border border-prohp-400/10">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 rounded-full bg-prohp-400 shrink-0" />
+            <span className="text-xs font-bold text-prohp-400 uppercase tracking-wider">{weekTitle}</span>
+          </div>
+          {weekDose && <div className="text-base font-bold text-slate-100 mb-1">{weekDose}</div>}
+          {weekNote && <div className="text-[12px] text-slate-400 leading-relaxed italic">{renderHtml(weekNote)}</div>}
+        </div>
+      );
     }
     var tierMatch = fl.match(/^(Beginner|Intermediate|Advanced|Sweet spot|Standard|Clinical|First-time)/i);
     if (tierMatch) {
@@ -208,6 +226,12 @@ function DosingRenderer({ content }) {
     var dl = lines.filter(function(l) { return l.trim(); });
     if (dl.length > 1 && dl.every(function(l) { return /^[-\u2022]\s/.test(l.trim()); })) {
       return (<div key={i} className="space-y-1.5">{dl.map(function(line, j) { var c = line.trim().replace(/^[-\u2022]\s*/, ''); return (<div key={j} className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-prohp-400 mt-2 shrink-0" /><div className="text-sm text-slate-300 leading-relaxed">{renderHtml(c)}</div></div>); })}</div>);
+    }
+    /* Each pill/capsule → pill chips */
+    var eachMatch = block.match(/^Each\s+(pill|capsule|serving|tablet)[:\s]+(.+)/i);
+    if (eachMatch) {
+      var parts = eachMatch[2].split(/\.\s+/).filter(function(p) { return p.trim(); });
+      return (<div key={i} className="flex flex-wrap justify-center gap-2">{parts.map(function(part, pi) { return (<span key={pi} className="inline-flex items-center px-4 py-2 rounded-full bg-slate-800/60 border border-white/10 text-[12px] text-slate-200 font-medium">{renderHtml(part.trim().replace(/\.$/, ''))}</span>); })}</div>);
     }
     return (<div key={i} className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div>);
   }
@@ -465,15 +489,15 @@ function HalfLifeBar({ halfLife, dosageRange }) {
   return (
     <div className="grid grid-cols-2 gap-3 mb-4">
       {halfLife && (
-        <div className="prohp-card p-4 border border-white/5 text-center">
-          <Clock className="w-5 h-5 text-prohp-400 mx-auto mb-2" />
+        <div className="prohp-card p-4 border border-white/5 text-center flex flex-col items-center justify-center">
+          <Clock className="w-5 h-5 text-prohp-400 mb-2" />
           <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Half-life</div>
           <div className="text-lg font-bold text-slate-100">{halfLife}</div>
         </div>
       )}
       {dosageRange && (
-        <div className="prohp-card p-4 border border-white/5 text-center">
-          <Beaker className="w-5 h-5 text-prohp-400 mx-auto mb-2" />
+        <div className="prohp-card p-4 border border-white/5 text-center flex flex-col items-center justify-center">
+          <Beaker className="w-5 h-5 text-prohp-400 mb-2" />
           <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Dose</div>
           {(() => {
             var parts = dosageRange.split(/[.!]\s+/);
@@ -756,7 +780,7 @@ export default function CompoundDetail() {
       )}
 
       {/* ═══ 17. COMMUNITY INTEL ═══ */}
-      {communityStats && communityStats.total > 0 && (<div className="prohp-card p-6 mb-4 border border-prohp-400/15 bg-prohp-400/[0.03]"><h3 className="text-sm font-bold text-prohp-400 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" /> Community Intel</h3><div className="flex gap-3 flex-wrap mb-4"><div className="bg-prohp-400/10 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Total Reports</span><div className="text-lg font-bold text-white">{communityStats.total}</div></div>{communityStats.with_side_effects > 0 && (<div className="bg-red-900/20 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Side Effect Reports</span><div className="text-lg font-bold text-red-400">{communityStats.with_side_effects}</div></div>)}</div>{communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (<div className="flex gap-2 flex-wrap mb-4">{communityStats.top_side_effects.slice(0, 6).map(function(se, i) { return (<span key={i} className="bg-red-900/15 border border-red-700/25 rounded-full px-3 py-1 text-[11px] text-red-400">{se.effect} ({se.count})</span>); })}</div>)}{user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (<div>{communityComments.length > 0 && (<div className="flex flex-col gap-2 mt-3"><h4 className="text-xs font-semibold text-slate-400">Top Community Comments</h4>{communityComments.map(function(c, i) { return (<div key={c.id || i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5"><div className="text-[13px] text-slate-300 leading-relaxed mb-2">{c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}</div><div className="flex justify-between text-[11px] text-slate-500"><span>{c.author || 'Anonymous'}</span><span className="text-prohp-400">{c.likes || 0} likes</span></div></div>); })}</div>)}</div>) : (<div className="text-center pt-3 border-t border-white/5"><p className="text-xs text-slate-400 mb-3">Unlock full community intel: top comments, dosage patterns, and detailed reports</p><Link to="/register" className="prohp-btn-primary text-xs px-4 py-2">Unlock Community Intel</Link></div>)}</div>)}
+      {communityStats && communityStats.total > 0 && (<div className="prohp-card p-6 mb-4 border border-prohp-400/15 bg-prohp-400/[0.03]"><h3 className="text-sm font-bold text-prohp-400 mb-4 flex items-center gap-2"><Shield className="w-4 h-4" /> Community Intel</h3><Link to="/community-intel" className="text-xs text-prohp-400 hover:text-prohp-300 transition-colors mb-3 inline-block">View full community data &rarr;</Link><div className="flex gap-3 flex-wrap mb-4"><div className="bg-prohp-400/10 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Total Reports</span><div className="text-lg font-bold text-white">{communityStats.total}</div></div>{communityStats.with_side_effects > 0 && (<div className="bg-red-900/20 rounded-lg px-3 py-2"><span className="text-[10px] text-slate-400 block">Side Effect Reports</span><div className="text-lg font-bold text-red-400">{communityStats.with_side_effects}</div></div>)}</div>{communityStats.top_side_effects && communityStats.top_side_effects.length > 0 && (<div className="flex gap-2 flex-wrap mb-4">{communityStats.top_side_effects.slice(0, 6).map(function(se, i) { return (<span key={i} className="bg-red-900/15 border border-red-700/25 rounded-full px-3 py-1 text-[11px] text-red-400">{se.effect} ({se.count})</span>); })}</div>)}{user && (user.tier === 'inner_circle' || user.tier === 'admin' || user.role === 'admin') ? (<div>{communityComments.length > 0 && (<div className="flex flex-col gap-2 mt-3"><h4 className="text-xs font-semibold text-slate-400">Top Community Comments</h4>{communityComments.map(function(c, i) { return (<div key={c.id || i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5"><div className="text-[13px] text-slate-300 leading-relaxed mb-2">{c.content && c.content.length > 280 ? c.content.slice(0, 280) + '...' : c.content}</div><div className="flex justify-between text-[11px] text-slate-500"><span>{c.author || 'Anonymous'}</span><span className="text-prohp-400">{c.likes || 0} likes</span></div></div>); })}</div>)}</div>) : (<div className="text-center pt-3 border-t border-white/5"><p className="text-xs text-slate-400 mb-3">Unlock full community intel: top comments, dosage patterns, and detailed reports</p><Link to="/register" className="prohp-btn-primary text-xs px-4 py-2">Unlock Community Intel</Link></div>)}</div>)}
 
       {/* ═══ 16. RELATED ═══ */}
       <div className="prohp-card p-6 mb-4"><div className="flex items-center justify-between mb-3"><div className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-slate-400" /><div className="text-sm font-semibold text-slate-200">Related Threads</div></div><Link to="/rooms/library" className="text-xs text-slate-500 hover:text-prohp-400 transition-colors">Library</Link></div>{relatedThreads.length ? (<div className="flex flex-col gap-2">{relatedThreads.map(function(t) { return (<Link key={t.id} to={'/t/' + t.id} className="prohp-card p-3 hover:bg-slate-800/40 transition-colors"><div className="text-[13px] font-semibold text-slate-200">{t.title}</div><div className="mt-1 text-[11px] text-slate-500">{t.reply_count} replies</div></Link>); })}</div>) : (<div className="text-sm text-slate-400">No related threads yet.</div>)}</div>
