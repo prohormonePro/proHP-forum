@@ -94,7 +94,7 @@ function MechanismRenderer({ content }) {
           }
 
           return (
-            <div key={i} className="text-sm text-slate-300 leading-relaxed">{renderHtml(para)}</div>
+            <div key={i} className="text-sm text-slate-300 leading-relaxed pl-3 border-l-2 border-slate-700/40">{renderHtml(para)}</div>
           );
         })}
       </div>
@@ -111,7 +111,7 @@ function MechanismRenderer({ content }) {
   );
 }
 
-/* DOSING: Structured with section headers + stack cards */
+/* DOSING: Structured with section headers + week cards + stack cards */
 function DosingRenderer({ content }) {
   if (!content) return null;
   var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
@@ -134,8 +134,30 @@ function DosingRenderer({ content }) {
           );
         }
 
-        /* Stack recommendations (detect "Mild", "Hardcore", etc. or compound names) */
-        var isStack = /^(mild|moderate|hardcore|best|ultimate|cutting|bulking|joint|recomp)/i.test(firstLine);
+        /* Week/dosing timeline entries */
+        var isWeek = /^(week|wk)\s*\d/i.test(firstLine);
+        if (isWeek) {
+          return (
+            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-prohp-400/[0.04] border border-prohp-400/10">
+              <div className="w-1.5 h-1.5 rounded-full bg-prohp-400 mt-2 shrink-0" />
+              <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(block)}</div>
+            </div>
+          );
+        }
+
+        /* Cycle length blocks */
+        var isCycle = /^(cycle|duration|length)/i.test(firstLine);
+        if (isCycle) {
+          return (
+            <div key={i} className="p-3 rounded-lg bg-slate-800/30 border border-white/5">
+              <div className="flex items-center gap-2 mb-1"><Clock className="w-3.5 h-3.5 text-prohp-400" /><span className="text-xs font-bold text-slate-300">Cycle Length</span></div>
+              <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(lines.slice(0).join('\n'))}</div>
+            </div>
+          );
+        }
+
+        /* Stack recommendations */
+        var isStack = /^(mild|moderate|hardcore|best|ultimate|cutting|bulking|joint|recomp|stacks)/i.test(firstLine);
         if (isStack) {
           return (
             <div key={i} className="bg-slate-800/40 border border-white/5 rounded-lg p-3">
@@ -149,7 +171,7 @@ function DosingRenderer({ content }) {
         if (isPCT) {
           return (
             <div key={i} className="bg-red-900/[0.06] border border-red-700/15 rounded-lg p-3">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">PCT</div>
+              <div className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1">Post-Cycle Therapy</div>
               <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(lines.slice(0).join('\n'))}</div>
             </div>
           );
@@ -164,27 +186,29 @@ function DosingRenderer({ content }) {
   );
 }
 
-/* SIDE EFFECTS: Each effect in its own warning card */
+/* SIDE EFFECTS: Each effect in its own warning card, severe first */
 function SideEffectsRenderer({ content }) {
   if (!content) return null;
   var blocks = content.split(/\n\n+/).filter(function(b) { return b.trim(); });
   if (blocks.length <= 1) blocks = content.split(/\n/).filter(function(b) { return b.trim() && b.trim().length > 10; });
 
+  /* Sort severe effects first */
+  var sorted = blocks.map(function(block) {
+    var text = block.trim();
+    var isSevere = /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA|heart|cardiac|death/i.test(text);
+    return { text: text, severe: isSevere };
+  }).sort(function(a, b) { return (b.severe ? 1 : 0) - (a.severe ? 1 : 0); });
+
   return (
     <div className="space-y-2">
-      {blocks.map(function(block, i) {
-        var text = block.trim();
-        if (!text) return null;
-
-        /* Detect severity from keywords */
-        var isSevere = /suppress|liver|toxic|shutdown|banned|extreme|mandatory|HPTA/i.test(text);
-        var borderColor = isSevere ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
-        var dotColor = isSevere ? 'bg-red-500' : 'bg-yellow-500';
-
+      {sorted.map(function(item, i) {
+        if (!item.text) return null;
+        var borderColor = item.severe ? 'border-red-700/20 bg-red-900/[0.04]' : 'border-yellow-700/10 bg-yellow-900/[0.03]';
+        var dotColor = item.severe ? 'bg-red-500' : 'bg-yellow-500';
         return (
           <div key={i} className={'flex items-start gap-3 p-3 rounded-lg border ' + borderColor}>
             <div className={'w-2 h-2 rounded-full mt-1.5 shrink-0 ' + dotColor} />
-            <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(text)}</div>
+            <div className="text-sm text-slate-300 leading-relaxed">{renderHtml(item.text)}</div>
           </div>
         );
       })}
@@ -489,21 +513,34 @@ export default function CompoundDetail() {
 
       {/* ═══ 1. HEADER ═══ */}
       <div className="prohp-card p-6 mb-4">
-        <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
-            {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
-            <div className="flex flex-wrap items-center gap-2">
-              {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
-              {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
-              {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
-              {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
+        <div className="flex items-start gap-5 mb-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+                {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
+                <div className="flex flex-wrap items-center gap-2">
+                  {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
+                  {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
+                  {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
+                  {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
+                </div>
+              </div>
+              <div className="flex gap-2">{videoId && (<button type="button" onClick={function() { setVideoOpen(true); }} className="prohp-btn-primary inline-flex items-center gap-2 text-xs"><Youtube className="w-4 h-4" /> Watch breakdown</button>)}</div>
             </div>
+            {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
-          <div className="flex gap-2">{videoId && (<button type="button" onClick={function() { setVideoOpen(true); }} className="prohp-btn-primary inline-flex items-center gap-2 text-xs"><Youtube className="w-4 h-4" /> Watch breakdown</button>)}</div>
+          {compound.product_image_url && (
+            <div className="hidden md:block shrink-0">
+              <img src={compound.product_image_url} alt={compound.name} className="rounded-xl w-32 h-auto object-contain" />
+            </div>
+          )}
         </div>
-        {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed mb-4" />}
-        {compound.product_image_url && (<div className="mb-4"><img src={compound.product_image_url} alt={compound.name} className="rounded-xl max-h-48 object-contain mx-auto" /></div>)}
+        {compound.product_image_url && (
+          <div className="mb-4 md:hidden">
+            <img src={compound.product_image_url} alt={compound.name} className="rounded-xl max-h-36 object-contain mx-auto" />
+          </div>
+        )}
         {compound.product_url && (<div className="mt-3 pt-3 border-t border-white/5"><a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"><ExternalLink className="w-3.5 h-3.5" /> Support the encyclopedia</a><DiscountSection compound={compound} gate_state={gate_state} /></div>)}
       </div>
 
