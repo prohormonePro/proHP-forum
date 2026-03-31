@@ -587,37 +587,57 @@ export default function CompoundDetail() {
 
       {/* ═══ 1. HEADER ═══ */}
       <div className="prohp-card p-6 mb-4 relative overflow-visible">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4">
+        {/* Desktop: asymmetrical grid */}
+        <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 280px', gap: '16px' }}>
           <div className="min-w-0">
-            <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
-              <div>
-                <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
-                {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
-                <div className="flex flex-wrap items-center gap-2">
-                  {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
-                  {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
-                  {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
-                  {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
-                </div>
-              </div>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+            {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
+              {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
+              {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
+              {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
             </div>
-            {videoId && (<div className="mb-3"><button type="button" onClick={function() { setVideoOpen(true); }} className="prohp-btn-primary inline-flex items-center gap-2 text-xs"><Youtube className="w-4 h-4" /> Watch breakdown</button></div>)}
             {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
+          {/* Hero staging area */}
+          <div className="relative flex items-center justify-center" style={{ marginTop: '-24px', marginBottom: '-50px', zIndex: 10 }}>
+            <div className="relative flex items-center justify-center">
+              {/* Backlight glow */}
+              <div className="absolute" style={{ width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(14,165,233,0.10) 0%, rgba(14,165,233,0.04) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+              {compound.slug && (
+                <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.parentElement.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '280px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 25px 50px rgba(0,0,0,0.6)) drop-shadow(0 8px 16px rgba(0,0,0,0.4))' }} />
+              )}
+              {/* Frosted glass button overlapping bottle */}
+              {videoId && (
+                <button type="button" onClick={function() { setVideoOpen(true); }} className="absolute z-20 inline-flex items-center gap-2 text-xs font-bold transition-all duration-200" style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)', background: 'rgba(14, 165, 233, 0.12)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(14, 165, 233, 0.6)', borderRadius: '12px', padding: '10px 20px', color: '#0EA5E9', boxShadow: '0 0 20px rgba(14,165,233,0.15), 0 4px 12px rgba(0,0,0,0.3)' }} onMouseEnter={function(e) { e.target.style.background = '#0EA5E9'; e.target.style.color = '#0f1117'; e.target.style.transform = 'translateX(-50%) scale(1.05)'; e.target.style.boxShadow = '0 0 30px rgba(14,165,233,0.4), 0 4px 20px rgba(0,0,0,0.4)'; }} onMouseLeave={function(e) { e.target.style.background = 'rgba(14, 165, 233, 0.12)'; e.target.style.color = '#0EA5E9'; e.target.style.transform = 'translateX(-50%)'; e.target.style.boxShadow = '0 0 20px rgba(14,165,233,0.15), 0 4px 12px rgba(0,0,0,0.3)'; }}>
+                  <Youtube className="w-4 h-4" /> Watch breakdown
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile: stacked */}
+        <div className="md:hidden">
+          <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+          {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
+            {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
+            {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
+            {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
+          </div>
           {compound.slug && (
-            <div className="hidden md:flex items-end justify-center relative" style={{ marginTop: '-30px', marginBottom: '-24px', zIndex: 2 }}>
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(34,157,216,0.08) 0%, transparent 70%)', transform: 'scale(2.5)', zIndex: 0 }} />
-                <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.parentElement.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10 w-44 h-auto object-contain" style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5)) drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
-              </div>
+            <div className="relative flex justify-center my-4">
+              <div className="absolute" style={{ width: '250px', height: '250px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }} />
+              <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '200px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.5))' }} />
             </div>
           )}
+          {videoId && (<div className="mb-3"><button type="button" onClick={function() { setVideoOpen(true); }} className="w-full inline-flex items-center justify-center gap-2 text-xs font-bold py-2.5 rounded-xl transition-all" style={{ background: 'rgba(14, 165, 233, 0.12)', backdropFilter: 'blur(12px)', border: '1px solid rgba(14, 165, 233, 0.6)', color: '#0EA5E9' }}><Youtube className="w-4 h-4" /> Watch breakdown</button></div>)}
+          {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
         </div>
-        {compound.slug && (
-          <div className="my-4 md:hidden flex justify-center">
-            <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = 'none'; }} alt={compound.name} className="w-40 h-auto object-contain" style={{ filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.5))' }} />
-          </div>
-        )}
+
         {compound.product_url && (<div className="mt-3 pt-3 border-t border-white/5"><a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"><ExternalLink className="w-3.5 h-3.5" /> Support the encyclopedia</a><DiscountSection compound={compound} gate_state={gate_state} /></div>)}
       </div>
 
