@@ -581,6 +581,12 @@ export default function CompoundDetail() {
 
   var [communityStats, setCommunityStats] = useState(null);
   var [communityComments, setCommunityComments] = useState([]);
+  var [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(function() {
+    function onScroll() { setShowScrollTop(window.scrollY > 600); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return function() { window.removeEventListener('scroll', onScroll); };
+  }, []);
   useEffect(function() {
     if (!compound || !compound.name) return;
     var apiBase = import.meta.env.VITE_API_URL || '';
@@ -761,7 +767,7 @@ export default function CompoundDetail() {
       {!videoId && compound && (<div className="prohp-card p-5 mb-4 border border-prohp-400/20 bg-prohp-400/[0.04] text-center"><div className="text-sm font-semibold text-slate-200 mb-2">This compound has not been covered yet.</div><p className="text-xs text-slate-400 mb-3">Want Travis to break it down? Drop a comment below and let him know.</p><button onClick={function() { var el = document.getElementById('community-discussion'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className="prohp-btn-primary text-xs">Request Coverage</button></div>)}
 
       {/* ═══ 14. SEARCH ═══ */}
-      <div className="mb-8">{compound && (<GrepGate excludeSlug={compound.slug || ""} autoQuery={compound.name} title={'Still have a question about ' + compound.name + ' or another product? Search the library.'} />)}</div>
+      <div className="mb-8">{compound && (<GrepGate excludeSlug={compound.slug || ""} autoQuery={compound.name} title={'Questions about ' + compound.name + '? Search the library.'} />)}</div>
 
       {/* ═══ 15. COMMUNITY DISCUSSION ═══ */}
       {compound && compound.thread_id && (
@@ -788,7 +794,7 @@ export default function CompoundDetail() {
 
       {/* ═══ 18. FOOTER ═══ */}
       <div className="text-center py-6 mb-8"><div className="text-sm font-bold text-slate-300 mb-1">Proof Over Hype.</div><div className="text-xs text-slate-500">Track your bloodwork. Trust your body. Adjust accordingly.</div></div>
-      <div className="flex justify-center mb-4"><button onClick={function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-xs text-slate-500 hover:text-[var(--prohp-blue)] transition-colors">&uarr; Back to top</button></div>
+      {showScrollTop && (<button onClick={function() { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="fixed z-[90] w-10 h-10 rounded-full bg-slate-800/90 backdrop-blur-sm border border-white/10 text-slate-400 hover:text-prohp-400 hover:border-prohp-400/30 transition-all shadow-lg flex items-center justify-center" style={{ bottom: '24px', left: '24px' }} aria-label="Back to top"><ArrowUp className="w-4 h-4" /></button>)}
     </div>
   );
 }
