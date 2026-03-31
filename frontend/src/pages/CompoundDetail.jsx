@@ -586,9 +586,9 @@ export default function CompoundDetail() {
       <Link to="/compounds" className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 z-[100] inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/90 backdrop-blur-md px-5 py-3 text-sm font-semibold text-slate-200 shadow-lg transition hover:bg-slate-800 hover:border-white/20 hover:text-[#229DD8]" aria-label="Back to Encyclopedia"><ChevronLeft className="w-4 h-4" /> Encyclopedia</Link>
 
       {/* ═══ 1. HEADER ═══ */}
-      <div className="prohp-card p-6 mb-4">
-        <div className="flex items-start gap-5 mb-4">
-          <div className="flex-1 min-w-0">
+      <div className="prohp-card p-6 mb-4 relative overflow-visible">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4">
+          <div className="min-w-0">
             <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
               <div>
                 <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
@@ -600,19 +600,22 @@ export default function CompoundDetail() {
                   {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
                 </div>
               </div>
-              <div className="flex gap-2">{videoId && (<button type="button" onClick={function() { setVideoOpen(true); }} className="prohp-btn-primary inline-flex items-center gap-2 text-xs"><Youtube className="w-4 h-4" /> Watch breakdown</button>)}</div>
             </div>
+            {videoId && (<div className="mb-3"><button type="button" onClick={function() { setVideoOpen(true); }} className="prohp-btn-primary inline-flex items-center gap-2 text-xs"><Youtube className="w-4 h-4" /> Watch breakdown</button></div>)}
             {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
-            {compound.slug && (
-            <div className="hidden md:block shrink-0">
-              <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = "none"; }} alt={compound.name} className="rounded-xl w-36 h-44 object-contain drop-shadow-lg" />
+          {compound.slug && (
+            <div className="hidden md:flex items-end justify-center relative" style={{ marginTop: '-30px', marginBottom: '-24px', zIndex: 2 }}>
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(34,157,216,0.08) 0%, transparent 70%)', transform: 'scale(2.5)', zIndex: 0 }} />
+                <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.parentElement.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10 w-44 h-auto object-contain" style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5)) drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
+              </div>
             </div>
           )}
         </div>
         {compound.slug && (
-          <div className="mb-4 md:hidden">
-            <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = "none"; }} alt={compound.name} className="rounded-xl max-h-44 object-contain mx-auto drop-shadow-lg" />
+          <div className="my-4 md:hidden flex justify-center">
+            <img src={`/images/compounds/${compound.slug}.png`} onError={(e) => { e.target.style.display = 'none'; }} alt={compound.name} className="w-40 h-auto object-contain" style={{ filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.5))' }} />
           </div>
         )}
         {compound.product_url && (<div className="mt-3 pt-3 border-t border-white/5"><a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"><ExternalLink className="w-3.5 h-3.5" /> Support the encyclopedia</a><DiscountSection compound={compound} gate_state={gate_state} /></div>)}
