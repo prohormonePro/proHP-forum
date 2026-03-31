@@ -588,7 +588,7 @@ export default function CompoundDetail() {
       {/* ═══ 1. HEADER ═══ */}
       <div className="prohp-card p-6 mb-4 relative overflow-visible">
         {/* Desktop: asymmetrical grid */}
-        <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 280px', gap: '16px' }}>
+        <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 260px', gap: '20px' }}>
           <div className="min-w-0">
             <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
             {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
@@ -600,51 +600,56 @@ export default function CompoundDetail() {
             </div>
             {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
           </div>
-          {/* Hero staging area */}
-          <div className="relative flex items-center justify-center" style={{ marginTop: '-16px', marginBottom: '32px', zIndex: 10 }}>
-            {compound.slug && (
+          {/* Hero staging: bottle + button vertical lockup */}
+          {compound.slug && (
+            <div className="flex flex-col items-center justify-center" style={{ marginTop: '-16px', marginBottom: '16px' }}>
+              {/* Bottle with backlight and anchor shadow */}
               <div className="relative">
-                {/* Backlight */}
-                <div className="absolute" style={{ width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(14,165,233,0.09) 0%, rgba(14,165,233,0.03) 45%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-                {/* Bottle */}
-                <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.closest('[style*="zIndex"]').style.display = 'none'; }} alt={compound.name} className="relative z-10 mx-auto" style={{ height: '260px', width: 'auto', maxWidth: '240px', objectFit: 'contain', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5)) drop-shadow(0 6px 12px rgba(0,0,0,0.3))' }} />
-                {/* Anchor shadow */}
-                <div className="absolute z-0" style={{ bottom: '-8px', left: '50%', transform: 'translateX(-50%)', width: '120px', height: '16px', background: 'radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%)', borderRadius: '50%' }} />
-                {/* Frosted pill button */}
-                {videoId && (
-                  <button type="button" onClick={function() { setVideoOpen(true); }} className="absolute z-20" style={{ bottom: '15%', left: '50%', transform: 'translateX(-50%)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', whiteSpace: 'nowrap', padding: '10px 24px', borderRadius: '9999px', background: 'rgba(14, 165, 233, 0.10)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(14, 165, 233, 0.4)', color: '#0EA5E9', fontSize: '12px', fontWeight: '700', letterSpacing: '0.02em', textShadow: '0 0 8px rgba(14, 165, 233, 0.3)', boxShadow: '0 0 16px rgba(14,165,233,0.12), 0 4px 12px rgba(0,0,0,0.25)', cursor: 'pointer', transition: 'all 0.2s ease-in-out' }} onMouseEnter={function(e) { var s = e.currentTarget.style; s.background = '#0EA5E9'; s.color = '#0f1117'; s.textShadow = 'none'; s.transform = 'translateX(-50%) scale(1.05)'; s.boxShadow = '0 0 30px rgba(14,165,233,0.4), 0 4px 20px rgba(0,0,0,0.4)'; }} onMouseLeave={function(e) { var s = e.currentTarget.style; s.background = 'rgba(14, 165, 233, 0.10)'; s.color = '#0EA5E9'; s.textShadow = '0 0 8px rgba(14, 165, 233, 0.3)'; s.transform = 'translateX(-50%)'; s.boxShadow = '0 0 16px rgba(14,165,233,0.12), 0 4px 12px rgba(0,0,0,0.25)'; }}>
-                    <Youtube className="w-4 h-4" /> Watch breakdown
-                  </button>
-                )}
+                <div className="absolute" style={{ width: '340px', height: '340px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 45%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+                <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { var p = e.target.closest('.flex.flex-col'); if (p) p.style.display = 'none'; }} alt={compound.name} className="relative z-10 mx-auto" style={{ height: '240px', width: 'auto', maxWidth: '220px', objectFit: 'contain', filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }} />
+                {/* Anchor shadow directly under bottle */}
+                <div style={{ width: '60%', height: '10px', margin: '2px auto 0', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, transparent 70%)', borderRadius: '50%' }} />
               </div>
-            )}
-          </div>
+              {/* Button: decoupled, 20px below bottle */}
+              {videoId && (
+                <button type="button" onClick={function() { setVideoOpen(true); }} style={{ marginTop: '20px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', whiteSpace: 'nowrap', padding: '10px 28px', borderRadius: '9999px', background: 'rgba(14, 165, 233, 0.10)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(14, 165, 233, 0.4)', color: '#0EA5E9', fontSize: '12px', fontWeight: '700', letterSpacing: '0.02em', textShadow: '0 0 8px rgba(14, 165, 233, 0.3)', boxShadow: '0 0 16px rgba(14,165,233,0.10), 0 2px 8px rgba(0,0,0,0.2)', cursor: 'pointer', transition: 'all 0.2s ease-in-out' }} onMouseEnter={function(e) { var s = e.currentTarget.style; s.background = '#0EA5E9'; s.color = '#0f1117'; s.textShadow = 'none'; s.transform = 'scale(1.05)'; s.boxShadow = '0 0 28px rgba(14,165,233,0.35), 0 4px 16px rgba(0,0,0,0.3)'; }} onMouseLeave={function(e) { var s = e.currentTarget.style; s.background = 'rgba(14, 165, 233, 0.10)'; s.color = '#0EA5E9'; s.textShadow = '0 0 8px rgba(14, 165, 233, 0.3)'; s.transform = 'scale(1)'; s.boxShadow = '0 0 16px rgba(14,165,233,0.10), 0 2px 8px rgba(0,0,0,0.2)'; }}>
+                  <Youtube className="w-4 h-4" /> Watch breakdown
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Mobile: stacked */}
-        <div className="md:hidden">
-          <h1 className="text-xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
-          {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
-            {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
-            {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
-            {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
+        {/* Mobile: stacked with hero order */}
+        <div className="md:hidden flex flex-col">
+          {/* 1. Title + Tags */}
+          <div>
+            <h1 className="text-xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+            {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
+              {compound.category && (<span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700/40">{compound.category}</span>)}
+              {compound.legal_status && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + legalClass(compound.legal_status)}>{legalLabel(compound.legal_status)}</span>)}
+              {compound.hair_loss_severity && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + hairClass(compound.hair_loss_severity)}>Hair loss: {compound.hair_loss_severity}</span>)}
+            </div>
           </div>
+          {/* 2. Hero asset: bottle + button */}
           {compound.slug && (
-            <div className="relative flex justify-center my-4">
-              <div className="absolute" style={{ width: '220px', height: '220px', background: 'radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }} />
-              <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.parentElement.style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '180px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.5))' }} />
+            <div className="flex flex-col items-center my-3">
+              <div className="relative">
+                <div className="absolute" style={{ width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }} />
+                <img src={'/images/compounds/' + compound.slug + '.png'} onError={function(e) { e.target.closest('.flex.flex-col.items-center').style.display = 'none'; }} alt={compound.name} className="relative z-10" style={{ height: '160px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.4))' }} />
+                <div style={{ width: '50%', height: '8px', margin: '2px auto 0', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%)', borderRadius: '50%' }} />
+              </div>
+              {videoId && (
+                <button type="button" onClick={function() { setVideoOpen(true); }} className="inline-flex items-center justify-center gap-2 mt-4" style={{ whiteSpace: 'nowrap', padding: '10px 28px', borderRadius: '9999px', background: 'rgba(14, 165, 233, 0.10)', backdropFilter: 'blur(14px)', border: '1px solid rgba(14, 165, 233, 0.4)', color: '#0EA5E9', fontSize: '12px', fontWeight: '700' }}>
+                  <Youtube className="w-4 h-4" /> Watch breakdown
+                </button>
+              )}
             </div>
           )}
-          {videoId && (
-            <div className="flex justify-center mb-3">
-              <button type="button" onClick={function() { setVideoOpen(true); }} className="inline-flex items-center justify-center gap-2" style={{ whiteSpace: 'nowrap', padding: '10px 24px', borderRadius: '9999px', background: 'rgba(14, 165, 233, 0.10)', backdropFilter: 'blur(14px)', border: '1px solid rgba(14, 165, 233, 0.4)', color: '#0EA5E9', fontSize: '12px', fontWeight: '700' }}>
-                <Youtube className="w-4 h-4" /> Watch breakdown
-              </button>
-            </div>
-          )}
-          {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed" />}
+          {/* 3. Summary */}
+          {hasRealSummary && <ContentBlock content={compound.summary} className="text-sm text-slate-300 leading-relaxed mt-2" />}
         </div>
 
         {compound.product_url && (<div className="mt-3 pt-3 border-t border-white/5"><a href={compound.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-prohp-400 transition-colors"><ExternalLink className="w-3.5 h-3.5" /> Support the encyclopedia</a><DiscountSection compound={compound} gate_state={gate_state} /></div>)}
