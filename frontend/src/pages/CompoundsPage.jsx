@@ -18,77 +18,86 @@ const CATEGORY_LABELS = {
 };
 
 const RISK_COLORS = {
-  low: { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', text: '#10b981' },
-  moderate: { bg: 'rgba(234,179,8,0.1)', border: 'rgba(234,179,8,0.2)', text: '#eab308' },
-  high: { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)', text: '#ef4444' },
-  extreme: { bg: 'rgba(220,38,38,0.15)', border: 'rgba(220,38,38,0.25)', text: '#dc2626' },
+  low: { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)', text: '#10b981' },
+  moderate: { bg: 'rgba(234,179,8,0.1)', border: 'rgba(234,179,8,0.25)', text: '#eab308' },
+  high: { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)', text: '#ef4444' },
+  extreme: { bg: 'rgba(220,38,38,0.15)', border: 'rgba(220,38,38,0.3)', text: '#dc2626' },
 };
+
+/* Premium fallback: frosted flask SVG */
+function FlaskFallback() {
+  return (
+    <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-[72px] opacity-30">
+      <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"/>
+      <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-600"/>
+      <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
+      <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
+    </svg>
+  );
+}
 
 function CompoundTile({ compound }) {
   const c = compound;
   const risk = RISK_COLORS[c.risk_tier] || RISK_COLORS.moderate;
-  const benefits = c.best_for || c.benefits || '';
-  const benefitText = benefits.length > 80 ? benefits.slice(0, 80).replace(/,\s*$/, '') + '...' : benefits;
+  const rawBenefits = c.best_for || '';
+  const benefitText = rawBenefits.length > 90 ? rawBenefits.slice(0, 90).replace(/,\s*$/, '') + '...' : rawBenefits;
 
   return (
-    <Link
-      to={`/compounds/${c.slug}`}
-      className="group block"
-      style={{ textDecoration: 'none' }}
-    >
+    <Link to={`/compounds/${c.slug}`} className="group block h-full" style={{ textDecoration: 'none' }}>
       <div
-        className="bg-slate-900/80 border border-white/[0.05] rounded-xl p-4 pt-5 text-center transition-all duration-200 h-full
-                   hover:-translate-y-0.5 hover:border-prohp-500/20"
-        style={{ boxShadow: 'none' }}
+        className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-3 py-4 flex flex-col items-center h-full
+                   transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(34,157,216,0.2)]"
         onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 24px rgba(34,157,216,0.06)'}
         onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
       >
-        {/* Bottle Image */}
-        <div className="w-20 h-24 mx-auto mb-3 rounded-lg flex items-center justify-center"
+        {/* Bottle - larger, commanding */}
+        <div className="w-24 h-28 mb-2 rounded-lg flex items-center justify-center flex-shrink-0"
              style={{ background: `radial-gradient(ellipse at center, ${risk.bg}, transparent 70%)` }}>
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
-            className="max-h-20 max-w-16 object-contain drop-shadow-sm"
+            className="max-h-24 max-w-20 object-contain drop-shadow-sm"
             onError={(e) => {
               e.target.style.display = 'none';
-              e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+              if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div className="w-9 h-16 rounded bg-gradient-to-b from-slate-700 to-slate-900 border border-white/10 items-center justify-center text-[10px] font-bold text-slate-500 hidden">
-            {c.name?.charAt(0) || '?'}
+          <div className="items-center justify-center hidden">
+            <FlaskFallback />
           </div>
         </div>
 
         {/* Name */}
-        <h3 className="text-sm font-semibold text-slate-100 mb-2 group-hover:text-prohp-400 transition-colors leading-tight">
+        <h3 className="text-[13px] font-semibold text-slate-100 mb-1.5 group-hover:text-prohp-400 transition-colors leading-tight text-center">
           {c.name}
         </h3>
 
-        {/* Badges */}
-        <div className="flex gap-1 justify-center flex-wrap mb-2.5">
+        {/* Benefit text - the hook */}
+        {benefitText ? (
+          <p className="text-[10px] text-slate-500 leading-relaxed text-center mb-2 line-clamp-2 flex-1">
+            {benefitText}
+          </p>
+        ) : (
+          <div className="flex-1" />
+        )}
+
+        {/* Badges - anchored to bottom */}
+        <div className="flex gap-1 justify-center flex-wrap mt-auto pt-1">
           <span
-            className="text-[9px] font-bold px-2 py-0.5 rounded-full"
+            className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
             style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}
           >
-            Risk: {c.risk_tier}
+            {c.risk_tier}
           </span>
-          <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-prohp-500/8 border border-prohp-500/15 text-prohp-400">
+          <span className="text-[8px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.06] text-slate-500">
             {CATEGORY_LABELS[c.category] || c.category}
           </span>
           {c.legal_status === 'banned' && (
-            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', border: '0.5px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', border: '0.5px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
               Banned
             </span>
           )}
         </div>
-
-        {/* Benefit text */}
-        {benefitText && (
-          <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
-            {benefitText}
-          </p>
-        )}
       </div>
     </Link>
   );
@@ -127,7 +136,6 @@ export default function CompoundsPage() {
     },
   });
 
-  // Client-side risk filter
   const compounds = (data?.compounds || []).filter(c => {
     if (riskFilter && c.risk_tier !== riskFilter) return false;
     return true;
@@ -143,29 +151,29 @@ export default function CompoundsPage() {
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
       {/* Header */}
-      <div className="mb-5">
-        <div className="flex items-center gap-3 mb-1">
+      <div className="mb-4">
+        <div className="flex items-center gap-2.5 mb-1">
           <FlaskConical className="w-5 h-5 text-prohp-400" />
           <h1 className="text-lg font-extrabold tracking-tight">Compound Encyclopedia</h1>
         </div>
-        <p className="text-xs text-slate-400">105 compounds. Every one reviewed. Proof over hype.</p>
+        <p className="text-xs text-slate-500">105 compounds. Every one reviewed. Proof over hype.</p>
       </div>
 
-      {/* Control Bar - single row */}
+      {/* Control Bar */}
       <div className="flex gap-2 mb-3 flex-wrap sm:flex-nowrap">
-        <div className="relative flex-1 min-w-[180px]">
+        <div className="relative flex-1 min-w-[160px]">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search compounds..."
-            className="w-full bg-slate-900/60 border border-white/[0.06] rounded-lg pl-8 pr-3 py-2 text-xs text-slate-300 placeholder-slate-600 focus:outline-none focus:border-prohp-500/30 transition-colors"
+            className="w-full bg-slate-900/60 border border-white/[0.06] rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-300 placeholder-slate-600 focus:outline-none focus:border-prohp-500/30 transition-colors"
           />
         </div>
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="bg-slate-900/60 border border-white/[0.06] rounded-lg px-3 py-2 text-xs text-slate-400 focus:outline-none focus:border-prohp-500/30"
+          className="bg-slate-900/60 border border-white/[0.06] rounded-lg px-3 py-1.5 text-xs text-slate-400 focus:outline-none focus:border-prohp-500/30"
         >
           <option value="">Most popular</option>
           <option value="risk">Risk (high first)</option>
@@ -174,14 +182,14 @@ export default function CompoundsPage() {
         </select>
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors whitespace-nowrap ${
             activeFilterCount > 0
               ? 'bg-prohp-500/10 border border-prohp-500/25 text-prohp-400'
               : 'bg-slate-900/60 border border-white/[0.06] text-slate-400 hover:text-slate-300'
           }`}
         >
           <SlidersHorizontal className="w-3.5 h-3.5" />
-          Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
+          Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
         </button>
       </div>
 
@@ -194,9 +202,7 @@ export default function CompoundsPage() {
               <X className="w-3 h-3 cursor-pointer hover:text-white" onClick={() => setRiskFilter('')} />
             </span>
           )}
-          <button onClick={() => setRiskFilter('')} className="text-[10px] text-slate-500 hover:text-slate-300">
-            Clear all
-          </button>
+          <button onClick={() => setRiskFilter('')} className="text-[10px] text-slate-600 hover:text-slate-300">Clear all</button>
         </div>
       )}
 
@@ -214,10 +220,10 @@ export default function CompoundsPage() {
                 <button
                   key={r}
                   onClick={() => setRiskFilter(riskFilter === r ? '' : r)}
-                  className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                  className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-lg transition-colors ${
                     riskFilter === r
                       ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
-                      : 'text-slate-500 hover:text-slate-300 bg-slate-800/50 border border-white/[0.04]'
+                      : 'text-slate-400 hover:text-slate-200 bg-slate-800/50 border border-white/[0.06]'
                   }`}
                 >
                   {r.charAt(0).toUpperCase() + r.slice(1)}
@@ -227,21 +233,21 @@ export default function CompoundsPage() {
           </div>
           <button
             onClick={() => setShowFilters(false)}
-            className="w-full py-2 rounded-lg text-xs font-semibold bg-prohp-500/15 text-prohp-400 border border-prohp-500/25 hover:bg-prohp-500/25 transition-colors"
+            className="w-full py-2 rounded-lg text-xs font-semibold bg-prohp-500/15 text-prohp-400 border border-prohp-500/25 hover:bg-prohp-500/25 transition-colors mt-1"
           >
             Apply filters
           </button>
         </div>
       )}
 
-      {/* Category pills */}
-      <div className="flex gap-1.5 flex-wrap mb-5 overflow-x-auto pb-1">
+      {/* Category pills - visible, clickable */}
+      <div className="flex gap-1.5 flex-wrap mb-4 overflow-x-auto pb-1">
         <button
           onClick={() => setCategory('')}
-          className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${
+          className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors ${
             !category
               ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
-              : 'text-slate-500 hover:text-slate-300 bg-slate-800/50 border border-white/[0.04]'
+              : 'text-slate-400 hover:text-slate-200 bg-slate-800/40 border border-white/[0.06]'
           }`}
         >
           All
@@ -250,10 +256,10 @@ export default function CompoundsPage() {
           <button
             key={c.category}
             onClick={() => setCategory(c.category)}
-            className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${
+            className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors ${
               category === c.category
                 ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
-                : 'text-slate-500 hover:text-slate-300 bg-slate-800/50 border border-white/[0.04]'
+                : 'text-slate-400 hover:text-slate-200 bg-slate-800/40 border border-white/[0.06]'
             }`}
           >
             {CATEGORY_LABELS[c.category] || c.category}{' '}
@@ -263,17 +269,17 @@ export default function CompoundsPage() {
       </div>
 
       {/* Tile Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
         {isLoading ? (
-          Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="bg-slate-900/80 border border-white/[0.05] rounded-xl p-4 pt-5 animate-pulse">
-              <div className="w-20 h-24 mx-auto mb-3 bg-slate-800 rounded-lg" />
-              <div className="h-4 bg-slate-800 rounded w-2/3 mx-auto mb-2" />
-              <div className="flex gap-1 justify-center mb-2">
-                <div className="h-4 bg-slate-800 rounded-full w-16" />
-                <div className="h-4 bg-slate-800 rounded-full w-20" />
+          Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-3 py-4 animate-pulse flex flex-col items-center">
+              <div className="w-24 h-28 bg-slate-800/50 rounded-lg mb-2" />
+              <div className="h-3.5 bg-slate-800 rounded w-2/3 mb-1.5" />
+              <div className="h-2.5 bg-slate-800/50 rounded w-4/5 mb-2" />
+              <div className="flex gap-1 mt-auto">
+                <div className="h-3.5 bg-slate-800 rounded-full w-12" />
+                <div className="h-3.5 bg-slate-800 rounded-full w-16" />
               </div>
-              <div className="h-3 bg-slate-800 rounded w-3/4 mx-auto" />
             </div>
           ))
         ) : (
@@ -287,8 +293,8 @@ export default function CompoundsPage() {
       </div>
 
       {/* Footer */}
-      <div className="text-center mt-8 mb-4 text-xs text-slate-600">
-        {compounds.length} compounds {'\u00B7'} Proof Over Hype
+      <div className="text-center mt-6 mb-4 text-[11px] text-slate-600">
+        {compounds.length} compounds &middot; Proof Over Hype
       </div>
     </div>
   );
