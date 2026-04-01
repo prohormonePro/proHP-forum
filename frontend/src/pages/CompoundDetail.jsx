@@ -7,6 +7,8 @@ import MarkdownRenderer from '../components/MarkdownRenderer';
 import GrepGate from '../components/GrepGate';
 import BackButton from '../components/layout/BackButton';
 import useAuthStore from '../stores/auth';
+import TestimonialWall from '../components/TestimonialWall';
+
 
 /* ═══════════════════════════════════════════
    UTILITIES
@@ -778,6 +780,9 @@ export default function CompoundDetail() {
       {gate_state === "member" && compound.nutrition_label_url && (<Modal open={labelOpen} title={(compound.name || "Supplement") + " - Supplement Facts"} onClose={function() { setLabelOpen(false); }}><div className="flex items-center justify-center p-4"><img src={compound.nutrition_label_url} alt={(compound.name || "Supplement") + " supplement facts"} className="max-w-full max-h-[80vh] object-contain" /></div></Modal>)}
 
       {compound.hair_loss_explanation && (<div className="text-xs text-slate-400 italic mb-4 px-1">Hair loss note: {compound.hair_loss_explanation}</div>)}
+
+
+      {gate_state !== "window" && <TestimonialWall />}
 
       {gate_state === "lead" && (
         <div className="prohp-card p-8 mb-4 border border-[rgba(34,157,216,0.25)] text-center" style={{ background: 'linear-gradient(180deg, rgba(14,165,233,0.06) 0%, rgba(14,165,233,0.02) 100%)' }}>
