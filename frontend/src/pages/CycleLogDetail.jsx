@@ -319,6 +319,20 @@ export default function CycleLogDetail() {
               <p className="text-sm font-bold text-[#229DD8]">Week {weekProgress.current} / {weekProgress.total}</p>
             </div>
           )}
+          {cycle.rating != null && (
+            <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
+              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Rating</p>
+              <p className="text-sm font-bold text-white">{cycle.rating}/10</p>
+            </div>
+          )}
+          {cycle.would_run_again != null && (
+            <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
+              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Run Again?</p>
+              <p className={"text-sm font-bold " + (cycle.would_run_again ? "text-emerald-400" : "text-red-400")}>
+                {cycle.would_run_again ? "Yes" : "No"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Description */}

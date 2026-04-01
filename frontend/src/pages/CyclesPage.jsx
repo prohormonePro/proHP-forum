@@ -103,6 +103,8 @@ export default function CyclesPage() {
                       {cycle.dose && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span>{cycle.dose}</span></>)}
                       {cycle.duration_weeks && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span>{cycle.duration_weeks} wk</span></>)}
                       {cycle.update_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span>{cycle.update_count} updates</span></>)}
+                      {cycle.rating != null && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span>{cycle.rating}/10</span></>)}
+                      {cycle.would_run_again != null && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className={cycle.would_run_again ? "text-emerald-400" : "text-red-400"}>{cycle.would_run_again ? "Run again" : "Would not run again"}</span></>)}
                     </div>
                   </div>
                 </div>
