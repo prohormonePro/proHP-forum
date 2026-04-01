@@ -33,9 +33,6 @@ function FlaskFallback() {
       <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
       <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
     </svg>
-  );
-}
-
 function CompoundTile({ compound }) {
   const c = compound;
   const RISK_COLORS = {
@@ -108,12 +105,6 @@ function CompoundTile({ compound }) {
         </div>
       </div>
     </Link>
-  );
-}
-
-  );
-}
-
 export default function CompoundsPage() {
   const { user, hasLeadAccess, setHasLeadAccess, checkLeadAccess } = useAuthStore();
   const [gateChecked, setGateChecked] = useState(false);
