@@ -27,7 +27,7 @@ const RISK_COLORS = {
 /* Premium fallback: frosted flask SVG */
 function FlaskFallback() {
   return (
-    <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-[72px] opacity-30">
+    <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-[96px] opacity-25">
       <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"/>
       <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-600"/>
       <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
@@ -46,17 +46,17 @@ function CompoundTile({ compound }) {
     <Link to={`/compounds/${c.slug}`} className="group block h-full" style={{ textDecoration: 'none' }}>
       <div
         className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-3 py-4 flex flex-col items-center h-full
-                   transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(34,157,216,0.2)]"
-        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 24px rgba(34,157,216,0.06)'}
+                   transition-all duration-200 hover:-translate-y-1.5 hover:border-[rgba(34,157,216,0.2)]"
+        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 12px 40px rgba(34,157,216,0.12)'}
         onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
       >
         {/* Bottle - larger, commanding */}
-        <div className="w-24 h-28 mb-2 rounded-lg flex items-center justify-center flex-shrink-0"
+        <div className="w-32 h-36 mb-3 rounded-lg flex items-center justify-center flex-shrink-0"
              style={{ background: `radial-gradient(ellipse at center, ${risk.bg}, transparent 70%)` }}>
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
-            className="max-h-24 max-w-20 object-contain drop-shadow-sm"
+            className="max-h-32 max-w-28 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {
               e.target.style.display = 'none';
               if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
