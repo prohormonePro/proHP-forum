@@ -27,7 +27,7 @@ const RISK_COLORS = {
 /* Premium fallback: frosted flask SVG */
 function FlaskFallback() {
   return (
-    <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-[96px] opacity-25">
+    <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-28 opacity-40">
       <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"/>
       <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-600"/>
       <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
@@ -45,18 +45,18 @@ function CompoundTile({ compound }) {
   return (
     <Link to={`/compounds/${c.slug}`} className="group block h-full" style={{ textDecoration: 'none' }}>
       <div
-        className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-3 py-4 flex flex-col items-center h-full
+        className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-3 pt-3 pb-3 flex flex-col items-center h-full
                    transition-all duration-200 hover:-translate-y-1.5 hover:border-[rgba(34,157,216,0.2)]"
         onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 12px 40px rgba(34,157,216,0.12)'}
         onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
       >
         {/* Bottle - larger, commanding */}
-        <div className="w-32 h-36 mb-3 rounded-lg flex items-center justify-center flex-shrink-0"
+        <div className="w-full h-40 mb-2 rounded-lg flex items-center justify-center flex-shrink-0"
              style={{ background: `radial-gradient(ellipse at center, ${risk.bg}, transparent 70%)` }}>
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
-            className="max-h-32 max-w-28 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-auto max-w-[75%] object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {
               e.target.style.display = 'none';
               if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
@@ -68,13 +68,13 @@ function CompoundTile({ compound }) {
         </div>
 
         {/* Name */}
-        <h3 className="text-[13px] font-semibold text-slate-100 mb-1.5 group-hover:text-prohp-400 transition-colors leading-tight text-center">
+        <h3 className="text-[13px] font-bold text-slate-100 mb-1 group-hover:text-prohp-400 transition-colors leading-tight text-center">
           {c.name}
         </h3>
 
         {/* Benefit text - the hook */}
         {benefitText ? (
-          <p className="text-[10px] text-slate-500 leading-relaxed text-center mb-2 line-clamp-2 flex-1">
+          <p className="text-[11px] text-slate-400 leading-snug text-center mb-2 line-clamp-2 flex-1">
             {benefitText}
           </p>
         ) : (
@@ -84,12 +84,12 @@ function CompoundTile({ compound }) {
         {/* Badges - anchored to bottom */}
         <div className="flex gap-1 justify-center flex-wrap mt-auto pt-1">
           <span
-            className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+            className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
             style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}
           >
             {c.risk_tier}
           </span>
-          <span className="text-[8px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.06] text-slate-500">
+          <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.06] text-slate-500">
             {CATEGORY_LABELS[c.category] || c.category}
           </span>
           {c.legal_status === 'banned' && (
