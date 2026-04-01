@@ -38,68 +38,79 @@ function FlaskFallback() {
 
 function CompoundTile({ compound }) {
   const c = compound;
+  const RISK_COLORS = {
+    low: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', text: '#10b981' },
+    moderate: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', text: '#eab308' },
+    high: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', text: '#ef4444' },
+    extreme: { bg: 'rgba(220,38,38,0.18)', border: 'rgba(220,38,38,0.35)', text: '#dc2626' },
+  };
+  const CATEGORY_LABELS = {
+    sarm: 'SARMs', prohormone: 'Prohormones', peptide: 'Peptides',
+    serm: 'SERMs / PCT', ai: 'Aromatase Inhibitors',
+    natural: 'Naturals', ancillary: 'Ancillaries', other: 'Other',
+  };
   const risk = RISK_COLORS[c.risk_tier] || RISK_COLORS.moderate;
-  const rawBenefits = c.best_for || '';
-  const benefitText = rawBenefits.length > 90 ? rawBenefits.slice(0, 90).replace(/,\s*$/, '') + '...' : rawBenefits;
+  const benefitText = (c.best_for || '').length > 80 ? (c.best_for || '').slice(0, 80).replace(/,\s*$/, '') + '...' : (c.best_for || '');
 
   return (
     <Link to={`/compounds/${c.slug}`} className="group block h-full" style={{ textDecoration: 'none' }}>
       <div
-        className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-0 pt-0 pb-3 flex flex-col items-center h-full
-                   transition-all duration-200 hover:-translate-y-1.5 hover:border-[rgba(34,157,216,0.2)]"
+        className="bg-slate-900/80 border border-white/[0.05] rounded-xl flex flex-col overflow-hidden h-full
+                   transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[rgba(34,157,216,0.3)]"
+        style={{ boxShadow: 'none' }}
         onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 12px 40px rgba(34,157,216,0.12)'}
         onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
       >
-        {/* Bottle - larger, commanding */}
-        <div className="w-full h-44 mb-1 flex items-center justify-center flex-shrink-0 overflow-hidden rounded-t-xl"
-             style={{ background: `radial-gradient(ellipse at center, ${risk.bg}, transparent 70%)` }}>
+        {/* THE STAGE - bottle commands the card */}
+        <div className="w-full flex items-center justify-center relative pt-4 pb-2"
+             style={{ height: '180px', background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)' }}>
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
-            className="h-[85%] w-auto max-w-[85%] object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.6)] transition-transform duration-500 group-hover:scale-110"
+            className="object-contain transition-transform duration-500 group-hover:scale-110"
+            style={{ height: '140px', maxWidth: '90%', filter: 'drop-shadow(0 20px 25px rgba(0,0,0,0.7))' }}
             onError={(e) => {
               e.target.style.display = 'none';
               if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div className="items-center justify-center hidden">
-            <FlaskFallback />
+          <div className="items-center justify-center hidden" style={{ height: '140px' }}>
+            <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ height: '120px', opacity: 0.5 }}>
+              <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"/>
+              <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-500"/>
+              <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600"/>
+              <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600"/>
+            </svg>
           </div>
         </div>
 
-        {/* Name */}
-        <h3 className="text-sm font-bold text-slate-100 mb-1 group-hover:text-prohp-400 transition-colors leading-tight text-center px-3">
-          {c.name}
-        </h3>
+        {/* THE DATA CONSOLE */}
+        <div className="px-3 pb-3 flex flex-col items-center text-center flex-1">
+          <h3 className="text-sm font-bold text-slate-100 tracking-tight leading-none mb-2 group-hover:text-prohp-400 transition-colors">
+            {c.name}
+          </h3>
 
-        {/* Benefit text - the hook */}
-        {benefitText ? (
-          <p className="text-[11px] text-slate-400 leading-snug text-center mb-1.5 line-clamp-2 flex-1 px-3">
-            {benefitText}
-          </p>
-        ) : (
-          <div className="flex-1" />
-        )}
-
-        {/* Badges - anchored to bottom */}
-        <div className="flex gap-1 justify-center flex-wrap mt-auto pt-1 px-2">
-          <span
-            className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-            style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}
-          >
-            {c.risk_tier}
-          </span>
-          <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.06] text-slate-500">
-            {CATEGORY_LABELS[c.category] || c.category}
-          </span>
-          {c.legal_status === 'banned' && (
-            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', border: '0.5px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
-              Banned
+          <div className="flex gap-1.5 justify-center flex-wrap mb-2">
+            <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                  style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}>
+              {c.risk_tier}
             </span>
+            <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.08] text-slate-400">
+              {CATEGORY_LABELS[c.category] || c.category}
+            </span>
+          </div>
+
+          {benefitText && (
+            <p className="text-[11px] text-slate-400 leading-snug line-clamp-2 mt-auto">
+              {benefitText}
+            </p>
           )}
         </div>
       </div>
     </Link>
+  );
+}
+
   );
 }
 
@@ -241,7 +252,7 @@ export default function CompoundsPage() {
       )}
 
       {/* Category pills - visible, clickable */}
-      <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 flex-nowrap scrollbar-hide">
+      <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 flex-nowrap scrollbar-hide snap-x">
         <button
           onClick={() => setCategory('')}
           className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors ${
