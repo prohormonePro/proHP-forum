@@ -18,78 +18,62 @@ const CATEGORY_LABELS = {
 };
 
 const RISK_COLORS = {
-  low: { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)', text: '#10b981' },
-  moderate: { bg: 'rgba(234,179,8,0.1)', border: 'rgba(234,179,8,0.25)', text: '#eab308' },
-  high: { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)', text: '#ef4444' },
-  extreme: { bg: 'rgba(220,38,38,0.15)', border: 'rgba(220,38,38,0.3)', text: '#dc2626' },
+  low: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', text: '#10b981' },
+  moderate: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', text: '#eab308' },
+  high: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', text: '#ef4444' },
+  extreme: { bg: 'rgba(220,38,38,0.18)', border: 'rgba(220,38,38,0.35)', text: '#dc2626' },
 };
 
-/* Premium fallback: frosted flask SVG */
-function FlaskFallback() {
-  return (
-    <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-32 opacity-50">
-      <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"/>
-      <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-600"/>
-      <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
-      <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-700"/>
-    </svg>
 function CompoundTile({ compound }) {
   const c = compound;
-  const RISK_COLORS = {
-    low: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', text: '#10b981' },
-    moderate: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', text: '#eab308' },
-    high: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', text: '#ef4444' },
-    extreme: { bg: 'rgba(220,38,38,0.18)', border: 'rgba(220,38,38,0.35)', text: '#dc2626' },
-  };
-  const CATEGORY_LABELS = {
-    sarm: 'SARMs', prohormone: 'Prohormones', peptide: 'Peptides',
-    serm: 'SERMs / PCT', ai: 'Aromatase Inhibitors',
-    natural: 'Naturals', ancillary: 'Ancillaries', other: 'Other',
-  };
   const risk = RISK_COLORS[c.risk_tier] || RISK_COLORS.moderate;
-  const benefitText = (c.best_for || '').length > 80 ? (c.best_for || '').slice(0, 80).replace(/,\s*$/, '') + '...' : (c.best_for || '');
+  const benefitText = (c.best_for || '').length > 80
+    ? (c.best_for || '').slice(0, 80).replace(/,\s*$/, '') + '...'
+    : (c.best_for || '');
 
   return (
     <Link to={`/compounds/${c.slug}`} className="group block h-full" style={{ textDecoration: 'none' }}>
       <div
-        className="bg-slate-900/80 border border-white/[0.05] rounded-xl flex flex-col overflow-hidden h-full
-                   transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[rgba(34,157,216,0.3)]"
-        style={{ boxShadow: 'none' }}
-        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 12px 40px rgba(34,157,216,0.12)'}
-        onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+        className="bg-slate-900/80 border border-white/[0.05] rounded-xl flex flex-col overflow-hidden h-full transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[rgba(34,157,216,0.3)]"
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(34,157,216,0.12)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
       >
-        {/* THE STAGE - bottle commands the card */}
-        <div className="w-full flex items-center justify-center relative pt-4 pb-2"
-             style={{ aspectRatio: '1/1', background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)' }}>
+        {/* THE STAGE */}
+        <div
+          className="w-full flex items-center justify-center relative"
+          style={{ aspectRatio: '4/3', background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)' }}
+        >
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
             className="object-contain transition-transform duration-500 group-hover:scale-110"
-            style={{ height: '140px', maxWidth: '95%', filter: 'drop-shadow(0 20px 25px rgba(0,0,0,0.7))' }}
+            style={{ width: '70%', height: 'auto', maxHeight: '85%', filter: 'drop-shadow(0 20px 25px rgba(0,0,0,0.7))' }}
             onError={(e) => {
               e.target.style.display = 'none';
               if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div className="items-center justify-center hidden" style={{ width: '60%' }}>
-            <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: 'auto', opacity: 0.5 }}>
-              <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"/>
-              <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-500"/>
-              <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600"/>
-              <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600"/>
+          <div className="items-center justify-center hidden" style={{ width: '55%' }}>
+            <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: 'auto', opacity: 0.45 }}>
+              <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400" />
+              <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" />
+              <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600" />
+              <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600" />
             </svg>
           </div>
         </div>
 
         {/* THE DATA CONSOLE */}
         <div className="px-3 pb-3 flex flex-col items-center text-center flex-1">
-          <h3 className="text-sm font-bold text-slate-100 tracking-tight leading-none mb-2 group-hover:text-prohp-400 transition-colors">
+          <h3 className="text-sm font-bold text-slate-100 tracking-tight leading-tight mb-1.5 group-hover:text-prohp-400 transition-colors">
             {c.name}
           </h3>
 
           <div className="flex gap-1.5 justify-center flex-wrap mb-2">
-            <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                  style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}>
+            <span
+              className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+              style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}
+            >
               {c.risk_tier}
             </span>
             <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.08] text-slate-400">
@@ -97,14 +81,19 @@ function CompoundTile({ compound }) {
             </span>
           </div>
 
-          {benefitText && (
+          {benefitText ? (
             <p className="text-[11px] text-slate-400 leading-snug line-clamp-2 mt-auto">
               {benefitText}
             </p>
+          ) : (
+            <div className="flex-1" />
           )}
         </div>
       </div>
     </Link>
+  );
+}
+
 export default function CompoundsPage() {
   const { user, hasLeadAccess, setHasLeadAccess, checkLeadAccess } = useAuthStore();
   const [gateChecked, setGateChecked] = useState(false);
@@ -138,7 +127,7 @@ export default function CompoundsPage() {
     },
   });
 
-  const compounds = (data?.compounds || []).filter(c => {
+  const compounds = (data?.compounds || []).filter((c) => {
     if (riskFilter && c.risk_tier !== riskFilter) return false;
     return true;
   });
@@ -148,7 +137,7 @@ export default function CompoundsPage() {
     return <EncyclopediaGate onUnlock={() => setHasLeadAccess(true)} />;
   }
 
-  const activeFilterCount = (riskFilter ? 1 : 0);
+  const activeFilterCount = riskFilter ? 1 : 0;
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
@@ -163,7 +152,7 @@ export default function CompoundsPage() {
 
       {/* Control Bar */}
       <div className="flex gap-2 mb-3 flex-nowrap">
-        <div className="relative flex-1 min-w-[160px]">
+        <div className="relative flex-1 min-w-[120px]">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
           <input
             value={search}
@@ -204,7 +193,9 @@ export default function CompoundsPage() {
               <X className="w-3 h-3 cursor-pointer hover:text-white" onClick={() => setRiskFilter('')} />
             </span>
           )}
-          <button onClick={() => setRiskFilter('')} className="text-[10px] text-slate-600 hover:text-slate-300">Clear all</button>
+          <button onClick={() => setRiskFilter('')} className="text-[10px] text-slate-600 hover:text-slate-300">
+            Clear all
+          </button>
         </div>
       )}
 
@@ -218,7 +209,7 @@ export default function CompoundsPage() {
           <div className="mb-3">
             <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Risk level</span>
             <div className="flex gap-1.5 flex-wrap">
-              {['low', 'moderate', 'high', 'extreme'].map(r => (
+              {['low', 'moderate', 'high', 'extreme'].map((r) => (
                 <button
                   key={r}
                   onClick={() => setRiskFilter(riskFilter === r ? '' : r)}
@@ -242,11 +233,11 @@ export default function CompoundsPage() {
         </div>
       )}
 
-      {/* Category pills - visible, clickable */}
+      {/* Category pills - horizontal scroll */}
       <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 flex-nowrap scrollbar-hide snap-x">
         <button
           onClick={() => setCategory('')}
-          className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors ${
+          className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors flex-shrink-0 snap-start ${
             !category
               ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
               : 'text-slate-400 hover:text-slate-200 bg-slate-800/40 border border-white/[0.06]'
@@ -258,7 +249,7 @@ export default function CompoundsPage() {
           <button
             key={c.category}
             onClick={() => setCategory(c.category)}
-            className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors ${
+            className={`text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-colors flex-shrink-0 snap-start ${
               category === c.category
                 ? 'bg-prohp-500/15 text-prohp-400 border border-prohp-500/25'
                 : 'text-slate-400 hover:text-slate-200 bg-slate-800/40 border border-white/[0.06]'
@@ -272,25 +263,22 @@ export default function CompoundsPage() {
 
       {/* Tile Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
-        {isLoading ? (
-          Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="bg-slate-900/80 border border-white/[0.05] rounded-xl px-3 py-4 animate-pulse flex flex-col items-center">
-              <div className="w-24 h-28 bg-slate-800/50 rounded-lg mb-2" />
-              <div className="h-3.5 bg-slate-800 rounded w-2/3 mb-1.5" />
-              <div className="h-2.5 bg-slate-800/50 rounded w-4/5 mb-2" />
-              <div className="flex gap-1 mt-auto">
-                <div className="h-3.5 bg-slate-800 rounded-full w-12" />
-                <div className="h-3.5 bg-slate-800 rounded-full w-16" />
+        {isLoading
+          ? Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="bg-slate-900/80 border border-white/[0.05] rounded-xl animate-pulse flex flex-col items-center overflow-hidden">
+                <div className="w-full bg-slate-800/30" style={{ aspectRatio: '4/3' }} />
+                <div className="px-3 py-3 w-full flex flex-col items-center">
+                  <div className="h-4 bg-slate-800 rounded w-2/3 mb-2" />
+                  <div className="flex gap-1">
+                    <div className="h-4 bg-slate-800 rounded-full w-14" />
+                    <div className="h-4 bg-slate-800 rounded-full w-18" />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          compounds.map((c) => <CompoundTile key={c.slug} compound={c} />)
-        )}
+            ))
+          : compounds.map((c) => <CompoundTile key={c.slug} compound={c} />)}
         {!isLoading && compounds.length === 0 && (
-          <div className="col-span-full text-center py-12 text-sm text-slate-500">
-            No compounds match your search.
-          </div>
+          <div className="col-span-full text-center py-12 text-sm text-slate-500">No compounds match your search.</div>
         )}
       </div>
 
