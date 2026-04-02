@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Dumbbell, Activity, CheckCircle, XCircle } from 'lucide-react';
+import { Dumbbell, Activity, CheckCircle, XCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { api } from '../hooks/api';
 import CycleLogForm from '../components/CycleLogForm';
 import useAuthStore from '../stores/auth';
