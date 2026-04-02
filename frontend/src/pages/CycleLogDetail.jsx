@@ -1,14 +1,14 @@
 import { useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply } from 'lucide-react';
+import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 
 const STATUS_MAP = {
   active: { icon: Activity, color: 'text-prohp-400', bg: 'bg-prohp-500/10', label: 'Active' },
-  completed: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Completed' },
+  completed: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Verified' },
   abandoned: { icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-500/10', label: 'Abandoned' },
 };
 
@@ -63,6 +63,20 @@ function timeAgo(dateString) {
 }
 
 const SEVERITY_LABELS = { 1: 'Minimal', 2: 'Mild', 3: 'Moderate', 4: 'Significant', 5: 'Severe' };
+
+function ratingColor(r) {
+  if (r == null) return 'text-slate-500';
+  if (r > 7) return 'text-emerald-400';
+  if (r >= 5) return 'text-amber-400';
+  return 'text-red-400';
+}
+
+function ratingBg(r) {
+  if (r == null) return 'bg-slate-500/10';
+  if (r > 7) return 'bg-emerald-500/10';
+  if (r >= 5) return 'bg-amber-500/10';
+  return 'bg-red-500/10';
+}
 
 function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
   const nextWeek = existingWeeks.length > 0 ? Math.max(...existingWeeks) + 1 : 1;
@@ -255,6 +269,8 @@ export default function CycleLogDetail() {
   const media = parseMediaLinks(cycle.description);
   const isOwner = user?.id === cycle.user_id;
   const existingWeeks = (updates || []).map((u) => u.week_number);
+  const latestUpdate = (updates || []).length > 0 ? [...updates].sort((a, b) => b.week_number - a.week_number)[0] : null;
+  const latestWeight = latestUpdate?.weight_lbs || null;
   const posts = threadData?.posts || [];
   const canComment = user && (user.tier === 'inner_circle' || user.tier === 'admin');
 
@@ -280,8 +296,9 @@ export default function CycleLogDetail() {
       {/* Protocol Header */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 md:p-8 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
-          <div>
-            <h1 className="text-2xl font-bold text-white mb-2">{cycle.title}</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
+            <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <span className="text-[#229DD8] font-semibold">{cycle.username}</span>
               {cycle.is_founding && <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
@@ -289,18 +306,22 @@ export default function CycleLogDetail() {
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
             </div>
           </div>
-          <div className={`flex items-center self-start gap-1.5 px-3 py-1.5 rounded-lg ${sc.bg}`}>
-            <Icon className={`w-4 h-4 ${sc.color}`} />
-            <span className={`text-xs font-bold uppercase ${sc.color}`}>{sc.label}</span>
+          <div className="flex items-center gap-3 self-start shrink-0">
+            {cycle.would_run_again != null && (
+              <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl ${cycle.would_run_again ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                {cycle.would_run_again ? <ThumbsUp className="w-5 h-5 text-emerald-400" /> : <ThumbsDown className="w-5 h-5 text-red-400" />}
+                <span className={`text-xs font-bold ${cycle.would_run_again ? 'text-emerald-400' : 'text-red-400'}`}>{cycle.would_run_again ? 'Again' : 'No'}</span>
+              </div>
+            )}
+            <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl ${ratingBg(cycle.rating)} border border-white/5`}>
+              {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<span className="text-xs text-slate-600 font-medium">N/R</span>)}
+            </div>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-            <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Compound</p>
-            <p className="text-sm font-bold text-white">{cycle.compound_name}</p>
-          </div>
+
           {cycle.dose && (
             <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
               <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Dose</p>
@@ -319,18 +340,10 @@ export default function CycleLogDetail() {
               <p className="text-sm font-bold text-[#229DD8]">Week {weekProgress.current} / {weekProgress.total}</p>
             </div>
           )}
-          {cycle.rating != null && (
+          {latestWeight && (
             <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Rating</p>
-              <p className="text-sm font-bold text-white">{cycle.rating}/10</p>
-            </div>
-          )}
-          {cycle.would_run_again != null && (
-            <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Run Again?</p>
-              <p className={"text-sm font-bold " + (cycle.would_run_again ? "text-emerald-400" : "text-red-400")}>
-                {cycle.would_run_again ? "Yes" : "No"}
-              </p>
+              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Latest Weight</p>
+              <p className="text-sm font-bold text-white">{latestWeight} lbs</p>
             </div>
           )}
         </div>
