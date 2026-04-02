@@ -40,25 +40,25 @@ function CompoundTile({ compound }) {
       >
         {/* THE STAGE */}
         <div
-          className="w-full flex items-center justify-center relative"
-          style={{ aspectRatio: '4/3', background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)' }}
+          className="w-full flex items-center justify-center relative overflow-hidden"
+          style={{ height: '180px', background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)' }}
         >
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
-            className="object-contain transition-transform duration-500 group-hover:scale-110"
-            style={{ width: '70%', height: 'auto', maxHeight: '85%', filter: 'drop-shadow(0 20px 25px rgba(0,0,0,0.7))' }}
+            className="absolute max-w-none transition-transform duration-500 group-hover:scale-[1.15]"
+            style={{ width: '150%', height: '150%', objectFit: 'contain', filter: 'drop-shadow(0 25px 25px rgba(0,0,0,0.85))' }}
             onError={(e) => {
               e.target.style.display = 'none';
               if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
             }}
           />
-          <div className="items-center justify-center hidden" style={{ width: '55%' }}>
-            <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: 'auto', opacity: 0.45 }}>
-              <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400" />
-              <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-500" />
-              <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600" />
-              <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-600" />
+          <div className="items-center justify-center hidden absolute" style={{ width: '70%', height: '70%' }}>
+            <svg viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%', opacity: 0.6 }}>
+              <path d="M18 4h12v20l14 32a4 4 0 01-3.6 5.7H7.6A4 4 0 014 56L18 24V4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300" />
+              <rect x="16" y="0" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" className="text-slate-400" />
+              <path d="M14 44h20" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-500" />
+              <path d="M16 52h16" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" className="text-slate-500" />
             </svg>
           </div>
         </div>
