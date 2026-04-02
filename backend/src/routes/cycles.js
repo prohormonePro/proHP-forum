@@ -147,4 +147,44 @@ router.post('/:id/updates', authenticate, requireTier('inner_circle'), async (re
   }
 });
 
+// PATCH /api/cycles/:id - Update cycle log (owner only, inner_circle+)
+router.patch('/:id', authenticate, requireTier('inner_circle'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = await query('SELECT id, user_id FROM cycle_logs WHERE id = $1', [id]);
+    if (!existing.rows[0]) return res.status(404).json({ error: 'Cycle log not found' });
+    if (existing.rows[0].user_id !== req.user.id) return res.status(403).json({ error: 'You can only edit your own cycle logs' });
+
+    const sets = [];
+    const params = [];
+    let idx = 1;
+
+    if (req.body.rating !== undefined) {
+      const r = parseInt(req.body.rating, 10);
+      if (isNaN(r) || r < 1 || r > 10) return res.status(400).json({ error: 'rating must be 1-10' });
+      sets.push('rating = $' + idx++);
+      params.push(r);
+    }
+    if (req.body.would_run_again !== undefined) {
+      sets.push('would_run_again = $' + idx++);
+      params.push(Boolean(req.body.would_run_again));
+    }
+    if (req.body.status !== undefined) {
+      if (!['active', 'completed', 'abandoned'].includes(req.body.status)) return res.status(400).json({ error: 'status must be active, completed, or abandoned' });
+      sets.push('status = $' + idx++);
+      params.push(req.body.status);
+    }
+    if (sets.length === 0) return res.status(400).json({ error: 'No valid fields to update' });
+
+    sets.push('updated_at = NOW()');
+    params.push(id);
+    const sql = 'UPDATE cycle_logs SET ' + sets.join(', ') + ' WHERE id = $' + idx + ' RETURNING *';
+    const result = await query(sql, params);
+    res.json({ cycle: result.rows[0] });
+  } catch (err) {
+    console.error('[cycles/patch]', err.message);
+    res.status(500).json({ error: 'Failed to update cycle log' });
+  }
+});
+
 module.exports = router;
