@@ -170,6 +170,9 @@ export default function CycleLogDetail() {
   const user = useAuthStore((x) => x.user);
   const queryClient = useQueryClient();
   const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [showCompleteForm, setShowCompleteForm] = useState(false);
+  const [completeRating, setCompleteRating] = useState('');
+  const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [posting, setPosting] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
@@ -194,6 +197,14 @@ export default function CycleLogDetail() {
   });
 
   const [commentError, setCommentError] = useState(null);
+
+  const completeCycle = useMutation({
+    mutationFn: (payload) => api.patch('/api/cycles/' + id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cycle', id] });
+      setShowCompleteForm(false);
+    },
+  });
 
   const createPost = useMutation({
     mutationFn: (postData) => api.post('/api/posts', postData),
@@ -408,8 +419,28 @@ export default function CycleLogDetail() {
         )}
       </div>
 
+      {/* Complete Cycle */}
+      {isOwner && status === 'active' && (
+        <div className="mb-6">
+          {!showCompleteForm ? (
+            <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
+          ) : (
+            <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-emerald-500/25 p-6">
+              <h3 className="text-lg font-bold text-white mb-1">Complete Cycle</h3>
+              <p className="text-xs text-slate-500 mb-5">Final verdict. Rate the compound and lock it in.</p>
+              <div className="space-y-4">
+                <div><label className="block text-xs font-medium text-slate-300 mb-1">Rating (1-10)</label><select value={completeRating} onChange={(e) => setCompleteRating(e.target.value)} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all"><option value="">Select rating</option>{[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+                <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completeWouldRunAgain} onChange={(e) => setCompleteWouldRunAgain(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-[#229DD8] focus:ring-[#229DD8]" /><span className="text-sm text-slate-300">Would run again</span></label>
+                {completeCycle.isError && (<div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3"><p className="text-red-400 text-sm">{completeCycle.error?.message || 'Failed'}</p></div>)}
+                <div className="flex gap-3"><button onClick={() => { if (!completeRating) return; completeCycle.mutate({ rating: parseInt(completeRating, 10), would_run_again: completeWouldRunAgain, status: 'completed' }); }} disabled={!completeRating || completeCycle.isPending} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">{completeCycle.isPending ? 'Submitting...' : 'Submit & Complete'}</button><button onClick={() => setShowCompleteForm(false)} className="px-4 py-3 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button></div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Author Update Form */}
-      {isOwner && (
+      {isOwner && status === 'active' && (
         <div className="mb-6">
           {!showUpdateForm ? (
             <button onClick={() => setShowUpdateForm(true)}
