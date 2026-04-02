@@ -46,8 +46,8 @@ function CompoundTile({ compound }) {
           <img
             src={`/images/compounds/${c.slug}.png`}
             alt={c.name}
-            className="absolute max-w-none transition-transform duration-500 group-hover:scale-[1.15]"
-            style={{ width: '150%', height: '150%', objectFit: 'contain', filter: 'drop-shadow(0 25px 25px rgba(0,0,0,0.85))' }}
+            className="absolute max-w-none w-[150%] h-[150%] lg:w-[135%] lg:h-[135%] object-contain transition-transform duration-500 group-hover:scale-[1.15]"
+            style={{ filter: 'drop-shadow(0 25px 25px rgba(0,0,0,0.85))' }}
             onError={(e) => {
               e.target.style.display = 'none';
               if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
@@ -65,18 +65,18 @@ function CompoundTile({ compound }) {
 
         {/* THE DATA CONSOLE */}
         <div className="px-3 pb-3 flex flex-col items-center text-center flex-1">
-          <h3 className="text-sm font-bold text-slate-100 tracking-tight leading-tight mb-1.5 group-hover:text-prohp-400 transition-colors">
+          <h3 className="text-sm lg:text-base font-bold text-slate-100 tracking-tight leading-tight mb-1.5 group-hover:text-prohp-400 transition-colors">
             {c.name}
           </h3>
 
           <div className="flex gap-1.5 justify-center flex-wrap mb-2">
             <span
-              className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+              className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full"
               style={{ background: risk.bg, border: `0.5px solid ${risk.border}`, color: risk.text }}
             >
               {c.risk_tier}
             </span>
-            <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.08] text-slate-400">
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800/60 border border-white/[0.08] text-slate-300">
               {CATEGORY_LABELS[c.category] || c.category}
             </span>
           </div>
