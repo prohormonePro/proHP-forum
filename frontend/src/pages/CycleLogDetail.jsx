@@ -161,20 +161,6 @@ function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
           {mutation.isPending ? 'Posting...' : `Post Week ${formData.week_number} Update`}
         </button>
       </form>
-      {/* Context-Aware Thread HUD */}
-      {showHud && (
-        <div className="fixed bottom-6 right-6" style={{zIndex: 9999}}>
-          {scrollDir === 'up' ? (
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
-              <ArrowUp className="w-3.5 h-3.5" /> Back to Top
-            </button>
-          ) : (
-            <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
-              <MessageSquare className="w-3.5 h-3.5" /> Drop a Comment
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -620,6 +606,20 @@ export default function CycleLogDetail() {
           </>
         )}
       </div>
+      {/* Context-Aware Thread HUD */}
+      {showHud && (
+        <div className="fixed bottom-6 right-6" style={{zIndex: 9999}}>
+          {scrollDir === 'up' ? (
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
+              <ArrowUp className="w-3.5 h-3.5" /> Back to Top
+            </button>
+          ) : (
+            <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
+              <MessageSquare className="w-3.5 h-3.5" /> Drop a Comment
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
