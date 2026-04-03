@@ -161,6 +161,20 @@ function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
           {mutation.isPending ? 'Posting...' : `Post Week ${formData.week_number} Update`}
         </button>
       </form>
+      {/* Context-Aware Thread HUD */}
+      {showHud && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          {scrollDir === 'up' ? (
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
+              <ArrowUp className="w-3.5 h-3.5" /> Back to Top
+            </button>
+          ) : (
+            <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
+              <MessageSquare className="w-3.5 h-3.5" /> Drop a Comment
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -173,6 +187,9 @@ export default function CycleLogDetail() {
   const [collapsedThreads, setCollapsedThreads] = useState({});
   const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
   const [showHud, setShowHud] = useState(false);
+  const [expandedWeeks, setExpandedWeeks] = useState({ 0: true });
+  const toggleWeek = (i) => setExpandedWeeks(prev => ({...prev, [i]: !prev[i]}));
+  const toggleAllWeeks = (open) => { const o = {}; (updates || []).forEach((_, i) => { o[i] = open; }); setExpandedWeeks(o); };
   const [scrollDir, setScrollDir] = useState('down');
   const lastScrollY = useRef(0);
   useEffect(() => {
@@ -181,7 +198,7 @@ export default function CycleLogDetail() {
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
       const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
-      setShowHud(y > 400 && !atBottom);
+      setShowHud(y > 200 && !atBottom);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -407,7 +424,12 @@ export default function CycleLogDetail() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-white">Weekly Updates</h2>
-          <span className="text-xs text-slate-500">{(updates || []).length} update{(updates || []).length !== 1 ? 's' : ''}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500">{(updates || []).length} update{(updates || []).length !== 1 ? 's' : ''}</span>
+            {(updates || []).length > 2 && (
+              <button onClick={() => toggleAllWeeks(!Object.values(expandedWeeks).some(v => v))} className="text-[10px] text-slate-500 hover:text-[#229DD8] transition-colors">{Object.values(expandedWeeks).some(v => v) ? 'Collapse All' : 'Expand All'}</button>
+            )}
+          </div>
         </div>
 
         {(updates || []).length === 0 ? (
@@ -419,12 +441,17 @@ export default function CycleLogDetail() {
           </div>
         ) : (
           <div className="space-y-3">
-            {updates.map((update) => (
-              <div key={update.id} className="prohp-card p-5 border border-white/5">
-                <div className="flex items-center justify-between mb-3">
+            {updates.map((update, idx) => (
+              <div key={update.id} className="prohp-card border border-white/5 overflow-hidden">
+                <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-5 hover:bg-slate-800/30 transition-colors text-left">
                   <span className="text-sm font-bold text-[#229DD8]">Week {update.week_number}</span>
-                  <span className="text-[10px] text-slate-500">{new Date(update.created_at).toLocaleDateString()}</span>
-                </div>
+                  <div className="flex items-center gap-3">
+                    {update.weight_lbs && <span className="text-[10px] text-slate-400">{update.weight_lbs} lbs</span>}
+                    <span className="text-[10px] text-slate-500">{new Date(update.created_at).toLocaleDateString()}</span>
+                    <span className="text-[10px] text-slate-600">{expandedWeeks[idx] ? '-' : '+'}</span>
+                  </div>
+                </button>
+                {expandedWeeks[idx] && <div className="px-5 pb-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                   {update.weight_lbs && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Weight</p><p className="text-sm text-white">{update.weight_lbs} lbs</p></div>)}
                   {update.body_fat_pct && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-sm text-white">{update.body_fat_pct}%</p></div>)}
@@ -434,6 +461,7 @@ export default function CycleLogDetail() {
                 {update.side_effects && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Sides:</span> {update.side_effects}</p>}
                 {update.mood_notes && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Mood:</span> {update.mood_notes}</p>}
                 {update.general_notes && <p className="text-sm text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
+                </div>}
               </div>
             ))}
           </div>
@@ -571,20 +599,7 @@ export default function CycleLogDetail() {
               </div>
             )}
 
-            {/* Context-Aware Thread HUD */}
-            {showHud && posts.length > 3 && (
-              <div className="fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out" style={{ opacity: showHud ? 1 : 0, transform: showHud ? 'translateY(0)' : 'translateY(20px)' }}>
-                {scrollDir === 'up' ? (
-                  <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
-                    <ArrowUp className="w-3.5 h-3.5" /> Back to Top
-                  </button>
-                ) : (
-                  <button onClick={() => { const box = document.querySelector('textarea[placeholder*="Share your thoughts"]') || document.querySelector('textarea[placeholder*="Reply to"]'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } else { const els = document.querySelectorAll('[id^=comment-]'); if (els.length) els[els.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
-                    <MessageSquare className="w-3.5 h-3.5" /> Drop a Comment
-                  </button>
-                )}
-              </div>
-            )}
+
 
             {/* New Top-Level Comment */}
             {canComment && !replyTo ? (
