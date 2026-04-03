@@ -50,6 +50,25 @@ router.post('/', authenticate, async (req, res) => {
       [thread_id, req.user.id, parent_id || null, body.trim()]
     );
 
+
+    // Parse @mentions and create notifications
+    try {
+      const mentions = (body.trim().match(/@(\w+)/g) || []).map(m => m.slice(1));
+      if (mentions.length > 0) {
+        const mentionedUsers = await query(
+          'SELECT id, username FROM users WHERE username = ANY($1)',
+          [mentions]
+        );
+        for (const mu of mentionedUsers.rows) {
+          if (mu.id !== req.user.id) {
+            await query(
+              'INSERT INTO notifications (user_id, type, source_user_id, post_id, thread_id, message) VALUES ($1, $2, $3, $4, $5, $6)',
+              [mu.id, 'mention', req.user.id, result.rows[0].id, thread_id, req.user.username + ' mentioned you']
+            );
+          }
+        }
+      }
+    } catch (mentionErr) { console.error('[mention]', mentionErr.message); }
     res.status(201).json({ post: result.rows[0] });
   } catch (err) {
     console.error('[posts/create]', err.message);
@@ -143,6 +162,60 @@ router.post('/:id/best-answer', authenticate, async (req, res) => {
   } catch (err) {
     console.error('[posts/best-answer]', err.message);
     res.status(500).json({ error: 'Failed to mark best answer' });
+  }
+});
+
+// PATCH /api/posts/:id - Edit post (author only)
+router.patch('/:id', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { body } = req.body;
+    if (!body || !body.trim()) return res.status(400).json({ error: 'Body is required' });
+    const existing = await query('SELECT id, author_id, edit_count FROM posts WHERE id = $1', [id]);
+    if (!existing.rows[0]) return res.status(404).json({ error: 'Post not found' });
+    if (existing.rows[0].author_id !== req.user.id) return res.status(403).json({ error: 'You can only edit your own posts' });
+    const result = await query(
+      'UPDATE posts SET body = $1, edit_count = edit_count + 1, updated_at = NOW() WHERE id = $2 RETURNING *',
+      [body.trim(), id]
+    );
+    res.json({ post: result.rows[0] });
+  } catch (err) {
+    console.error('[posts/edit]', err.message);
+    res.status(500).json({ error: 'Failed to edit post' });
+  }
+});
+
+// DELETE /api/posts/:id - Soft delete (author or admin)
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = await query('SELECT id, author_id FROM posts WHERE id = $1', [id]);
+    if (!existing.rows[0]) return res.status(404).json({ error: 'Post not found' });
+    const isAdmin = req.user.tier === 'admin';
+    if (existing.rows[0].author_id !== req.user.id && !isAdmin) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+    await query('UPDATE posts SET body = $1, is_deleted = true, updated_at = NOW() WHERE id = $2', ['[deleted]', id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[posts/delete]', err.message);
+    res.status(500).json({ error: 'Failed to delete post' });
+  }
+});
+
+// POST /api/posts/:id/report - Report a post
+router.post('/:id/report', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    if (!reason || !reason.trim()) return res.status(400).json({ error: 'Reason is required' });
+    const existing = await query('SELECT id FROM reports WHERE reporter_id = $1 AND post_id = $2', [req.user.id, id]);
+    if (existing.rows[0]) return res.status(400).json({ error: 'Already reported' });
+    await query('INSERT INTO reports (reporter_id, post_id, reason) VALUES ($1, $2, $3)', [req.user.id, id, reason.trim()]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[posts/report]', err.message);
+    res.status(500).json({ error: 'Failed to report' });
   }
 });
 

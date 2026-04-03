@@ -72,6 +72,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/rooms', require('./routes/rooms'));
 app.use('/api/threads', require('./routes/threads'));
 app.use('/api/posts', require('./routes/posts'));
+app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/compounds', require('./routes/compounds'));
 app.use('/api/cycles', require('./routes/cycles'));
 app.use('/api/stripe', require('./routes/stripe'));
