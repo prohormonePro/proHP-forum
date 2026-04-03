@@ -252,7 +252,7 @@ export default function CycleLogDetail() {
       setCommentText('');
       setReplyTo(null);
       setCommentError(null);
-      setTimeout(() => { const els = document.querySelectorAll('[id^=comment-]'); if (els.length) els[els.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 500);
+
     },
     onError: (err) => {
       setCommentError(err?.message || 'Failed to post. Please try again.');
