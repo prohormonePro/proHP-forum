@@ -204,7 +204,7 @@ export default function CycleLogDetail() {
 
   const { data: threadData, isLoading: threadLoading, refetch: refetchThread } = useQuery({
     queryKey: ['thread', data?.cycle?.thread_id],
-    queryFn: () => api.get(`/api/threads/${data.cycle.thread_id}`).then(r => r?.data ?? r),
+    queryFn: () => api.get(`/api/threads/${data.cycle.thread_id}?limit=200`).then(r => r?.data ?? r),
     enabled: !!data?.cycle?.thread_id,
   });
 
