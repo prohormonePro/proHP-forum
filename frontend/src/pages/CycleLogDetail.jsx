@@ -218,6 +218,7 @@ export default function CycleLogDetail() {
   const [reportingPost, setReportingPost] = useState(null);
   const [reportReason, setReportReason] = useState('');
   const [sortMode, setSortMode] = useState('best');
+  const [commentSearch, setCommentSearch] = useState('');
   const [copiedPost, setCopiedPost] = useState(null);
   const copyLink = (pid) => { const url = window.location.origin + window.location.pathname + '#comment-' + pid; try { navigator.clipboard.writeText(url); } catch(e) { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } setCopiedPost(pid); setTimeout(() => setCopiedPost(null), 1500); };
   const [posting, setPosting] = useState(false);
@@ -346,7 +347,8 @@ export default function CycleLogDetail() {
   const canComment = user && (user.tier === 'inner_circle' || user.tier === 'admin');
 
   const replyToPost = replyTo ? posts.find(p => p.id === replyTo) : null;
-  const topLevel = posts
+  const filteredPosts = commentSearch.trim() ? posts.filter(p => p.body.toLowerCase().includes(commentSearch.toLowerCase()) || p.author_username?.toLowerCase().includes(commentSearch.toLowerCase())) : posts;
+  const topLevel = filteredPosts
     .filter(p => !p.parent_id)
     .sort((a, b) => {
       if (sortMode === 'newest') return new Date(b.created_at) - new Date(a.created_at);
@@ -354,7 +356,7 @@ export default function CycleLogDetail() {
       return (b.score || 0) - (a.score || 0) || new Date(a.created_at) - new Date(b.created_at);
     });
   const repliesByParent = {};
-  posts
+  filteredPosts
     .filter(p => p.parent_id)
     .sort((a, b) => (b.score || 0) - (a.score || 0) || new Date(a.created_at) - new Date(b.created_at))
     .forEach(p => {
@@ -544,6 +546,7 @@ export default function CycleLogDetail() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
+            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search comments..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 w-28 sm:w-36 focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
             <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
               <option value="best" className="bg-slate-800 text-slate-300">Best</option>
               <option value="newest" className="bg-slate-800 text-slate-300">Newest</option>
@@ -593,6 +596,8 @@ export default function CycleLogDetail() {
                                   <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
                                 )}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
+                                {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
+                                {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
                                 {isCollapsed && descendantCount > 0 && (
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
