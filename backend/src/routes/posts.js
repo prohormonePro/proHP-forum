@@ -77,19 +77,9 @@ router.post('/:id/vote', authenticate, async (req, res) => {
       );
 
       if (existing.rows[0]) {
-        const old = existing.rows[0];
-        if (old.value === value) {
-          await client.query('DELETE FROM votes WHERE id = $1', [old.id]);
-          const col = value === 1 ? 'upvotes' : 'downvotes';
-          await client.query(`UPDATE posts SET ${col} = GREATEST(0, ${col} - 1) WHERE id = $1`, [id]);
-        } else {
-          await client.query('UPDATE votes SET value = $1 WHERE id = $2', [value, old.id]);
-          if (value === 1) {
-            await client.query('UPDATE posts SET upvotes = upvotes + 1, downvotes = GREATEST(0, downvotes - 1) WHERE id = $1', [id]);
-          } else {
-            await client.query('UPDATE posts SET downvotes = downvotes + 1, upvotes = GREATEST(0, upvotes - 1) WHERE id = $1', [id]);
-          }
-        }
+        await client.query('COMMIT');
+        const current = await query('SELECT upvotes, downvotes, score FROM posts WHERE id = $1', [id]);
+        return res.json(current.rows[0]);
       } else {
         await client.query(
           'INSERT INTO votes (user_id, target_type, target_id, value) VALUES ($1, $2, $3, $4)',
