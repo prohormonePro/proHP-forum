@@ -504,7 +504,7 @@ export default function CycleLogDetail() {
             <MessageSquare className="w-5 h-5 text-[#229DD8]" />
             <h3 className="text-lg font-bold text-white">Community Feedback</h3>
           </div>
-          <span className="text-xs text-slate-500">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
+          <span className="text-xs text-slate-500 whitespace-nowrap shrink-0">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
         </div>
 
         {!cycle.thread_id ? (
@@ -516,7 +516,7 @@ export default function CycleLogDetail() {
             ) : (
               <div className="space-y-3 mb-6">
                 {(() => {
-                  const marginByDepth = ['ml-0', 'ml-8', 'ml-14', 'ml-14'];
+                  const marginByDepth = ['ml-0', 'ml-4 sm:ml-8', 'ml-6 sm:ml-14', 'ml-6 sm:ml-14'];
                   const borderByDepth = ['border-l-transparent', 'border-l-[#229DD8]/30', 'border-l-[#229DD8]/15', 'border-l-slate-600/20'];
                   const avatarSize = (d) => d < 2 ? 'w-8 h-8 text-sm' : 'w-7 h-7 text-xs';
                   const avatarBg = (d) => d === 0 ? 'bg-[#229DD8]' : d === 1 ? 'bg-[#1b87bc]' : 'bg-slate-700';
@@ -547,7 +547,7 @@ export default function CycleLogDetail() {
                                 {(p.author_tier === 'inner_circle' || p.author_tier === 'admin') && (
                                   <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
                                 )}
-                                <span className="text-[11px] text-slate-500">{timeAgo(p.created_at)}</span>
+                                <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
                                 {isCollapsed && descendantCount > 0 && (
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
                                 )}
