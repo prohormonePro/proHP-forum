@@ -516,9 +516,9 @@ export default function CycleLogDetail() {
             ) : (
               <div className="space-y-3 mb-6">
                 {(() => {
-                  const marginByDepth = ['ml-0', 'ml-4 sm:ml-8', 'ml-6 sm:ml-14', 'ml-6 sm:ml-14'];
-                  const borderByDepth = ['border-l-transparent', 'border-l-[#229DD8]/30', 'border-l-[#229DD8]/15', 'border-l-slate-600/20'];
-                  const avatarSize = (d) => d < 2 ? 'w-8 h-8 text-sm' : 'w-7 h-7 text-xs';
+                  const marginByDepth = ['ml-0', 'ml-3 sm:ml-8', 'ml-5 sm:ml-14', 'ml-5 sm:ml-14'];
+                  const borderByDepth = ['border-l-transparent', 'border-l-[#229DD8]/40', 'border-l-[#229DD8]/25', 'border-l-[#229DD8]/15'];
+                  const avatarSize = (d) => d === 0 ? 'w-8 h-8 text-sm' : d === 1 ? 'w-7 h-7 text-xs' : 'w-6 h-6 text-[10px]';
                   const avatarBg = (d) => d === 0 ? 'bg-[#229DD8]' : d === 1 ? 'bg-[#1b87bc]' : 'bg-slate-700';
 
                   function renderComment(p, depth) {
@@ -529,7 +529,7 @@ export default function CycleLogDetail() {
                     const descendantCount = children.reduce(function cc(s, k) { return s + 1 + (repliesByParent[k.id] || []).reduce(cc, 0); }, 0);
                     return (
                       <div key={p.id} className={depth > 0 ? 'mt-2' : ''} id={'comment-' + p.id}>
-                        <div className={`${marginByDepth[d]} bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-2 ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
+                        <div className={`${marginByDepth[d]} bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-[3px] ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
                           <div className="flex items-start gap-3">
                             <div className="flex flex-col items-center gap-1">
                               <div className={`${avatarSize(d)} rounded-lg ${avatarBg(d)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
@@ -552,8 +552,8 @@ export default function CycleLogDetail() {
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
                                 )}
                               </div>
-                              {parentPost && depth >= 3 && (
-                                <div className="mb-1.5"><span className="text-[11px] text-[#229DD8]/60 font-medium">@{parentPost.author_username}</span></div>
+                              {depth >= 1 && (
+                                <div className="mb-1"><span className="text-[10px] text-slate-500 font-medium">{depth >= 3 && parentPost ? '@ ' + parentPost.author_username : 'reply'}</span></div>
                               )}
                               {!isCollapsed && (<>
                               <div className="text-sm text-slate-300 leading-relaxed mb-2">
