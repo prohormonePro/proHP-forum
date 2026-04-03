@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown, Pencil, Trash2, Flag, Link2 } from 'lucide-react';
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
 import MarkdownRenderer from '../components/MarkdownRenderer';
@@ -193,6 +193,11 @@ export default function CycleLogDetail() {
   const [completeRating, setCompleteRating] = useState('');
   const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [editingPost, setEditingPost] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [reportingPost, setReportingPost] = useState(null);
+  const [reportReason, setReportReason] = useState('');
+  const [sortMode, setSortMode] = useState('best');
   const [posting, setPosting] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const replyBoxRef = useRef(null);
@@ -215,6 +220,18 @@ export default function CycleLogDetail() {
     },
   });
 
+  const editPost = useMutation({
+    mutationFn: ({ postId, body }) => api.patch('/api/posts/' + postId, { body }),
+    onSuccess: () => { if (refetchThread) refetchThread(); setEditingPost(null); setEditText(''); },
+  });
+  const deletePost = useMutation({
+    mutationFn: ({ postId }) => api.del('/api/posts/' + postId),
+    onSuccess: () => { if (refetchThread) refetchThread(); },
+  });
+  const reportPost = useMutation({
+    mutationFn: ({ postId, reason }) => api.post('/api/posts/' + postId + '/report', { reason }),
+    onSuccess: () => { setReportingPost(null); setReportReason(''); },
+  });
   const [commentError, setCommentError] = useState(null);
 
   const completeCycle = useMutation({
@@ -309,7 +326,11 @@ export default function CycleLogDetail() {
   const replyToPost = replyTo ? posts.find(p => p.id === replyTo) : null;
   const topLevel = posts
     .filter(p => !p.parent_id)
-    .sort((a, b) => (b.score || 0) - (a.score || 0) || new Date(a.created_at) - new Date(b.created_at));
+    .sort((a, b) => {
+      if (sortMode === 'newest') return new Date(b.created_at) - new Date(a.created_at);
+      if (sortMode === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+      return (b.score || 0) - (a.score || 0) || new Date(a.created_at) - new Date(b.created_at);
+    });
   const repliesByParent = {};
   posts
     .filter(p => p.parent_id)
@@ -499,7 +520,14 @@ export default function CycleLogDetail() {
             <MessageSquare className="w-5 h-5 text-[#229DD8]" />
             <h3 className="text-lg font-bold text-white">Community Feedback</h3>
           </div>
-          <span className="text-xs text-slate-500 whitespace-nowrap shrink-0">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
+            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-400 rounded-md px-2 py-0.5 focus:outline-none focus:border-[#229DD8]/30">
+              <option value="best">Best</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
         </div>
 
         {!cycle.thread_id ? (
@@ -543,6 +571,7 @@ export default function CycleLogDetail() {
                                   <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
                                 )}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
+                                {p.edit_count > 0 && <span className="text-[9px] text-slate-600 bg-slate-800/50 px-1.5 py-0.5 rounded">edited {p.edit_count}x</span>}
                                 {isCollapsed && descendantCount > 0 && (
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
                                 )}
@@ -554,20 +583,33 @@ export default function CycleLogDetail() {
                                 ) : null;
                               })()}
                               {!isCollapsed && (<>
-                              <div className="text-sm text-slate-300 leading-relaxed mb-2">
-                                <MarkdownRenderer content={p.body} />
+                              <div className={`text-sm leading-relaxed mb-2 ${p.is_deleted ? 'text-slate-600 italic' : 'text-slate-300'}`}>
+                                {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                               </div>
-                              <div className="flex items-center gap-1">
-                                {user && (
-                                  <div className="flex items-center gap-0.5 mr-3">
-                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending}><ArrowUp className="w-3.5 h-3.5" /></button>
+                              {p.image_url && !p.is_deleted && (
+                                <div className="mb-2"><img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/5" loading="lazy" /></div>
+                              )}
+                              <div className="flex items-center gap-1 flex-wrap">
+                                {user && !p.is_deleted && (
+                                  <div className="flex items-center gap-0.5 mr-2">
+                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote}><ArrowUp className="w-3.5 h-3.5" /></button>
                                     <span className={`text-xs font-semibold min-w-[20px] text-center ${(p.score || 0) > 0 ? 'text-[#229DD8]' : (p.score || 0) < 0 ? 'text-red-400' : 'text-slate-500'}`}>{p.score || 0}</span>
-                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending}><ArrowDown className="w-3.5 h-3.5" /></button>
+                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote}><ArrowDown className="w-3.5 h-3.5" /></button>
                                   </div>
                                 )}
-                                {canComment && (
+                                {canComment && !p.is_deleted && (
                                   <button onClick={() => handleReply(p.id, p.author_username)} className={`flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md transition-all ${replyTo === p.id ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`}><Reply className="w-3 h-3" /> Reply</button>
                                 )}
+                                {user && user.id === p.author_id && !p.is_deleted && (
+                                  <button onClick={() => { setEditingPost(p.id); setEditText(p.body); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded-md transition-all"><Pencil className="w-3 h-3" /></button>
+                                )}
+                                {user && (user.id === p.author_id || user.tier === 'admin') && !p.is_deleted && (
+                                  <button onClick={() => { if (confirm('Delete this comment?')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all"><Trash2 className="w-3 h-3" /></button>
+                                )}
+                                {user && user.id !== p.author_id && !p.is_deleted && (
+                                  <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
+                                )}
+                                <button onClick={() => { navigator.clipboard.writeText(window.location.origin + window.location.pathname + '#comment-' + p.id); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-slate-300 hover:bg-slate-700/30 rounded-md transition-all"><Link2 className="w-3 h-3" /></button>
                               </div>
                               {replyTo === p.id && canComment && (
                                 <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-[#229DD8]/20">
