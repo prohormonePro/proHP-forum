@@ -55,7 +55,7 @@ router.post('/', authenticate, async (req, res) => {
 
     const result = await query(
       `INSERT INTO posts (thread_id, author_id, parent_id, body)
-       VALUES ($1, $2, $3, $4)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [thread_id, req.user.id, parent_id || null, body.trim()]
     );

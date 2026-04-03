@@ -16,7 +16,8 @@ router.get('/', optionalAuth, async (req, res) => {
                       cl.status, cl.rating, cl.would_run_again, cl.start_date, cl.follower_count, cl.update_count,
                       cl.is_featured, cl.created_at,
                       u.username, u.display_name, u.tier AS user_tier, u.is_founding
-               FROM cycle_logs cl
+               , (SELECT count(*)::int FROM posts p WHERE p.thread_id = c.thread_id AND NOT p.is_deleted) as comment_count
+       FROM cycle_logs cl
                JOIN users u ON u.id = cl.user_id
                WHERE cl.is_public = true`;
     const params = [];
