@@ -265,11 +265,6 @@ export default function CycleLogDetail() {
 
   const handleVote = (postId, value) => {
     if (!user) return;
-    const post = posts.find(p => p.id === postId);
-    if (post && post.user_vote && post.user_vote !== value) {
-      votePost.mutate({ postId, value: post.user_vote });
-      return;
-    }
     votePost.mutate({ postId, value });
   };
 
