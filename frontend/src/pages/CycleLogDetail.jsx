@@ -621,6 +621,25 @@ export default function CycleLogDetail() {
                                   </div>
                                 </div>
                               )}
+                              {editingPost === p.id && (
+                                <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-amber-500/20">
+                                  <textarea value={editText} onChange={(e) => setEditText(e.target.value)} rows={3} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all resize-none mb-2" />
+                                  <div className="flex items-center gap-2">
+                                    <button onClick={() => editPost.mutate({ postId: p.id, body: editText })} disabled={!editText.trim() || editPost.isPending} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{editPost.isPending ? '...' : 'Save Edit'}</button>
+                                    <button onClick={() => setEditingPost(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
+                                  </div>
+                                </div>
+                              )}
+                              {reportingPost === p.id && (
+                                <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-red-500/20">
+                                  <p className="text-[10px] text-slate-400 mb-2">Why are you reporting this?</p>
+                                  <textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} rows={2} placeholder="Spam, harassment, misinformation..." className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all resize-none mb-2" />
+                                  <div className="flex items-center gap-2">
+                                    <button onClick={() => reportPost.mutate({ postId: p.id, reason: reportReason })} disabled={!reportReason.trim() || reportPost.isPending} className="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{reportPost.isPending ? '...' : 'Submit Report'}</button>
+                                    <button onClick={() => setReportingPost(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
+                                  </div>
+                                </div>
+                              )}
                               </>)}
                             </div>
                           </div>
