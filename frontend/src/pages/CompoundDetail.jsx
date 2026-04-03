@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink, ArrowUp, ArrowDown, CornerDownRight, CheckCircle, Award, Clock, Shield, Beaker, Heart, Activity, Zap, Droplets, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { ChevronLeft, MessageSquare, Search, X, AlertTriangle, Youtube, Lock, ExternalLink, ArrowUp, ArrowDown, CornerDownRight, CheckCircle, Award, Clock, Shield, Beaker, Heart, Activity, Zap, Droplets, ChevronDown, ChevronUp, Check, Link2 } from 'lucide-react';
 import { api } from '../hooks/api';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import GrepGate from '../components/GrepGate';
@@ -604,6 +604,8 @@ export default function CompoundDetail() {
   var videoId = useMemo(function() { if (!compound) return ''; return extractYouTubeId(compound.youtube_video_id) || extractYouTubeId(compound.youtube_url); }, [compound]);
   var [videoOpen, setVideoOpen] = useState(false);
   var [joinOpen, setJoinOpen] = useState(false);
+  var [copiedLink, setCopiedLink] = useState(false);
+  var shareCompound = function() { var url = window.location.href; try { navigator.clipboard.writeText(url); } catch(e) { var t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } setCopiedLink(true); setTimeout(function() { setCopiedLink(false); }, 1500); };
   var [labelOpen, setLabelOpen] = useState(false);
   var [showAllPosts, setShowAllPosts] = useState(false);
 
@@ -658,7 +660,10 @@ export default function CompoundDetail() {
         {/* Desktop: grid with compressed hero column */}
         <div className="hidden md:grid" style={{ gridTemplateColumns: '1fr 240px', gap: '20px', alignItems: 'start' }}>
           <div className="min-w-0">
-            <h1 className="text-2xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-extrabold tracking-tight">{compound.name}</h1>
+              <button onClick={shareCompound} className={'inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg transition-all ' + (copiedLink ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5')} style={{transition: 'all 0.15s ease'}}>{copiedLink ? <><CheckCircle className="w-3 h-3" /><span>Copied!</span></> : <><Link2 className="w-3 h-3" /><span>Share</span></>}</button>
+            </div>
             {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
@@ -690,7 +695,10 @@ export default function CompoundDetail() {
         {/* Mobile: stacked with hero between tags and summary */}
         <div className="md:hidden flex flex-col">
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight mb-1">{compound.name}</h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-xl font-extrabold tracking-tight">{compound.name}</h1>
+              <button onClick={shareCompound} className={'inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg transition-all ' + (copiedLink ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5')} style={{transition: 'all 0.15s ease'}}>{copiedLink ? <><CheckCircle className="w-3 h-3" /><span>Copied!</span></> : <><Link2 className="w-3 h-3" /><span>Share</span></>}</button>
+            </div>
             {compound.company && <p className="text-xs text-slate-500 mb-2">{compound.company}</p>}
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {compound.risk_tier && (<span className={'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ' + riskClass(compound.risk_tier)}>Risk: {compound.risk_tier.charAt(0).toUpperCase() + compound.risk_tier.slice(1).toLowerCase()}</span>)}
