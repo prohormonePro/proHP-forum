@@ -198,6 +198,8 @@ export default function CycleLogDetail() {
   const [reportingPost, setReportingPost] = useState(null);
   const [reportReason, setReportReason] = useState('');
   const [sortMode, setSortMode] = useState('best');
+  const [copiedPost, setCopiedPost] = useState(null);
+  const copyLink = (pid) => { const url = window.location.origin + window.location.pathname + '#comment-' + pid; try { navigator.clipboard.writeText(url); } catch(e) { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } setCopiedPost(pid); setTimeout(() => setCopiedPost(null), 1500); };
   const [posting, setPosting] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const replyBoxRef = useRef(null);
@@ -609,7 +611,7 @@ export default function CycleLogDetail() {
                                 {user && user.id !== p.author_id && !p.is_deleted && (
                                   <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
                                 )}
-                                <button onClick={() => { const url = window.location.origin + window.location.pathname + '#comment-' + p.id; if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(() => alert('Link copied!')).catch(() => { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('Link copied!'); }); } else { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('Link copied!'); } }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-slate-300 hover:bg-slate-700/30 rounded-md transition-all"><Link2 className="w-3 h-3" /></button>
+                                <button onClick={() => copyLink(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${copiedPost === p.id ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-600 hover:text-slate-300 hover:bg-slate-700/30'}`} style={{transition: 'all 0.15s ease'}}>{copiedPost === p.id ? <><CheckCircle className="w-3 h-3" /><span className="text-[10px] font-medium">Copied!</span></> : <Link2 className="w-3 h-3" />}</button>
                               </div>
                               {replyTo === p.id && canComment && (
                                 <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-[#229DD8]/20">
