@@ -460,7 +460,7 @@ export default function CycleLogDetail() {
 
       {/* Community Feedback Section */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-[#229DD8]" />
             <h3 className="text-lg font-bold text-white">Community Feedback</h3>
@@ -469,188 +469,93 @@ export default function CycleLogDetail() {
         </div>
 
         {!cycle.thread_id ? (
-          <div className="text-center p-8">
-            <p className="text-sm text-slate-400">Comments not available for this log.</p>
-          </div>
+          <div className="text-center p-8"><p className="text-sm text-slate-400">Comments not available for this log.</p></div>
         ) : (
           <>
-            {/* Comments List */}
             {posts.length === 0 ? (
-              <div className="text-center p-8">
-                <p className="text-sm text-slate-400">No comments yet. Be the first to share your thoughts.</p>
-              </div>
+              <div className="text-center p-8"><p className="text-sm text-slate-400">No comments yet. Be the first to share your thoughts.</p></div>
             ) : (
-              <div className="space-y-4 mb-6">
-                {topLevel.map((post) => (
-                    <div key={post.id}>
-                      <div className="bg-slate-950/50 rounded-xl p-4 border border-white/5">
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#229DD8] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                            {post.author_username?.charAt(0).toUpperCase() || 'A'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-sm font-semibold text-[#229DD8]">{post.author_username}</span>
-                              {(post.author_tier === 'inner_circle' || post.author_tier === 'admin') && (
-                                <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
-                                  {post.author_tier === 'admin' ? 'ADM' : 'IC'}
-                                </span>
-                              )}
-                              <span className="text-xs text-slate-500">{timeAgo(post.created_at)}</span>
-                            </div>
-                            <div className="text-sm text-slate-300 leading-relaxed mb-3">
-                              <MarkdownRenderer content={post.body} />
-                            </div>
-                            <div className="flex items-center gap-4">
-                              {user && (
-                                <div className="flex items-center gap-1">
-                                  <button onClick={() => handleVote(post.id, 1)} className={`p-1 rounded transition-colors ${post.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending}>
-                                    <ArrowUp className="w-4 h-4" />
-                                  </button>
-                                  <span className="text-xs font-medium text-slate-400 min-w-[20px] text-center">{post.score || 0}</span>
-                                  <button onClick={() => handleVote(post.id, -1)} className={`p-1 rounded transition-colors ${post.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending}>
-                                    <ArrowDown className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              )}
-                              {canComment && (
-                                <button onClick={() => handleReply(post.id, post.author_username)} className="flex items-center gap-1 px-2 py-1 text-xs text-slate-400 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded transition-colors">
-                                  <Reply className="w-3 h-3" /> Reply
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {(repliesByParent[post.id] || []).map((reply) => (
-                        <div key={reply.id}>
-                          <div className="ml-8 mt-2 bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-2 border-l-[#229DD8]/20">
-                            <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 rounded-full bg-[#229DD8] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                                {reply.author_username?.charAt(0).toUpperCase() || 'A'}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-sm font-semibold text-[#229DD8]">{reply.author_username}</span>
-                                  {(reply.author_tier === 'inner_circle' || reply.author_tier === 'admin') && (
-                                    <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
-                                      {reply.author_tier === 'admin' ? 'ADM' : 'IC'}
-                                    </span>
-                                  )}
-                                  <span className="text-xs text-slate-500">{timeAgo(reply.created_at)}</span>
-                                </div>
-                                <div className="text-sm text-slate-300 leading-relaxed mb-2">
-                                  <MarkdownRenderer content={reply.body} />
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  {user && (
-                                    <div className="flex items-center gap-1">
-                                      <button onClick={() => handleVote(reply.id, 1)} className={`p-1 rounded transition-colors ${reply.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`}><ArrowUp className="w-3.5 h-3.5" /></button>
-                                      <span className="text-xs font-medium text-slate-400 min-w-[16px] text-center">{reply.score || 0}</span>
-                                      <button onClick={() => handleVote(reply.id, -1)} className={`p-1 rounded transition-colors ${reply.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/5'}`}><ArrowDown className="w-3.5 h-3.5" /></button>
-                                    </div>
-                                  )}
-                                  {canComment && (
-                                    <button onClick={() => handleReply(reply.id, reply.author_username)} className="flex items-center gap-1 px-2 py-1 text-xs text-slate-400 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded transition-colors"><Reply className="w-3 h-3" /> Reply</button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Level 3 replies */}
-                          {(repliesByParent[reply.id] || []).map((r3) => (
-                            <div key={r3.id} className="ml-16 mt-2 bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-2 border-l-slate-600/30">
-                              <div className="flex items-start gap-3">
-                                <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                  {r3.author_username?.charAt(0).toUpperCase() || 'A'}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-sm font-semibold text-[#229DD8]">{r3.author_username}</span>
-                                    {(r3.author_tier === 'inner_circle' || r3.author_tier === 'admin') && (
-                                      <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{r3.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
-                                    )}
-                                    <span className="text-xs text-slate-500">{timeAgo(r3.created_at)}</span>
-                                  </div>
-                                  <div className="text-sm text-slate-300 leading-relaxed">
-                                    <MarkdownRenderer content={r3.body} />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="space-y-3 mb-6">
+                {(() => {
+                  const marginByDepth = ['ml-0', 'ml-8', 'ml-14', 'ml-14'];
+                  const borderByDepth = ['border-l-transparent', 'border-l-[#229DD8]/30', 'border-l-[#229DD8]/15', 'border-l-slate-600/20'];
+                  const avatarSize = (d) => d < 2 ? 'w-8 h-8 text-sm' : 'w-7 h-7 text-xs';
+                  const avatarBg = (d) => d === 0 ? 'bg-[#229DD8]' : d === 1 ? 'bg-[#1b87bc]' : 'bg-slate-700';
 
-                        {/* Comment Form */}
-            {canComment ? (
-              <div className="mt-6" ref={replyBoxRef}>
-                {replyToPost && (
-                  <div className="mb-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-slate-400">
-                        Replying to <span className="text-[#229DD8]">{replyToPost.author_username}</span>
-                      </span>
-                      <button
-                        onClick={() => setReplyTo(null)}
-                        className="text-xs text-slate-500 hover:text-white transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                    <div className="text-xs text-slate-500 line-clamp-2">
-                      {replyToPost.body.substring(0, 100)}
-                      {replyToPost.body.length > 100 ? '...' : ''}
-                    </div>
-                  </div>
-                )}
-                <textarea
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder={replyTo ? "Write your reply..." : "Share your thoughts, advice, or questions..."}
-                  rows={3}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3"
-                />
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={postComment}
-                    disabled={!commentText.trim() || posting}
-                    className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
-                  >
-                {commentError && (
-                  <p className="text-red-400 text-sm mt-1 mb-2">{commentError}</p>
-                )}
-                    {posting ? 'Posting...' : replyTo ? 'Post Reply' : 'Post Comment'}
-                  </button>
-                  {replyTo && (
-                    <button
-                      onClick={() => setReplyTo(null)}
-                      className="text-sm text-slate-400 hover:text-white transition-colors"
-                    >
-                      Cancel Reply
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : user ? (
-              <div className="mt-6 text-center">
-                <p className="text-sm text-slate-400 mb-3">Join Inner Circle to comment and engage with the community.</p>
-                <Link
-                  to="/compounds"
-                  className="inline-block bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-semibold rounded-xl px-6 py-2.5 transition-all"
-                >
-                  Upgrade to Inner Circle
-                </Link>
-              </div>
-            ) : (
-              <div className="mt-6 text-center">
-                <p className="text-sm text-slate-400">Sign in to join the discussion.</p>
+                  function renderComment(p, depth) {
+                    const d = Math.min(depth, 3);
+                    const parentPost = depth >= 3 ? posts.find(x => x.id === p.parent_id) : null;
+                    const children = repliesByParent[p.id] || [];
+                    return (
+                      <div key={p.id} className={depth > 0 ? 'mt-2' : ''}>
+                        <div className={`${marginByDepth[d]} bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-2 ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
+                          <div className="flex items-start gap-3">
+                            <div className={`${avatarSize(d)} rounded-lg ${avatarBg(d)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
+                              {p.author_username?.charAt(0).toUpperCase() || 'A'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className="text-sm font-semibold text-[#229DD8]">{p.author_username}</span>
+                                {(p.author_tier === 'inner_circle' || p.author_tier === 'admin') && (
+                                  <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
+                                )}
+                                <span className="text-[11px] text-slate-500">{timeAgo(p.created_at)}</span>
+                              </div>
+                              {parentPost && depth >= 3 && (
+                                <div className="mb-1.5"><span className="text-[11px] text-[#229DD8]/60 font-medium">@{parentPost.author_username}</span></div>
+                              )}
+                              <div className="text-sm text-slate-300 leading-relaxed mb-2">
+                                <MarkdownRenderer content={p.body} />
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {user && (
+                                  <div className="flex items-center gap-0.5 mr-3">
+                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending}><ArrowUp className="w-3.5 h-3.5" /></button>
+                                    <span className={`text-xs font-semibold min-w-[20px] text-center ${(p.score || 0) > 0 ? 'text-[#229DD8]' : (p.score || 0) < 0 ? 'text-red-400' : 'text-slate-500'}`}>{p.score || 0}</span>
+                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending}><ArrowDown className="w-3.5 h-3.5" /></button>
+                                  </div>
+                                )}
+                                {canComment && (
+                                  <button onClick={() => handleReply(p.id, p.author_username)} className={`flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md transition-all ${replyTo === p.id ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`}><Reply className="w-3 h-3" /> Reply</button>
+                                )}
+                              </div>
+                              {replyTo === p.id && canComment && (
+                                <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-[#229DD8]/20">
+                                  <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
+                                  {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
+                                  <div className="flex items-center gap-2">
+                                    <button onClick={postComment} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
+                                    <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        {children.map(child => renderComment(child, depth + 1))}
+                      </div>
+                    );
+                  }
+                  return topLevel.map(p => renderComment(p, 0));
+                })()}
               </div>
             )}
+
+            {/* New Top-Level Comment */}
+            {canComment && !replyTo ? (
+              <div className="mt-4 pt-4 border-t border-white/5">
+                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
+                {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
+                <button onClick={postComment} disabled={!commentText.trim() || posting} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{posting ? 'Posting...' : 'Post Comment'}</button>
+              </div>
+            ) : !canComment && user ? (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-slate-400 mb-3">Join Inner Circle to comment and engage with the community.</p>
+                <Link to="/compounds" className="inline-block bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-semibold rounded-xl px-6 py-2.5 transition-all">Upgrade to Inner Circle</Link>
+              </div>
+            ) : !user ? (
+              <div className="mt-6 text-center"><p className="text-sm text-slate-400">Sign in to join the discussion.</p></div>
+            ) : null}
           </>
         )}
       </div>
