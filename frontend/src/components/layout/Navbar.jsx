@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, LogOut } from 'lucide-react';
+import { Search, LogOut, Bell } from 'lucide-react';
 import useAuthStore from '../../stores/auth';
 
 const TIER_LABELS = {

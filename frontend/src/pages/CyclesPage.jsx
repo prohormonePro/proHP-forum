@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Dumbbell, Activity, CheckCircle, XCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Dumbbell, Activity, CheckCircle, XCircle, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
 import { api } from '../hooks/api';
 import CycleLogForm from '../components/CycleLogForm';
 import useAuthStore from '../stores/auth';
@@ -96,6 +96,7 @@ export default function CyclesPage() { const [showForm, setShowForm] = useState(
                   <div className="flex-1 p-5 min-w-0">
                     {/* Compound headline */}
                     <h3 className="text-lg font-extrabold text-white truncate mb-1">{cycle.compound_name}</h3>
+                  {cycle.comment_count > 0 && <span className="flex items-center gap-1 text-[10px] text-slate-500 ml-2"><MessageSquare className="w-3 h-3" />{cycle.comment_count}</span>}
                     {/* Title */}
                     <p className="text-sm text-slate-300 font-medium truncate mb-2">{cycle.title}</p>
                     {/* Dose + Duration inline */}
