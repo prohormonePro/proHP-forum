@@ -193,6 +193,26 @@ export default function CycleLogDetail() {
   const [completeRating, setCompleteRating] = useState('');
   const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [commentImage, setCommentImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const imageInputRef = useRef(null);
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setCommentError('Image must be under 5MB'); return; }
+    setCommentImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/posts/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  };
   const [editingPost, setEditingPost] = useState(null);
   const [editText, setEditText] = useState('');
   const [reportingPost, setReportingPost] = useState(null);
@@ -660,9 +680,17 @@ export default function CycleLogDetail() {
             {/* New Top-Level Comment */}
             {canComment && !replyTo ? (
               <div className="mt-4 pt-4 border-t border-white/5">
-                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
+                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
+            {imagePreview && (
+              <div className="mb-3 relative inline-block">
+                <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-white/10" />
+                <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">x</button>
+              </div>
+            )}
+            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
-                <button onClick={postComment} disabled={!commentText.trim() || posting} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{posting ? 'Posting...' : 'Post Comment'}</button>
+                <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
+                <button type="button" onClick={() => imageInputRef.current?.click()} className="text-slate-500 hover:text-[#229DD8] transition-colors p-2 rounded-lg hover:bg-[#229DD8]/5"><Activity className="w-4 h-4" /></button>
               </div>
             ) : !canComment && user ? (
               <div className="mt-6 text-center">
