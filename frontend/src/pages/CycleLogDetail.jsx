@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown } from 'lucide-react';
@@ -172,6 +172,20 @@ export default function CycleLogDetail() {
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [collapsedThreads, setCollapsedThreads] = useState({});
   const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
+  const [showHud, setShowHud] = useState(false);
+  const [scrollDir, setScrollDir] = useState('down');
+  const lastScrollY = useRef(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrollDir(y > lastScrollY.current ? 'down' : 'up');
+      lastScrollY.current = y;
+      const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
+      setShowHud(y > 400 && !atBottom);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
   const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
@@ -557,11 +571,18 @@ export default function CycleLogDetail() {
               </div>
             )}
 
-            {/* Sticky Thread Nav */}
-            {posts.length > 5 && (
-              <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
-                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="bg-slate-900/90 backdrop-blur-md border border-slate-700/50 text-slate-400 hover:text-[#229DD8] hover:border-[#229DD8]/30 rounded-xl px-3 py-2 text-xs font-bold transition-all shadow-lg" title="Back to top"><ArrowUp className="w-4 h-4" /></button>
-                <button onClick={() => { const els = document.querySelectorAll('[id^=comment-]'); if (els.length) els[els.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }} className="bg-slate-900/90 backdrop-blur-md border border-slate-700/50 text-slate-400 hover:text-[#229DD8] hover:border-[#229DD8]/30 rounded-xl px-3 py-2 text-xs font-bold transition-all shadow-lg" title="Jump to latest"><ArrowDown className="w-4 h-4" /></button>
+            {/* Context-Aware Thread HUD */}
+            {showHud && posts.length > 3 && (
+              <div className="fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out" style={{ opacity: showHud ? 1 : 0, transform: showHud ? 'translateY(0)' : 'translateY(20px)' }}>
+                {scrollDir === 'up' ? (
+                  <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
+                    <ArrowUp className="w-3.5 h-3.5" /> Back to Top
+                  </button>
+                ) : (
+                  <button onClick={() => { const box = document.querySelector('textarea[placeholder*="Share your thoughts"]') || document.querySelector('textarea[placeholder*="Reply to"]'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } else { const els = document.querySelectorAll('[id^=comment-]'); if (els.length) els[els.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
+                    <MessageSquare className="w-3.5 h-3.5" /> Drop a Comment
+                  </button>
+                )}
               </div>
             )}
 
