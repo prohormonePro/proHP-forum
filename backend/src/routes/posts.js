@@ -1,4 +1,14 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '../../uploads')),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_'))
+});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
+  if (['image/jpeg','image/png','image/gif','image/webp'].includes(file.mimetype)) cb(null, true);
+  else cb(new Error('Only images allowed'), false);
+}});
 const { query, getClient } = require('../config/db');
 const { authenticate, requireTier, TIER_LEVELS } = require('../middleware/auth');
 
@@ -162,6 +172,18 @@ router.post('/:id/best-answer', authenticate, async (req, res) => {
   } catch (err) {
     console.error('[posts/best-answer]', err.message);
     res.status(500).json({ error: 'Failed to mark best answer' });
+  }
+});
+
+// POST /api/posts/upload - Upload image for comment
+router.post('/upload', authenticate, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+    const imageUrl = '/uploads/' + req.file.filename;
+    res.json({ url: imageUrl });
+  } catch (err) {
+    console.error('[posts/upload]', err.message);
+    res.status(500).json({ error: 'Upload failed' });
   }
 });
 

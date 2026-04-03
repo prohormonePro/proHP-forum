@@ -71,6 +71,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/rooms', require('./routes/rooms'));
 app.use('/api/threads', require('./routes/threads'));
+app.use('/uploads', express.static(require('path').join(__dirname, '../uploads')));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/compounds', require('./routes/compounds'));
