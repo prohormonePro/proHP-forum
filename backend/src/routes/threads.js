@@ -44,7 +44,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
 
     // Fetch posts
     const postsResult = await query(
-      `SELECT p.id, p.body, p.parent_id, p.is_best_answer, p.is_helpful,
+      `SELECT p.id, p.body, p.parent_id, p.is_best_answer, p.is_helpful, p.edit_count, p.is_deleted, p.image_url, p.author_id,
               p.upvotes, p.downvotes, p.score, p.created_at, p.updated_at,
               u.id AS author_id, u.username AS author_username,
               u.display_name AS author_display_name, u.tier AS author_tier,

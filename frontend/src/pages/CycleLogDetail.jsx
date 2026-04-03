@@ -522,10 +522,10 @@ export default function CycleLogDetail() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
-            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-400 rounded-md px-2 py-0.5 focus:outline-none focus:border-[#229DD8]/30">
-              <option value="best">Best</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
+            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
+              <option value="best" className="bg-slate-800 text-slate-300">Best</option>
+              <option value="newest" className="bg-slate-800 text-slate-300">Newest</option>
+              <option value="oldest" className="bg-slate-800 text-slate-300">Oldest</option>
             </select>
           </div>
         </div>
@@ -571,7 +571,7 @@ export default function CycleLogDetail() {
                                   <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
                                 )}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
-                                {p.edit_count > 0 && <span className="text-[9px] text-slate-600 bg-slate-800/50 px-1.5 py-0.5 rounded">edited {p.edit_count}x</span>}
+                                {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
                                 {isCollapsed && descendantCount > 0 && (
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
                                 )}
@@ -592,9 +592,9 @@ export default function CycleLogDetail() {
                               <div className="flex items-center gap-1 flex-wrap">
                                 {user && !p.is_deleted && (
                                   <div className="flex items-center gap-0.5 mr-2">
-                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote}><ArrowUp className="w-3.5 h-3.5" /></button>
+                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowUp className="w-3.5 h-3.5" /></button>
                                     <span className={`text-xs font-semibold min-w-[20px] text-center ${(p.score || 0) > 0 ? 'text-[#229DD8]' : (p.score || 0) < 0 ? 'text-red-400' : 'text-slate-500'}`}>{p.score || 0}</span>
-                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote}><ArrowDown className="w-3.5 h-3.5" /></button>
+                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowDown className="w-3.5 h-3.5" /></button>
                                   </div>
                                 )}
                                 {canComment && !p.is_deleted && (
@@ -609,7 +609,7 @@ export default function CycleLogDetail() {
                                 {user && user.id !== p.author_id && !p.is_deleted && (
                                   <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
                                 )}
-                                <button onClick={() => { navigator.clipboard.writeText(window.location.origin + window.location.pathname + '#comment-' + p.id); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-slate-300 hover:bg-slate-700/30 rounded-md transition-all"><Link2 className="w-3 h-3" /></button>
+                                <button onClick={() => { const url = window.location.origin + window.location.pathname + '#comment-' + p.id; if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(() => alert('Link copied!')).catch(() => { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('Link copied!'); }); } else { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('Link copied!'); } }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-slate-300 hover:bg-slate-700/30 rounded-md transition-all"><Link2 className="w-3 h-3" /></button>
                               </div>
                               {replyTo === p.id && canComment && (
                                 <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-[#229DD8]/20">
