@@ -326,9 +326,16 @@ export default function CycleLogDetail() {
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in p-6">
-      <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
-        <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
-      </Link>
+      <div className="flex items-center justify-between mb-6">
+        <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition">
+          <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
+        </Link>
+        {cycle?.thread_id && (
+          <Link to={'/t/' + cycle.thread_id} className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all">
+            <MessageSquare className="w-3 h-3" /> View Public Thread
+          </Link>
+        )}
+      </div>
 
       {/* Protocol Header */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 md:p-8 mb-6">
