@@ -516,8 +516,8 @@ export default function CycleLogDetail() {
             ) : (
               <div className="space-y-3 mb-6">
                 {(() => {
-                  const marginByDepth = ['ml-0', 'ml-3 sm:ml-8', 'ml-5 sm:ml-14', 'ml-5 sm:ml-14'];
-                  const borderByDepth = ['border-l-transparent', 'border-l-[#229DD8]/40', 'border-l-[#229DD8]/25', 'border-l-[#229DD8]/15'];
+                  const marginByDepth = ['ml-0', 'ml-5 sm:ml-8', 'ml-9 sm:ml-14', 'ml-9 sm:ml-14'];
+                  const borderByDepth = ['border-l-transparent', 'border-l-[#229DD8]/50', 'border-l-[#229DD8]/35', 'border-l-[#229DD8]/20'];
                   const avatarSize = (d) => d === 0 ? 'w-8 h-8 text-sm' : d === 1 ? 'w-7 h-7 text-xs' : 'w-6 h-6 text-[10px]';
                   const avatarBg = (d) => d === 0 ? 'bg-[#229DD8]' : d === 1 ? 'bg-[#1b87bc]' : 'bg-slate-700';
 
@@ -552,9 +552,12 @@ export default function CycleLogDetail() {
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
                                 )}
                               </div>
-                              {depth >= 1 && (
-                                <div className="mb-1"><span className="text-[10px] text-slate-500 font-medium">{depth >= 3 && parentPost ? '@ ' + parentPost.author_username : 'reply'}</span></div>
-                              )}
+                              {depth >= 1 && (() => {
+                                const parent = posts.find(x => x.id === p.parent_id);
+                                return parent ? (
+                                  <div className="mb-1"><span className="text-[10px] font-medium"><span className="text-slate-600">replying to </span><span className="text-[#229DD8]/70">@{parent.author_username}</span></span></div>
+                                ) : null;
+                              })()}
                               {!isCollapsed && (<>
                               <div className="text-sm text-slate-300 leading-relaxed mb-2">
                                 <MarkdownRenderer content={p.body} />
