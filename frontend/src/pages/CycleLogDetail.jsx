@@ -170,6 +170,8 @@ export default function CycleLogDetail() {
   const user = useAuthStore((x) => x.user);
   const queryClient = useQueryClient();
   const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [collapsedThreads, setCollapsedThreads] = useState({});
+  const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
   const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
@@ -486,12 +488,21 @@ export default function CycleLogDetail() {
                     const d = Math.min(depth, 3);
                     const parentPost = depth >= 3 ? posts.find(x => x.id === p.parent_id) : null;
                     const children = repliesByParent[p.id] || [];
+                    const isCollapsed = collapsedThreads[p.id];
+                    const descendantCount = children.reduce(function cc(s, k) { return s + 1 + (repliesByParent[k.id] || []).reduce(cc, 0); }, 0);
                     return (
-                      <div key={p.id} className={depth > 0 ? 'mt-2' : ''}>
+                      <div key={p.id} className={depth > 0 ? 'mt-2' : ''} id={'comment-' + p.id}>
                         <div className={`${marginByDepth[d]} bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-2 ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
                           <div className="flex items-start gap-3">
-                            <div className={`${avatarSize(d)} rounded-lg ${avatarBg(d)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
-                              {p.author_username?.charAt(0).toUpperCase() || 'A'}
+                            <div className="flex flex-col items-center gap-1">
+                              <div className={`${avatarSize(d)} rounded-lg ${avatarBg(d)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
+                                {p.author_username?.charAt(0).toUpperCase() || 'A'}
+                              </div>
+                              {children.length > 0 && (
+                                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-600 hover:text-[#229DD8] font-mono transition-colors w-5 h-5 flex items-center justify-center rounded hover:bg-[#229DD8]/5" title={isCollapsed ? 'Expand' : 'Collapse'}>
+                                  {isCollapsed ? '+' : '-'}
+                                </button>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
@@ -500,10 +511,14 @@ export default function CycleLogDetail() {
                                   <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
                                 )}
                                 <span className="text-[11px] text-slate-500">{timeAgo(p.created_at)}</span>
+                                {isCollapsed && descendantCount > 0 && (
+                                  <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
+                                )}
                               </div>
                               {parentPost && depth >= 3 && (
                                 <div className="mb-1.5"><span className="text-[11px] text-[#229DD8]/60 font-medium">@{parentPost.author_username}</span></div>
                               )}
+                              {!isCollapsed && (<>
                               <div className="text-sm text-slate-300 leading-relaxed mb-2">
                                 <MarkdownRenderer content={p.body} />
                               </div>
@@ -529,15 +544,24 @@ export default function CycleLogDetail() {
                                   </div>
                                 </div>
                               )}
+                              </>)}
                             </div>
                           </div>
                         </div>
-                        {children.map(child => renderComment(child, depth + 1))}
+                        {!isCollapsed && children.map(child => renderComment(child, depth + 1))}
                       </div>
                     );
                   }
                   return topLevel.map(p => renderComment(p, 0));
                 })()}
+              </div>
+            )}
+
+            {/* Sticky Thread Nav */}
+            {posts.length > 5 && (
+              <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="bg-slate-900/90 backdrop-blur-md border border-slate-700/50 text-slate-400 hover:text-[#229DD8] hover:border-[#229DD8]/30 rounded-xl px-3 py-2 text-xs font-bold transition-all shadow-lg" title="Back to top"><ArrowUp className="w-4 h-4" /></button>
+                <button onClick={() => { const els = document.querySelectorAll('[id^=comment-]'); if (els.length) els[els.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }} className="bg-slate-900/90 backdrop-blur-md border border-slate-700/50 text-slate-400 hover:text-[#229DD8] hover:border-[#229DD8]/30 rounded-xl px-3 py-2 text-xs font-bold transition-all shadow-lg" title="Jump to latest"><ArrowDown className="w-4 h-4" /></button>
               </div>
             )}
 
