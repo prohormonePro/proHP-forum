@@ -179,6 +179,15 @@ export default function CycleLogDetail() {
   const [scrollDir, setScrollDir] = useState('down');
   const lastScrollY = useRef(0);
   useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#comment-')) {
+      setTimeout(() => {
+        const el = document.getElementById(hash.slice(1));
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.outline = '2px solid rgba(34,157,216,0.5)'; el.style.borderRadius = '12px'; setTimeout(() => { el.style.outline = 'none'; }, 3000); }
+      }, 1000);
+    }
+  }, []);
+  useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
@@ -228,7 +237,7 @@ export default function CycleLogDetail() {
     try {
       const cRes = await fetch((import.meta.env.VITE_API_URL || '') + '/api/compounds?limit=200');
       const cData = await cRes.json();
-      allCompounds = (cData.compounds || cData || []).map(c2 => ({ name: c2.name, category: c2.category, slug: c2.slug }));
+      allCompounds = (cData.compounds || cData || []).map(c2 => ({ name: c2.name, category: c2.category, slug: c2.slug, is_published: c2.is_published }));
       if (data.cycle.compound_name) {
         const slug = allCompounds.find(c2 => c2.name === data.cycle.compound_name)?.slug;
         if (slug) {
@@ -247,7 +256,7 @@ export default function CycleLogDetail() {
         role: 'You are analyzing a verified hormone cycle log from ProHormonePro (forum.prohormonepro.com). This is real data from a real person. Treat it like a clinical consultation. Be specific. Use their actual numbers. Never guess when the data exists.',
         critical_warning: 'IMPORTANT: The compounds listed in this file are prohormones and SARMs sold as dietary supplements. They are NOT anabolic steroids. Do not confuse product names with pharmaceutical steroids. For example, Andriol in this context is a Hi-Tech Pharmaceuticals product (1-DHEA based), NOT testosterone undecanoate. Always reference the compound_detail section for accurate information.',
         response_format: 'Start with a 2-sentence cycle summary. Analyze week-over-week trends using their actual data. Flag concerning trends (stalled weight, escalating side effects, mood shifts). End with 3 specific recommendations for their next cycle.',
-        compound_context: 'Use the compound_detail section below as your primary source for this compound. Cross-reference dose and duration against the mechanism and known effects described there. Do not rely on external assumptions about this compound name.',
+        compound_context: 'Use the compound_detail section below as your primary source for this compound. Cross-reference dose and duration against the mechanism and known effects described there. Do not rely on external assumptions about this compound name. Note: some compounds in the index were formerly legal prohormones that are now banned (e.g. original Superdrol, original Halodrol). Modern products with the same name (Hi-Tech Superdrol, Hi-Tech Halodrol) are legal reformulations using different pathways (e.g. two-step conversion via 1-DHEA). Always check whether the user is referring to the banned original or the modern legal version.',
         session_governance: 'This context file should be re-uploaded every 8-10 messages to prevent context drift. The AI may begin confusing prohormone product names with pharmaceutical compounds after extended conversation. Re-injecting this file resets the context.'
       },
       compound_detail: compoundDetail,
@@ -428,7 +437,7 @@ export default function CycleLogDetail() {
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">3.</span><span className="text-xs text-slate-400">Upload the file and ask anything about your cycle</span></div>
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">4.</span><span className="text-xs text-slate-400">Re-upload every 8-10 messages to keep the AI accurate</span></div>
               </div>
-              <p className="text-xs text-slate-500 mb-4">Includes your compound encyclopedia data, all 105 ProHP compounds, and built-in guardrails so the AI knows these are supplements, not steroids.</p>
+              <p className="text-xs text-slate-500 mb-4">Includes encyclopedia data, compound status (active/banned), all 105 ProHP compounds, and guardrails so the AI knows supplements from steroids.</p>
               <div className="flex gap-3">
                 <button onClick={() => { downloadCycleJSON(); setShowHandoffGuide(false); }} className="flex-1 bg-gradient-to-r from-[#229DD8] to-[#1b87bc] text-white font-bold text-sm rounded-xl py-2.5 transition-all hover:from-[#1b87bc] hover:to-[#166e9c]">Download Cycle File</button>
                 <button onClick={() => setShowHandoffGuide(false)} className="px-4 text-slate-500 hover:text-white text-sm transition-colors">Close</button>

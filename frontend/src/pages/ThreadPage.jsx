@@ -36,6 +36,15 @@ export default function ThreadPage() {
   const replyBoxRef = useRef(null);
 
   useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#comment-')) {
+      setTimeout(() => {
+        const el = document.getElementById(hash.slice(1));
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.outline = '2px solid rgba(34,157,216,0.5)'; el.style.borderRadius = '12px'; setTimeout(() => { el.style.outline = 'none'; }, 3000); }
+      }, 1000);
+    }
+  }, []);
+  useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
