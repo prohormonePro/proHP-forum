@@ -595,8 +595,7 @@ export default function CycleLogDetail() {
                                 <span className="text-sm font-semibold text-[#229DD8]">{p.author_username}</span>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
-                                {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
-                                {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
+                                
                                 {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
                                 {isCollapsed && descendantCount > 0 && (
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
