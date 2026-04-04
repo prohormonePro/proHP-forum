@@ -226,7 +226,7 @@ export default function CycleLogDetail() {
     let compoundDetail = null;
     let allCompounds = [];
     try {
-      const cRes = await fetch((import.meta.env.VITE_API_URL || '') + '/api/compounds');
+      const cRes = await fetch((import.meta.env.VITE_API_URL || '') + '/api/compounds?limit=200');
       const cData = await cRes.json();
       allCompounds = (cData.compounds || cData || []).map(c2 => ({ name: c2.name, category: c2.category, slug: c2.slug }));
       if (data.cycle.compound_name) {
@@ -428,7 +428,7 @@ export default function CycleLogDetail() {
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">3.</span><span className="text-xs text-slate-400">Upload the file and ask anything about your cycle</span></div>
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">4.</span><span className="text-xs text-slate-400">Re-upload every 8-10 messages to keep the AI accurate</span></div>
               </div>
-              <p className="text-[10px] text-slate-600 mb-4">Includes your compound encyclopedia data, all 105 ProHP compounds, and built-in guardrails so the AI knows these are supplements, not steroids.</p>
+              <p className="text-xs text-slate-500 mb-4">Includes your compound encyclopedia data, all 105 ProHP compounds, and built-in guardrails so the AI knows these are supplements, not steroids.</p>
               <div className="flex gap-3">
                 <button onClick={() => { downloadCycleJSON(); setShowHandoffGuide(false); }} className="flex-1 bg-gradient-to-r from-[#229DD8] to-[#1b87bc] text-white font-bold text-sm rounded-xl py-2.5 transition-all hover:from-[#1b87bc] hover:to-[#166e9c]">Download Cycle File</button>
                 <button onClick={() => setShowHandoffGuide(false)} className="px-4 text-slate-500 hover:text-white text-sm transition-colors">Close</button>
@@ -778,9 +778,9 @@ export default function CycleLogDetail() {
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-colors px-4 py-2 rounded-lg bg-[#229DD8]/10 hover:bg-[#229DD8]/20 border border-[#229DD8]/20 hover:border-[#229DD8]/40" title="Attach image"><Activity className="w-4 h-4" /><span className="text-[11px] font-medium">Attach</span></button>
-                  <span className="text-[9px] text-slate-600 hidden sm:inline">Bloodwork, progress pics, supplement labels</span>
+                <div className="flex flex-wrap items-center gap-3 w-full mt-3 pt-3 border-t border-white/5">
+                  <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-all px-4 py-2 rounded-lg bg-[#229DD8]/10 hover:bg-[#229DD8]/20 border border-[#229DD8]/20 hover:border-[#229DD8]/40"><Activity className="w-4 h-4" /><span className="text-xs font-medium">Attach</span></button>
+                  <span className="text-[11px] text-slate-500">Bloodwork, progress pics, supplement labels, PDFs</span>
                 </div>
               </div>
             ) : !canComment && user ? (
