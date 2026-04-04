@@ -127,7 +127,7 @@ function WeeklyUpdateForm({ cycleId, existingWeeks, onSuccess }) {
   const ic = "w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all";
 
   return (
-    <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-[#229DD8]/25 p-6">
+    <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-[#229DD8]/25 p-3 sm:p-6">
       <h3 className="text-lg font-bold text-white mb-1">Post Weekly Update</h3>
       <p className="text-xs text-slate-500 mb-5">Drop the data. That is how we learn.</p>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -587,7 +587,7 @@ export default function CycleLogDetail() {
           {!showCompleteForm ? (
             <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
           ) : (
-            <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-emerald-500/25 p-6">
+            <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-emerald-500/25 p-3 sm:p-6">
               <h3 className="text-lg font-bold text-white mb-1">Complete Cycle</h3>
               <p className="text-xs text-slate-500 mb-5">Final verdict. Rate the compound and lock it in.</p>
               <div className="space-y-4">
@@ -616,19 +616,21 @@ export default function CycleLogDetail() {
       )}
 
       {/* Community Feedback Section */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-6">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#229DD8]" />
-            <h3 className="text-lg font-bold text-white">Community Feedback</h3>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-3 sm:p-6 overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+          <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-[#229DD8]" />
+              <h3 className="text-lg font-bold text-white">Community Feedback</h3>
+            </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
-            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 flex-1 min-w-0 max-w-[100px] sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
-            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
-              <option value="best" className="bg-slate-800 text-slate-300">Best</option>
-              <option value="newest" className="bg-slate-800 text-slate-300">Newest</option>
-              <option value="oldest" className="bg-slate-800 text-slate-300">Oldest</option>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 flex-1 min-w-0 sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
+            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 shrink-0 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
+              <option value="best">Best</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
             </select>
           </div>
         </div>

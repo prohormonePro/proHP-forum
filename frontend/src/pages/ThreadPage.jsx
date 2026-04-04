@@ -245,15 +245,17 @@ export default function ThreadPage() {
       </article>
 
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-6">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#229DD8]" />
-            <h2 className="text-base font-bold text-white">Replies</h2>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+          <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-[#229DD8]" />
+              <h2 className="text-base font-bold text-white">Replies</h2>
+            </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} {posts.length === 1 ? 'reply' : 'replies'}</span>
-            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 w-20 sm:w-28 focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
-            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 flex-1 min-w-0 sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
+            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 shrink-0 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
               <option value="best">Best</option>
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
