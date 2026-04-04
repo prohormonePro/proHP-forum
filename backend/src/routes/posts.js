@@ -211,11 +211,15 @@ router.patch('/:id', authenticate, async (req, res) => {
 router.delete('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const existing = await query('SELECT id, author_id FROM posts WHERE id = $1', [id]);
+    const existing = await query('SELECT id, author_id, created_at FROM posts WHERE id = $1', [id]);
     if (!existing.rows[0]) return res.status(404).json({ error: 'Post not found' });
     const isAdmin = req.user.tier === 'admin';
     if (existing.rows[0].author_id !== req.user.id && !isAdmin) {
       return res.status(403).json({ error: 'Not authorized' });
+    }
+    if (!isAdmin && existing.rows[0].author_id === req.user.id) {
+      const postAge = Date.now() - new Date(existing.rows[0].created_at || 0).getTime();
+      if (postAge > 600000) return res.status(403).json({ error: 'Delete window expired. You can still edit your comment.' });
     }
     await query('UPDATE posts SET body = $1, is_deleted = true, updated_at = NOW() WHERE id = $2', ['[deleted]', id]);
     res.json({ success: true });

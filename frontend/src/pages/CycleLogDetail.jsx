@@ -633,13 +633,9 @@ export default function CycleLogDetail() {
                                 {user && (user.id === p.author_id || user.tier === 'admin') && !p.is_deleted && (
                                   <button onClick={() => { if (confirm('Delete this comment?')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all"><Trash2 className="w-3 h-3" /></button>
                                 )}
-                                {user && user.tier === 'admin' && !p.is_deleted && (
-                                  <button onClick={() => { if (confirm('Pin this comment?')) { /* TODO: pin endpoint */ } }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all" title="Pin"><Award className="w-3 h-3" /></button>
-                                )}
                                 {user && user.id !== p.author_id && !p.is_deleted && (
                                   <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
                                 )}
-                                <button onClick={() => { const saved = JSON.parse(localStorage.getItem('savedComments') || '[]'); if (saved.includes(p.id)) { localStorage.setItem('savedComments', JSON.stringify(saved.filter(x => x !== p.id))); } else { saved.push(p.id); localStorage.setItem('savedComments', JSON.stringify(saved)); } }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all" title="Bookmark"><Bookmark className="w-3 h-3" /></button>
                                 <button onClick={() => copyLink(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${copiedPost === p.id ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-600 hover:text-slate-300 hover:bg-slate-700/30'}`} style={{transition: 'all 0.15s ease'}}>{copiedPost === p.id ? <><CheckCircle className="w-3 h-3" /><span className="text-[10px] font-medium">Copied!</span></> : <Link2 className="w-3 h-3" />}</button>
                               </div>
                               {replyTo === p.id && canComment && (
