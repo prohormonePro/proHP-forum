@@ -208,9 +208,10 @@ export default function CycleLogDetail() {
     const formData = new FormData();
     formData.append('image', file);
     const token = localStorage.getItem('prohp_at');
-    const res = await fetch('/api/posts/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+    if (!token) throw new Error('Please log in to upload images');
+    const res = await fetch((import.meta.env.VITE_API_URL || '') + '/api/posts/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+    if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error || 'Upload failed: ' + res.status); }
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Upload failed');
     return data.url;
   };
   const [editingPost, setEditingPost] = useState(null);
@@ -631,8 +632,8 @@ export default function CycleLogDetail() {
                                 {user && user.id === p.author_id && !p.is_deleted && (
                                   <button onClick={() => { setEditingPost(p.id); setEditText(p.body); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded-md transition-all"><Pencil className="w-3 h-3" /></button>
                                 )}
-                                {user && (user.id === p.author_id || user.tier === 'admin') && !p.is_deleted && (
-                                  <button onClick={() => { if (confirm('Delete this comment?')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all"><Trash2 className="w-3 h-3" /></button>
+                                {user && ((user.id === p.author_id && (Date.now() - new Date(p.created_at).getTime()) < 600000) || user.tier === 'admin') && !p.is_deleted && (
+                                  <button onClick={() => { if (confirm('Delete this comment? This cannot be undone.')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all" title="Delete (within 10 min)"><Trash2 className="w-3 h-3" /></button>
                                 )}
                                 {user && user.id !== p.author_id && !p.is_deleted && (
                                   <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
@@ -694,10 +695,11 @@ export default function CycleLogDetail() {
                 <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">x</button>
               </div>
             )}
+            <p className="text-[9px] text-slate-600 mb-1.5">Drop bloodwork, progress pics, or cycle data. Proof builds trust.</p>
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
-                <button type="button" onClick={() => imageInputRef.current?.click()} className="text-slate-500 hover:text-[#229DD8] transition-colors p-2 rounded-lg hover:bg-[#229DD8]/5"><Activity className="w-4 h-4" /></button>
+                <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-1.5 text-slate-500 hover:text-[#229DD8] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#229DD8]/5 border border-slate-700/30 hover:border-[#229DD8]/20" title="Attach image"><Activity className="w-4 h-4" /><span className="text-[10px] hidden sm:inline">Attach proof</span></button>
               </div>
             ) : !canComment && user ? (
               <div className="mt-6 text-center">

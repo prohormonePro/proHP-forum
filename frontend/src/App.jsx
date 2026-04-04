@@ -15,6 +15,7 @@ import RegisterPage from './pages/RegisterPage';
 import GrepGate from "./components/GrepGate";
 import CreateThread from "./pages/CreateThread";
 import UserProfile from './pages/UserProfile';
+import NotificationsPage from './pages/NotificationsPage';
 
 import ClaimAccountPage from "./pages/ClaimAccountPage";
 import SearchPage from "./pages/SearchPage";
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/u/:username" element={<UserProfile />} />
             <Route path="/community-intel" element={<CommunityIntel />} />
             <Route path="/consultation" element={<ConsultationPage />} />
