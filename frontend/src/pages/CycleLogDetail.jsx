@@ -188,15 +188,18 @@ export default function CycleLogDetail() {
     }
   }, []);
   useEffect(() => {
+    let hideTimer = null;
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
       const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
       setShowHud(y > 200 && !atBottom);
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => setShowHud(false), 2500);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => { window.removeEventListener('scroll', onScroll); if (hideTimer) clearTimeout(hideTimer); };
   }, []);
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
@@ -365,7 +368,7 @@ export default function CycleLogDetail() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto animate-fade-in px-3 sm:px-6 py-4 sm:py-6">
+      <div className="max-w-3xl mx-auto animate-fade-in px-3 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-slate-800 rounded w-1/3" />
           <div className="h-4 bg-slate-800 rounded w-2/3" />
@@ -453,7 +456,7 @@ export default function CycleLogDetail() {
       </div>
 
       {/* Protocol Header */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6">
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
@@ -621,7 +624,7 @@ export default function CycleLogDetail() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
-            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 w-16 sm:w-28 focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
+            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 flex-1 min-w-0 max-w-[100px] sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
             <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
               <option value="best" className="bg-slate-800 text-slate-300">Best</option>
               <option value="newest" className="bg-slate-800 text-slate-300">Newest</option>

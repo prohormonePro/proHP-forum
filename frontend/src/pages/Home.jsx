@@ -42,7 +42,7 @@ export default function Home() {
               Welcome back, {user.display_name || user.username}.
             </h1>
             <p className="text-sm text-[var(--text-secondary)]">
-              52+ compounds reviewed. 2M+ views. Every claim receipted.
+              105+ compounds reviewed. 2M+ views. Every claim receipted.
             </p>
           </div>
         ) : (

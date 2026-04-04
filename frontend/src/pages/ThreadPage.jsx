@@ -45,15 +45,18 @@ export default function ThreadPage() {
     }
   }, []);
   useEffect(() => {
+    let hideTimer = null;
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
       const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
       setShowHud(y > 200 && !atBottom);
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => setShowHud(false), 2500);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => { window.removeEventListener('scroll', onScroll); if (hideTimer) clearTimeout(hideTimer); };
   }, []);
 
   const copyLink = (pid) => { const url = window.location.origin + window.location.pathname + '#comment-' + pid; try { navigator.clipboard.writeText(url); } catch(e) { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } setCopiedPost(pid); setTimeout(() => setCopiedPost(null), 1500); };
