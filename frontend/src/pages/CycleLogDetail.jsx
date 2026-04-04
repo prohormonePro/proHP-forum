@@ -385,7 +385,7 @@ export default function CycleLogDetail() {
             <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <span className="text-[#229DD8] font-semibold">{cycle.username}</span>
-              {cycle.is_founding && <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
+              {cycle.is_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
               <span className="w-1 h-1 rounded-full bg-slate-600" />
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
             </div>
@@ -592,9 +592,7 @@ export default function CycleLogDetail() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-sm font-semibold text-[#229DD8]">{p.author_username}</span>
-                                {(p.author_tier === 'inner_circle' || p.author_tier === 'admin') && (
-                                  <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">{p.author_tier === 'admin' ? 'ADM' : 'IC'}</span>
-                                )}
+                                {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
                                 {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
