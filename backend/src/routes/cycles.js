@@ -15,8 +15,8 @@ router.get('/', optionalAuth, async (req, res) => {
     let sql = `SELECT cl.id, cl.title, cl.compound_name, cl.dose, cl.duration_weeks,
                       cl.status, cl.rating, cl.would_run_again, cl.start_date, cl.follower_count, cl.update_count,
                       cl.is_featured, cl.created_at,
-                      u.username, u.display_name, u.tier AS user_tier, u.is_founding
-               , (SELECT count(*)::int FROM posts p WHERE p.thread_id = c.thread_id AND NOT p.is_deleted) as comment_count
+                      u.username, u.display_name, u.tier AS user_tier, u.is_founding,
+             (SELECT count(*)::int FROM posts p2 WHERE p2.thread_id = cl.thread_id) as comment_count
        FROM cycle_logs cl
                JOIN users u ON u.id = cl.user_id
                WHERE cl.is_public = true`;
