@@ -149,7 +149,7 @@ export default function ThreadPage() {
             <div className="flex-1 min-w-0">
               {!isCollapsed && (<>
                 <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                  <Link to={`/u/${p.author_username}`} className="text-xs font-semibold text-slate-300 hover:text-[#229DD8] transition-colors">{p.author_username}</Link>
+                  <Link to={`/u/${p.author_username}`} className="text-xs font-semibold text-slate-300 hover:text-[#229DD8] transition-colors truncate max-w-[120px] sm:max-w-[160px] inline-block align-bottom">{p.author_username}</Link>
                   {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                   {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
                   <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
@@ -164,9 +164,9 @@ export default function ThreadPage() {
                 <div className="flex items-center gap-1 flex-wrap">
                   {user && !p.is_deleted && (
                     <div className="flex items-center gap-0.5 mr-2">
-                      <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowUp className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-slate-500 bg-slate-700/20' : p.user_vote ? 'text-slate-700' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowUp className="w-3.5 h-3.5" /></button>
                       <span className={`text-xs font-semibold min-w-[20px] text-center ${(p.score || 0) > 0 ? 'text-[#229DD8]' : (p.score || 0) < 0 ? 'text-red-400' : 'text-slate-500'}`}>{p.score || 0}</span>
-                      <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowDown className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-slate-500 bg-slate-700/20' : p.user_vote ? 'text-slate-700' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowDown className="w-3.5 h-3.5" /></button>
                     </div>
                   )}
                   {canComment && !p.is_deleted && (<button onClick={() => handleReply(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md transition-all ${replyTo === p.id ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`}><Reply className="w-3 h-3" /> Reply</button>)}
@@ -226,16 +226,16 @@ export default function ThreadPage() {
       <article className="prohp-card p-5 mb-4">
         <div className="flex items-start gap-4">
           <div className="flex flex-col items-center gap-1 pt-1">
-            <button onClick={() => user && voteThread.mutate({ value: 1 })} className={`p-1 rounded transition-colors ${thread.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8]'} ${!user ? 'opacity-40' : ''}`} disabled={!user}><ArrowUp className="w-5 h-5" /></button>
+            <button onClick={() => user && voteThread.mutate({ value: 1 })} className={`p-1 rounded transition-colors ${thread.user_vote === 1 ? 'text-slate-500 bg-slate-700/20' : thread.user_vote ? 'text-slate-700' : 'text-slate-500 hover:text-[#229DD8]'} ${!user ? 'opacity-40' : ''}`} disabled={!user}><ArrowUp className="w-5 h-5" /></button>
             <span className={`text-sm font-bold font-mono ${thread.score > 0 ? 'text-[#229DD8]' : thread.score < 0 ? 'text-red-400' : 'text-slate-400'}`}>{thread.score}</span>
-            <button onClick={() => user && voteThread.mutate({ value: -1 })} className={`p-1 rounded transition-colors ${thread.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-500 hover:text-red-400'} ${!user ? 'opacity-40' : ''}`} disabled={!user}><ArrowDown className="w-5 h-5" /></button>
+            <button onClick={() => user && voteThread.mutate({ value: -1 })} className={`p-1 rounded transition-colors ${thread.user_vote === -1 ? 'text-slate-500 bg-slate-700/20' : thread.user_vote ? 'text-slate-700' : 'text-slate-500 hover:text-red-400'} ${!user ? 'opacity-40' : ''}`} disabled={!user}><ArrowDown className="w-5 h-5" /></button>
           </div>
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-extrabold text-slate-100 mb-2 leading-snug">{thread.title}</h1>
             {thread.compound_name && (<Link to={`/compounds/${thread.compound_slug}`} className="inline-flex text-[10px] font-semibold text-[#229DD8]/80 bg-[#229DD8]/10 px-2 py-0.5 rounded mb-3 hover:bg-[#229DD8]/20 transition-colors">{thread.compound_name}</Link>)}
             <MarkdownRenderer content={thread.body} className="text-sm text-slate-300 leading-relaxed mb-4" />
             <div className="flex items-center gap-3 text-[11px] text-slate-500 border-t border-white/[0.04] pt-3">
-              <Link to={`/u/${thread.author_username}`} className="font-medium text-slate-400 hover:text-[#229DD8] transition-colors">{thread.author_username}</Link>
+              <Link to={`/u/${thread.author_username}`} className="font-medium text-slate-400 hover:text-[#229DD8] transition-colors truncate max-w-[150px] sm:max-w-[200px] inline-block align-bottom">{thread.author_username}</Link>
               {thread.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
               <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {thread.view_count}</span>
               <span className="ml-auto">{new Date(thread.created_at).toLocaleDateString()}</span>

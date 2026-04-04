@@ -462,7 +462,7 @@ export default function CycleLogDetail() {
             <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
             <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="text-[#229DD8] font-semibold">{cycle.username}</span>
+              <span className="text-[#229DD8] font-semibold truncate max-w-[150px] sm:max-w-[200px] inline-block align-bottom">{cycle.username}</span>
               {cycle.is_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
               <span className="w-1 h-1 rounded-full bg-slate-600" />
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
@@ -671,7 +671,7 @@ export default function CycleLogDetail() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-sm font-semibold text-[#229DD8]">{p.author_username}</span>
+                                <span className="text-sm font-semibold text-[#229DD8] truncate max-w-[120px] sm:max-w-[160px] inline-block align-bottom">{p.author_username}</span>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
@@ -714,9 +714,9 @@ export default function CycleLogDetail() {
                               <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap overflow-hidden">
                                 {user && !p.is_deleted && (
                                   <div className="flex items-center gap-0.5 mr-2">
-                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowUp className="w-3.5 h-3.5" /></button>
+                                    <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-slate-500 bg-slate-700/20' : p.user_vote ? 'text-slate-700' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowUp className="w-3.5 h-3.5" /></button>
                                     <span className={`text-xs font-semibold min-w-[20px] text-center ${(p.score || 0) > 0 ? 'text-[#229DD8]' : (p.score || 0) < 0 ? 'text-red-400' : 'text-slate-500'}`}>{p.score || 0}</span>
-                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-red-400 bg-red-500/10' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowDown className="w-3.5 h-3.5" /></button>
+                                    <button onClick={() => handleVote(p.id, -1)} className={`p-1 rounded-md transition-all ${p.user_vote === -1 ? 'text-slate-500 bg-slate-700/20' : p.user_vote ? 'text-slate-700' : 'text-slate-600 hover:text-red-400 hover:bg-red-500/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowDown className="w-3.5 h-3.5" /></button>
                                   </div>
                                 )}
                                 {canComment && !p.is_deleted && (
