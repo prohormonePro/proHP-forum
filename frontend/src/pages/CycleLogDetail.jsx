@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown, Pencil, Trash2, Flag, Link2 } from 'lucide-react';
+import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown, Pencil, Trash2, Flag, Link2, Award, Bookmark } from 'lucide-react';
 import { api } from '../hooks/api';
 import useAuthStore from '../stores/auth';
 import MarkdownRenderer from '../components/MarkdownRenderer';
