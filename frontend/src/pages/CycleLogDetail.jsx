@@ -423,7 +423,7 @@ export default function CycleLogDetail() {
     });
 
   return (
-    <div className="max-w-3xl mx-auto animate-fade-in p-6">
+    <div className="max-w-3xl mx-auto animate-fade-in px-3 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
       <div className="flex items-center justify-between mb-6">
         <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition">
           <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
