@@ -594,6 +594,7 @@ export default function CycleLogDetail() {
                               <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-sm font-semibold text-[#229DD8]">{p.author_username}</span>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
+                                {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
                                 
                                 {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
@@ -612,9 +613,23 @@ export default function CycleLogDetail() {
                                 {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                               </div>
                               {p.image_url && !p.is_deleted && (
-                                <div className="mb-2">
-                                  <button onClick={(e) => { const img = e.currentTarget.nextElementSibling; img.style.display = img.style.display === 'none' ? 'block' : 'none'; e.currentTarget.textContent = img.style.display === 'none' ? '📎 View attachment' : '📎 Hide attachment'; }} className="text-[10px] text-[#229DD8] hover:text-[#1b87bc] cursor-pointer mb-1.5 font-medium">📎 View attachment</button>
-                                  <img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/10" loading="lazy" style={{display: 'none'}} />
+                                <div className="mb-3 mt-1">
+                                  <button onClick={(e) => { const frame = e.currentTarget.nextElementSibling; frame.style.display = frame.style.display === 'none' ? 'block' : 'none'; e.currentTarget.textContent = frame.style.display === 'none' ? '📎 View attachment' : '📎 Hide attachment'; }} className="text-[11px] text-[#229DD8] hover:text-white cursor-pointer font-medium transition-colors inline-flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-[#229DD8]/10">📎 View attachment</button>
+                                  <div style={{display: 'none'}} className="mt-2">
+                                    <div className="rounded-xl overflow-hidden border-2 border-[#229DD8]/20 bg-gradient-to-b from-slate-800/30 to-slate-950/60 shadow-lg shadow-[#229DD8]/5">
+                                      <div className="p-3">
+                                        {p.image_url.endsWith('.pdf') ? (
+                                          <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-colors text-sm font-medium justify-center p-4">View PDF Document</a>
+                                        ) : (
+                                          <img src={p.image_url} alt="" className="w-full max-h-[500px] object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity" loading="lazy" onClick={() => { const o = document.createElement('div'); o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:99999;cursor:zoom-out;padding:20px'; const i = document.createElement('img'); i.src = p.image_url; i.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain;border-radius:12px'; o.appendChild(i); o.onclick = () => o.remove(); document.body.appendChild(o); }} />
+                                        )}
+                                      </div>
+                                      <div className="px-3 pb-2 flex items-center justify-between border-t border-white/5 pt-1.5">
+                                        <span className="text-[9px] text-slate-600">Click to view full screen</span>
+                                        <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="text-[9px] text-[#229DD8] hover:text-white transition-colors font-medium">Open original</a>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                               )}
                               <div className="flex items-center gap-1 flex-wrap">
@@ -687,7 +702,7 @@ export default function CycleLogDetail() {
             {/* New Top-Level Comment */}
             {canComment && !replyTo ? (
               <div className="mt-4 pt-4 border-t border-white/5">
-                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
+                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
             {imagePreview && (
               <div className="mb-3 relative inline-block">
                 <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-white/10" />

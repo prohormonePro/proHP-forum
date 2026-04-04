@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_'))
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
-  if (['image/jpeg','image/png','image/gif','image/webp'].includes(file.mimetype)) cb(null, true);
+  if (['image/jpeg','image/png','image/gif','image/webp','application/pdf'].includes(file.mimetype)) cb(null, true);
   else cb(new Error('Only images allowed'), false);
 }});
 const { query, getClient } = require('../config/db');
