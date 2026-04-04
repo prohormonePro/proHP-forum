@@ -365,7 +365,7 @@ export default function CycleLogDetail() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto animate-fade-in p-6">
+      <div className="max-w-3xl mx-auto animate-fade-in px-3 sm:px-6 py-4 sm:py-6">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-slate-800 rounded w-1/3" />
           <div className="h-4 bg-slate-800 rounded w-2/3" />
@@ -377,7 +377,7 @@ export default function CycleLogDetail() {
 
   if (error || !data?.cycle) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
+      <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
         <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
           <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
         </Link>
@@ -453,7 +453,7 @@ export default function CycleLogDetail() {
       </div>
 
       {/* Protocol Header */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 md:p-8 mb-6">
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
@@ -621,7 +621,7 @@ export default function CycleLogDetail() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
-            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search comments..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 w-28 sm:w-36 focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
+            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 w-16 sm:w-28 focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
             <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
               <option value="best" className="bg-slate-800 text-slate-300">Best</option>
               <option value="newest" className="bg-slate-800 text-slate-300">Newest</option>
@@ -706,7 +706,7 @@ export default function CycleLogDetail() {
                                   </div>
                                 </div>
                               )}
-                              <div className="flex items-center gap-1 flex-wrap">
+                              <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap overflow-hidden">
                                 {user && !p.is_deleted && (
                                   <div className="flex items-center gap-0.5 mr-2">
                                     <button onClick={() => handleVote(p.id, 1)} className={`p-1 rounded-md transition-all ${p.user_vote === 1 ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`} disabled={votePost.isPending || !!p.user_vote} style={p.user_vote ? {opacity: 0.3, cursor: 'not-allowed'} : {}}><ArrowUp className="w-3.5 h-3.5" /></button>
