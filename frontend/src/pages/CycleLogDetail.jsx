@@ -237,7 +237,7 @@ export default function CycleLogDetail() {
     try {
       const cRes = await fetch((import.meta.env.VITE_API_URL || '') + '/api/compounds?limit=200');
       const cData = await cRes.json();
-      allCompounds = (cData.compounds || cData || []).map(c2 => ({ name: c2.name, category: c2.category, slug: c2.slug, is_published: c2.is_published }));
+      allCompounds = (cData.compounds || cData || []).map(c2 => ({ name: c2.name, category: c2.category, slug: c2.slug, company: c2.company || null, status: (c2.summary && (c2.summary.includes('BANNED') || c2.summary.includes('banned'))) ? 'banned' : 'active' }));
       if (data.cycle.compound_name) {
         const slug = allCompounds.find(c2 => c2.name === data.cycle.compound_name)?.slug;
         if (slug) {
@@ -256,11 +256,11 @@ export default function CycleLogDetail() {
         role: 'You are analyzing a verified hormone cycle log from ProHormonePro (forum.prohormonepro.com). This is real data from a real person. Treat it like a clinical consultation. Be specific. Use their actual numbers. Never guess when the data exists.',
         critical_warning: 'IMPORTANT: The compounds listed in this file are prohormones and SARMs sold as dietary supplements. They are NOT anabolic steroids. Do not confuse product names with pharmaceutical steroids. For example, Andriol in this context is a Hi-Tech Pharmaceuticals product (1-DHEA based), NOT testosterone undecanoate. Always reference the compound_detail section for accurate information.',
         response_format: 'Start with a 2-sentence cycle summary. Analyze week-over-week trends using their actual data. Flag concerning trends (stalled weight, escalating side effects, mood shifts). End with 3 specific recommendations for their next cycle.',
-        compound_context: 'Use the compound_detail section below as your primary source for this compound. Cross-reference dose and duration against the mechanism and known effects described there. Do not rely on external assumptions about this compound name. Note: some compounds in the index were formerly legal prohormones that are now banned (e.g. original Superdrol, original Halodrol). Modern products with the same name (Hi-Tech Superdrol, Hi-Tech Halodrol) are legal reformulations using different pathways (e.g. two-step conversion via 1-DHEA). Always check whether the user is referring to the banned original or the modern legal version.',
+        compound_context: 'Use the compound_detail section below as your primary source for this compound. Cross-reference dose and duration against the mechanism and known effects described there. Do not rely on external assumptions about this compound name. The prohp_compound_index marks each compound as active or BANNED based on verified data. Hi-Tech Pharmaceuticals products listed are legal two-step converting prohormones unless marked BANNED. Some product names (Dianabol, Winstrol, Equipoise, Primobolan, Halodrol) are trademarked names purchased by Hi-Tech and are NOT the original steroids. Always check the compound_detail summary for the definitive status.',
         session_governance: 'This context file should be re-uploaded every 8-10 messages to prevent context drift. The AI may begin confusing prohormone product names with pharmaceutical compounds after extended conversation. Re-injecting this file resets the context.'
       },
       compound_detail: compoundDetail,
-      prohp_compound_index: allCompounds.map(c2 => c2.name + ' (' + c2.category + ')'),
+      prohp_compound_index: allCompounds.map(c2 => { let label = c2.name + ' [' + c2.category + ']'; if (c2.company) label += ' - ' + c2.company; if (c2.status === 'banned') label += ' (BANNED)'; return label; }),
       cycle: { compound: data.cycle.compound_name, dose: data.cycle.dose, duration_weeks: data.cycle.duration_weeks, status: data.cycle.status, rating: data.cycle.rating, would_run_again: data.cycle.would_run_again, start_date: data.cycle.start_date, description: data.cycle.description, author: data.cycle.username, total_logged_weeks: filledWeeks.length, community_verdict: verdicts.length > 0 ? verdicts[0] : null },
       weekly_updates: weeks,
       community_discussion: (posts || []).map(p => ({ author: p.author_username, body: p.body, score: p.score, is_verdict: p.is_best_answer, parent_id: p.parent_id, date: p.created_at })),
@@ -437,7 +437,7 @@ export default function CycleLogDetail() {
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">3.</span><span className="text-xs text-slate-400">Upload the file and ask anything about your cycle</span></div>
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">4.</span><span className="text-xs text-slate-400">Re-upload every 8-10 messages to keep the AI accurate</span></div>
               </div>
-              <p className="text-xs text-slate-500 mb-4">Includes encyclopedia data, compound status (active/banned), all 105 ProHP compounds, and guardrails so the AI knows supplements from steroids.</p>
+              <p className="text-xs text-slate-500 mb-4">Includes encyclopedia data with verified active/banned status, all 105 compounds with manufacturer info, and guardrails so the AI knows Hi-Tech reformulations from scheduled originals.</p>
               <div className="flex gap-3">
                 <button onClick={() => { downloadCycleJSON(); setShowHandoffGuide(false); }} className="flex-1 bg-gradient-to-r from-[#229DD8] to-[#1b87bc] text-white font-bold text-sm rounded-xl py-2.5 transition-all hover:from-[#1b87bc] hover:to-[#166e9c]">Download Cycle File</button>
                 <button onClick={() => setShowHandoffGuide(false)} className="px-4 text-slate-500 hover:text-white text-sm transition-colors">Close</button>
