@@ -148,7 +148,7 @@ export default function ThreadPage() {
                 <div className={`text-sm leading-relaxed mb-2 ${p.is_deleted ? 'text-slate-600 italic' : 'text-slate-300'}`}>
                   {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                 </div>
-                {p.image_url && !p.is_deleted && (<div className="mb-2"><img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/5" loading="lazy" /></div>)}
+                {p.image_url && !p.is_deleted && (<details className="mb-2"><summary className="text-[10px] text-slate-500 cursor-pointer hover:text-[#229DD8] transition-colors mb-1">View attachment</summary><img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/5" loading="lazy" /></details>)}
                 <div className="flex items-center gap-1 flex-wrap">
                   {user && !p.is_deleted && (
                     <div className="flex items-center gap-0.5 mr-2">

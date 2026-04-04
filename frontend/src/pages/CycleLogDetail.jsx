@@ -207,7 +207,7 @@ export default function CycleLogDetail() {
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('prohp_at');
     const res = await fetch('/api/posts/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Upload failed');
@@ -614,7 +614,10 @@ export default function CycleLogDetail() {
                                 {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                               </div>
                               {p.image_url && !p.is_deleted && (
-                                <div className="mb-2"><img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/5" loading="lazy" /></div>
+                                <details className="mb-2">
+                                  <summary className="text-[10px] text-slate-500 cursor-pointer hover:text-[#229DD8] transition-colors mb-1">View attachment</summary>
+                                  <img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/5" loading="lazy" />
+                                </details>
                               )}
                               <div className="flex items-center gap-1 flex-wrap">
                                 {user && !p.is_deleted && (
