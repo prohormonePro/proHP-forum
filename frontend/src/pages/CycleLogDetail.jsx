@@ -613,10 +613,10 @@ export default function CycleLogDetail() {
                                 {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                               </div>
                               {p.image_url && !p.is_deleted && (
-                                <details className="mb-2">
-                                  <summary className="text-[10px] text-slate-500 cursor-pointer hover:text-[#229DD8] transition-colors mb-1">View attachment</summary>
-                                  <img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/5" loading="lazy" />
-                                </details>
+                                <div className="mb-2">
+                                  <button onClick={(e) => { const img = e.currentTarget.nextElementSibling; img.style.display = img.style.display === 'none' ? 'block' : 'none'; e.currentTarget.textContent = img.style.display === 'none' ? '📎 View attachment' : '📎 Hide attachment'; }} className="text-[10px] text-[#229DD8] hover:text-[#1b87bc] cursor-pointer mb-1.5 font-medium">📎 View attachment</button>
+                                  <img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/10" loading="lazy" style={{display: 'none'}} />
+                                </div>
                               )}
                               <div className="flex items-center gap-1 flex-wrap">
                                 {user && !p.is_deleted && (
@@ -695,7 +695,7 @@ export default function CycleLogDetail() {
                 <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">x</button>
               </div>
             )}
-            <p className="text-[9px] text-slate-600 mb-1.5">Drop bloodwork, progress pics, or cycle data. Proof builds trust.</p>
+            <p className="text-[9px] text-slate-600 mb-1.5">Your results help the next guy make a better decision.</p>
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
