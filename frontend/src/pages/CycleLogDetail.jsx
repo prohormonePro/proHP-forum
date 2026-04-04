@@ -222,11 +222,16 @@ export default function CycleLogDetail() {
   const [commentSearch, setCommentSearch] = useState('');
   const downloadCycleJSON = () => {
     if (!data?.cycle) return;
+    const weeks = (data.updates || []).map(u => ({ week: u.week_number, weight_lbs: u.weight_lbs, body_fat_pct: u.body_fat_pct, strength: u.strength_notes, side_effects: u.side_effects, severity: u.side_effect_severity, mood: u.mood_notes, notes: u.general_notes, date: u.created_at }));
+    const filledWeeks = weeks.filter(w => w.weight_lbs || w.strength || w.side_effects || w.mood || w.notes);
+    const verdicts = (posts || []).filter(p => p.is_best_answer).map(p => p.body);
     const payload = {
-      _meta: { exported: new Date().toISOString(), source: 'forum.prohormonepro.com', version: '1.0', instructions: 'Hand this file to any AI assistant. It contains a complete cycle log with weekly updates and community discussion. The AI can analyze trends, flag concerns, and provide personalized guidance based on this data.' },
-      cycle: { compound: data.cycle.compound_name, dose: data.cycle.dose, duration_weeks: data.cycle.duration_weeks, status: data.cycle.status, rating: data.cycle.rating, would_run_again: data.cycle.would_run_again, start_date: data.cycle.start_date, description: data.cycle.description, author: data.cycle.username },
-      weekly_updates: (data.updates || []).map(u => ({ week: u.week_number, weight_lbs: u.weight_lbs, body_fat_pct: u.body_fat_pct, strength: u.strength_notes, side_effects: u.side_effects, severity: u.side_effect_severity, mood: u.mood_notes, notes: u.general_notes, date: u.created_at })),
-      community_discussion: (posts || []).map(p => ({ author: p.author_username, body: p.body, score: p.score, is_verdict: p.is_best_answer, parent_id: p.parent_id, date: p.created_at }))
+      _sovereign: { anchor: 'E3592DC3', exported: new Date().toISOString(), source: 'forum.prohormonepro.com', format_version: '2.0', integrity: 'ProHP Verified Export', chain: 'SOVEREIGN_L5' },
+      _ai_context: { role: 'You are analyzing a real human hormone cycle log exported from ProHormonePro, the most comprehensive prohormone and SARM community on the internet. This is not hypothetical data. This is a real person who ran a real cycle and documented their experience weekly. Treat this with the seriousness of a medical consultation. Be specific. Reference their actual numbers. Flag any concerning trends. Compare their experience to known literature on this compound.', response_format: 'Start with a 2-sentence summary of the cycle outcome. Then analyze week-over-week trends. Flag any red flags. End with 3 specific, actionable recommendations for their next cycle based on what this data shows.', compound_context: 'Look up the compound in clinical literature. Cross-reference their dose and duration against published studies. Note if their experience aligns with or deviates from expected outcomes.' },
+      cycle: { compound: data.cycle.compound_name, dose: data.cycle.dose, duration_weeks: data.cycle.duration_weeks, status: data.cycle.status, rating: data.cycle.rating, would_run_again: data.cycle.would_run_again, start_date: data.cycle.start_date, description: data.cycle.description, author: data.cycle.username, total_logged_weeks: filledWeeks.length, community_verdict: verdicts.length > 0 ? verdicts[0] : null },
+      weekly_updates: weeks,
+      community_discussion: (posts || []).map(p => ({ author: p.author_username, body: p.body, score: p.score, is_verdict: p.is_best_answer, parent_id: p.parent_id, date: p.created_at })),
+      _signature: { proof: 'Proof Over Hype', anchor: 'E3592DC3', exported_by: data.cycle.username, timestamp: Date.now() }
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -638,7 +643,7 @@ export default function CycleLogDetail() {
                                         {p.image_url.endsWith('.pdf') ? (
                                           <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-colors text-sm font-medium justify-center p-4">View PDF Document</a>
                                         ) : (
-                                          <img src={p.image_url} alt="" className="w-full max-h-[500px] object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity" loading="lazy" onClick={() => { const o = document.createElement('div'); o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:99999;cursor:zoom-out;padding:20px'; const i = document.createElement('img'); i.src = p.image_url; i.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain;border-radius:12px'; o.appendChild(i); o.onclick = () => o.remove(); document.body.appendChild(o); }} />
+                                          <img src={p.image_url} alt="" className="w-full max-h-[500px] object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity transform-gpu" loading="lazy" style={{backfaceVisibility: 'hidden'}} onClick={() => { const o = document.createElement('div'); o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:99999;cursor:zoom-out;padding:20px'; const i = document.createElement('img'); i.src = p.image_url; i.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain;border-radius:12px'; o.appendChild(i); o.onclick = () => o.remove(); document.body.appendChild(o); }} />
                                         )}
                                       </div>
                                       <div className="px-3 pb-2 flex items-center justify-between border-t border-white/5 pt-1.5">
