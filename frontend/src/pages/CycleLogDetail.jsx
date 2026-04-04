@@ -220,6 +220,22 @@ export default function CycleLogDetail() {
   const [reportReason, setReportReason] = useState('');
   const [sortMode, setSortMode] = useState('best');
   const [commentSearch, setCommentSearch] = useState('');
+  const downloadCycleJSON = () => {
+    if (!data?.cycle) return;
+    const payload = {
+      _meta: { exported: new Date().toISOString(), source: 'forum.prohormonepro.com', version: '1.0', instructions: 'Hand this file to any AI assistant. It contains a complete cycle log with weekly updates and community discussion. The AI can analyze trends, flag concerns, and provide personalized guidance based on this data.' },
+      cycle: { compound: data.cycle.compound_name, dose: data.cycle.dose, duration_weeks: data.cycle.duration_weeks, status: data.cycle.status, rating: data.cycle.rating, would_run_again: data.cycle.would_run_again, start_date: data.cycle.start_date, description: data.cycle.description, author: data.cycle.username },
+      weekly_updates: (data.updates || []).map(u => ({ week: u.week_number, weight_lbs: u.weight_lbs, body_fat_pct: u.body_fat_pct, strength: u.strength_notes, side_effects: u.side_effects, severity: u.side_effect_severity, mood: u.mood_notes, notes: u.general_notes, date: u.created_at })),
+      community_discussion: (posts || []).map(p => ({ author: p.author_username, body: p.body, score: p.score, is_verdict: p.is_best_answer, parent_id: p.parent_id, date: p.created_at }))
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (data.cycle.compound_name || 'cycle') + '-log-' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   const [copiedPost, setCopiedPost] = useState(null);
   const copyLink = (pid) => { const url = window.location.origin + window.location.pathname + '#comment-' + pid; try { navigator.clipboard.writeText(url); } catch(e) { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } setCopiedPost(pid); setTimeout(() => setCopiedPost(null), 1500); };
   const [posting, setPosting] = useState(false);
@@ -616,8 +632,8 @@ export default function CycleLogDetail() {
                                 <div className="mb-3 mt-1">
                                   <button onClick={(e) => { const frame = e.currentTarget.nextElementSibling; frame.style.display = frame.style.display === 'none' ? 'block' : 'none'; e.currentTarget.textContent = frame.style.display === 'none' ? '📎 View attachment' : '📎 Hide attachment'; }} className="text-[11px] text-[#229DD8] hover:text-white cursor-pointer font-medium transition-colors inline-flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-[#229DD8]/10">📎 View attachment</button>
                                   <div style={{display: 'none'}} className="mt-2">
-                                    <div className="rounded-xl overflow-hidden border-2 border-[#229DD8]/20 bg-gradient-to-b from-slate-800/30 to-slate-950/60 shadow-lg shadow-[#229DD8]/5">
-                                      <div className="p-3">
+                                    <div className="rounded-xl overflow-hidden border-2 border-[#229DD8]/20 bg-gradient-to-b from-slate-800/30 to-slate-950/60 shadow-lg shadow-[#229DD8]/5 transform-gpu" style={{backfaceVisibility: 'hidden', willChange: 'transform'}}>
+                                      <div className="p-3 transform-gpu">
                                         {p.image_url.endsWith('.pdf') ? (
                                           <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-colors text-sm font-medium justify-center p-4">View PDF Document</a>
                                         ) : (
