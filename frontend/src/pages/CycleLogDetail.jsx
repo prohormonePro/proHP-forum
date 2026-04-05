@@ -781,7 +781,7 @@ export default function CycleLogDetail() {
                     const descendantCount = children.reduce(function cc(s, k) { return s + 1 + (repliesByParent[k.id] || []).reduce(cc, 0); }, 0);
                     return (
                       <div key={p.id} className={depth > 0 ? 'mt-2' : ''} id={'comment-' + p.id}>
-                        <div className={`${marginByDepth[d]} ${p.author_id === cycle.user_id ? 'bg-amber-950/30 border-amber-500/15' : 'bg-slate-950/50 border-white/5'} rounded-xl p-4 border-l-[3px] ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
+                        <div className={`${marginByDepth[d]} ${p.author_id === cycle?.user_id ? 'bg-amber-950/30 border border-amber-500/15' : 'bg-slate-950/50 border border-white/5'} rounded-xl p-4 border-l-[3px] ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
                           <div className="flex items-start gap-3">
                             <div className="flex flex-col items-center gap-1">
                               <div className={`${avatarSize(d)} rounded-lg ${avatarBg(d)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
