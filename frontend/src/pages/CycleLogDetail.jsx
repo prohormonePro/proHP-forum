@@ -194,10 +194,9 @@ export default function CycleLogDetail() {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
-      const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
       const box = document.querySelector('textarea');
       setCommentBoxAbove(box ? box.getBoundingClientRect().bottom < 0 : false);
-      if (y > 200 && !atBottom) {
+      if (y > 200) {
         setShowHud(true);
         if (fadeTimer) clearTimeout(fadeTimer);
         fadeTimer = setTimeout(() => setShowHud(false), 1500);
