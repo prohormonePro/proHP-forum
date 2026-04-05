@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { LineChart, Line, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ComposedChart } from 'recharts';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown, Pencil, Trash2, Flag, Link2, Award, Bookmark } from 'lucide-react';
@@ -630,49 +630,75 @@ export default function CycleLogDetail() {
         const hasWeight = chartData.some(d => d.weight !== null);
         const hasBf = chartData.some(d => d.bf !== null);
         if (!hasWeight && !hasBf) return null;
+        const weightVals = chartData.filter(d => d.weight).map(d => d.weight);
+        const bfVals = chartData.filter(d => d.bf).map(d => d.bf);
+        const weightDelta = weightVals.length >= 2 ? (weightVals[weightVals.length-1] - weightVals[0]).toFixed(1) : null;
+        const bfDelta = bfVals.length >= 2 ? (bfVals[bfVals.length-1] - bfVals[0]).toFixed(1) : null;
+        const bfLowest = bfVals.length > 0 ? Math.min(...bfVals) : null;
         return (
-          <div className="mb-6 bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-3 sm:p-6 overflow-x-hidden">
-            <h2 className="text-lg font-bold text-white mb-4">Cycle Progress</h2>
+          <div className="mb-6 bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/10 p-4 sm:p-6 overflow-x-hidden shadow-lg shadow-[#229DD8]/5">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-white tracking-tight">Cycle Progress</h2>
+              <div className="flex items-center gap-2">
+                {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-[10px] text-slate-500 font-medium">Weight</span></div>}
+                {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-[10px] text-slate-500 font-medium">Body Fat</span></div>}
+              </div>
+            </div>
+            {(weightDelta || bfDelta) && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {weightDelta && <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div>}
+                {bfDelta && <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div>}
+                {bfLowest && bfVals.length >= 2 && <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}%</div>}
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {hasWeight && (
                 <div className={!hasBf ? 'sm:col-span-2' : ''}>
-                  <p className="text-[10px] uppercase text-slate-500 font-semibold mb-2">Weight (lbs)</p>
-                  <div className="h-40 sm:h-48">
+                  <p className="text-[9px] uppercase text-slate-600 font-semibold mb-2 tracking-widest">Weight (lbs)</p>
+                  <div className="h-44 sm:h-52">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
-                        <YAxis tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} domain={['dataMin - 2', 'dataMax + 2']} />
-                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(34,157,216,0.2)', borderRadius: '8px', fontSize: '12px', color: '#e2e8f0' }} />
-                        <Line type="monotone" dataKey="weight" stroke="#229DD8" strokeWidth={2} dot={{ fill: '#229DD8', r: 4 }} activeDot={{ r: 6, fill: '#229DD8' }} connectNulls />
-                      </LineChart>
+                      <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+                        <defs>
+                          <linearGradient id="weightGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#229DD8" stopOpacity={0.25} />
+                            <stop offset="100%" stopColor="#229DD8" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
+                        <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
+                        <Area type="monotone" dataKey="weight" fill="url(#weightGrad)" stroke="none" connectNulls />
+                        <Line type="monotone" dataKey="weight" stroke="#229DD8" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#229DD8', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#229DD8', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
               )}
               {hasBf && (
                 <div className={!hasWeight ? 'sm:col-span-2' : ''}>
-                  <p className="text-[10px] uppercase text-slate-500 font-semibold mb-2">Body Fat %</p>
-                  <div className="h-40 sm:h-48">
+                  <p className="text-[9px] uppercase text-slate-600 font-semibold mb-2 tracking-widest">Body Fat %</p>
+                  <div className="h-44 sm:h-52">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
-                        <YAxis tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} domain={['dataMin - 1', 'dataMax + 1']} />
-                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '8px', fontSize: '12px', color: '#e2e8f0' }} />
-                        <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b', r: 4 }} activeDot={{ r: 6, fill: '#f59e0b' }} connectNulls />
-                      </LineChart>
+                      <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+                        <defs>
+                          <linearGradient id="bfGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.2} />
+                            <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
+                        <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
+                        <Area type="monotone" dataKey="bf" fill="url(#bfGrad)" stroke="none" connectNulls />
+                        <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#f59e0b', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#f59e0b', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
               )}
             </div>
-            {chartData.length >= 2 && (
-              <div className="mt-3 flex items-center gap-4">
-                {hasWeight && <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#229DD8] rounded"></div><span className="text-[10px] text-slate-500">Weight</span></div>}
-                {hasBf && <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-amber-500 rounded"></div><span className="text-[10px] text-slate-500">Body Fat</span></div>}
-              </div>
-            )}
           </div>
         );
       })()}
