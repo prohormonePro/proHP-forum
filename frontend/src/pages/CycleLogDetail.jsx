@@ -472,7 +472,7 @@ export default function CycleLogDetail() {
             <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <span className="text-[#229DD8] font-semibold truncate max-w-[150px] sm:max-w-[200px] inline-block align-bottom">{cycle.username}</span>
-              {cycle.is_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
+              {cycle.is_founding && <span className="text-[8px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded">FM</span>}
               <span className="w-1 h-1 rounded-full bg-slate-600" />
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
               {threadData?.thread?.view_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className="text-[11px] text-slate-500 font-medium">{threadData.thread.view_count.toLocaleString()} tracking</span></>)}
@@ -638,20 +638,22 @@ export default function CycleLogDetail() {
         const bfLowest = bfVals.length > 0 ? Math.min(...bfVals) : null;
         return (
           <div className="mb-6 bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/10 p-4 sm:p-6 overflow-x-hidden shadow-lg shadow-[#229DD8]/5">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-white tracking-tight">Cycle Progress</h2>
-              <div className="flex items-center gap-2">
-                {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-[10px] text-slate-500 font-medium">Weight</span></div>}
-                {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-[10px] text-slate-500 font-medium">Body Fat</span></div>}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-bold text-white tracking-tight">Cycle Progress</h2>
+                <div className="flex items-center gap-2">
+                  {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-[10px] text-slate-500 font-medium">Weight</span></div>}
+                  {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-[10px] text-slate-500 font-medium">Body Fat</span></div>}
+                </div>
               </div>
+              {(weightDelta || bfDelta) && (
+                <div className="flex flex-wrap gap-1.5">
+                  {weightDelta && <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div>}
+                  {bfDelta && <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div>}
+                  {bfLowest && bfVals.length >= 2 && <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}%</div>}
+                </div>
+              )}
             </div>
-            {(weightDelta || bfDelta) && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {weightDelta && <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div>}
-                {bfDelta && <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div>}
-                {bfLowest && bfVals.length >= 2 && <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}%</div>}
-              </div>
-            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {hasWeight && (
                 <div className={!hasBf ? 'sm:col-span-2' : ''}>
@@ -796,7 +798,7 @@ export default function CycleLogDetail() {
                               <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-sm font-semibold text-[#229DD8] truncate max-w-[120px] sm:max-w-[160px] inline-block align-bottom">{p.author_username}</span>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
-                                {p.author_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
+                                {p.author_founding && <span className="text-[8px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
                                 
                                 {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
@@ -922,7 +924,7 @@ export default function CycleLogDetail() {
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
-                <div className="flex flex-wrap items-center gap-3 w-full mt-3 pt-3 border-t border-white/5">
+                <div className="flex flex-wrap items-center gap-3 w-full mt-2">
                   <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-all px-4 py-2 rounded-lg bg-[#229DD8]/10 hover:bg-[#229DD8]/20 border border-[#229DD8]/20 hover:border-[#229DD8]/40"><Activity className="w-4 h-4" /><span className="text-xs font-medium">Attach</span></button>
                   <span className="text-[11px] text-slate-500">Bloodwork, progress pics, supplement labels, PDFs</span>
                 </div>
