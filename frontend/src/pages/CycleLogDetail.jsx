@@ -179,6 +179,7 @@ export default function CycleLogDetail() {
   const toggleAllWeeks = (open) => { const o = {}; (updates || []).forEach((_, i) => { o[i] = open; }); setExpandedWeeks(o); };
   const [scrollDir, setScrollDir] = useState('down');
   const lastScrollY = useRef(0);
+  const hudLocked = useRef(false);
   useEffect(() => {
     const hash = window.location.hash;
     if (hash && hash.startsWith('#comment-')) {
@@ -192,6 +193,7 @@ export default function CycleLogDetail() {
     let fadeTimer = null;
     const onScroll = () => {
       const y = window.scrollY;
+      if (hudLocked.current) { lastScrollY.current = y; return; }
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
       const box = document.getElementById('main-comment-box');
@@ -823,7 +825,7 @@ export default function CycleLogDetail() {
         </div>
       ) : commentBoxAbove ? (
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
-          <button onClick={() => { const box = document.getElementById('main-comment-box'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 500); } }} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
+          <button onClick={() => { hudLocked.current = true; setShowHud(false); const box = document.getElementById('main-comment-box'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => { box.focus(); hudLocked.current = false; }, 1500); } }} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
             <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Comment
           </button>
         </div>
