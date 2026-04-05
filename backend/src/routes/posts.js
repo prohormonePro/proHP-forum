@@ -79,6 +79,20 @@ router.post('/', authenticate, async (req, res) => {
         }
       }
     } catch (mentionErr) { console.error('[mention]', mentionErr.message); }
+
+    // Notify parent comment author on reply
+    try {
+      if (parent_id) {
+        const parentPost = await query('SELECT author_id FROM posts WHERE id = $1', [parent_id]);
+        if (parentPost.rows[0] && parentPost.rows[0].author_id !== req.user.id) {
+          await query(
+            'INSERT INTO notifications (user_id, type, title, body, link) VALUES ($1, $2, $3, $4, $5)',
+            [parentPost.rows[0].author_id, 'reply', req.user.username + ' replied to your comment', body.trim().substring(0, 100), '/t/' + thread_id + '#comment-' + result.rows[0].id]
+          );
+        }
+      }
+    } catch (replyErr) { console.error('[reply-notify]', replyErr.message); }
+
     res.status(201).json({ post: result.rows[0] });
   } catch (err) {
     console.error('[posts/create]', err.message);
