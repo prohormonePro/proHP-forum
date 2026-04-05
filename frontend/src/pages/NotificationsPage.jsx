@@ -84,7 +84,7 @@ export default function NotificationsPage() {
             const typeInfo = TYPE_ICONS[n.type] || TYPE_ICONS.system;
             const Icon = typeInfo.icon;
             return (
-              <div key={n.id} onClick={() => !n.is_read && markOneRead(n.id)}
+              <div key={n.id} onClick={() => { if (!n.is_read) markOneRead(n.id); if (n.link) window.location.href = n.link; }}
                 className={`prohp-card p-3 sm:p-4 border transition-all cursor-pointer ${n.is_read ? 'border-white/5 opacity-60' : 'border-[#229DD8]/15 hover:border-[#229DD8]/30'}`}>
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-lg shrink-0 ${typeInfo.bg}`}>
