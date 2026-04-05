@@ -188,18 +188,20 @@ export default function CycleLogDetail() {
     }
   }, []);
   useEffect(() => {
-    let hideTimer = null;
+    let showTimer = null;
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
+      setShowHud(false);
+      if (showTimer) clearTimeout(showTimer);
       const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
-      setShowHud(y > 200 && !atBottom);
-      if (hideTimer) clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => setShowHud(false), 2500);
+      if (y > 200 && !atBottom) {
+        showTimer = setTimeout(() => setShowHud(true), 2500);
+      }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { window.removeEventListener('scroll', onScroll); if (hideTimer) clearTimeout(hideTimer); };
+    return () => { window.removeEventListener('scroll', onScroll); if (showTimer) clearTimeout(showTimer); };
   }, []);
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
