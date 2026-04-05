@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, LogOut, Bell } from 'lucide-react';
+import { api } from '../../hooks/api';
 import useAuthStore from '../../stores/auth';
 
 const TIER_LABELS = {
@@ -11,6 +12,13 @@ const TIER_LABELS = {
 
 export default function Navbar() {
   const user = useAuthStore((s) => s.user);
+  const [unreadCount, setUnreadCount] = useState(0);
+  useEffect(() => {
+    if (!user) { setUnreadCount(0); return; }
+    api.get('/api/notifications/unread-count').then(r => setUnreadCount(r.count || 0)).catch(() => {});
+    const interval = setInterval(() => { api.get('/api/notifications/unread-count').then(r => setUnreadCount(r.count || 0)).catch(() => {}); }, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,6 +63,7 @@ export default function Navbar() {
               </Link>
               <a href="/notifications" className="relative text-slate-500 hover:text-[#229DD8] p-1.5 transition-colors" title="Notifications">
                 <Bell className="w-4 h-4" />
+                {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? '9+' : unreadCount}</span>}
               </a>
               <button onClick={() => { logout(); navigate("/"); }} className="text-slate-500 hover:text-slate-300 p-1.5 transition-colors" title="Log out">
                 <LogOut className="w-4 h-4" />

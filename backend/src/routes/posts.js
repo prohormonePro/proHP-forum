@@ -72,8 +72,8 @@ router.post('/', authenticate, async (req, res) => {
         for (const mu of mentionedUsers.rows) {
           if (mu.id !== req.user.id) {
             await query(
-              'INSERT INTO notifications (user_id, type, source_user_id, post_id, thread_id, message) VALUES ($1, $2, $3, $4, $5, $6)',
-              [mu.id, 'mention', req.user.id, result.rows[0].id, thread_id, req.user.username + ' mentioned you']
+              'INSERT INTO notifications (user_id, type, title, body, link) VALUES ($1, $2, $3, $4, $5)',
+              [mu.id, 'mention', '@' + req.user.username + ' mentioned you', req.user.username + ' mentioned you in a comment', '/threads/' + thread_id + '#comment-' + result.rows[0].id]
             );
           }
         }
