@@ -53,8 +53,8 @@ export default function ThreadPage() {
       if (hudLocked.current) { lastScrollY.current = y; return; }
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
-      const box = document.getElementById('main-comment-box');
-      setCommentBoxAbove(box ? (box.getBoundingClientRect().top > window.innerHeight || box.getBoundingClientRect().bottom < 0) : false);
+      const section = document.getElementById('feedback-section');
+      setCommentBoxAbove(section ? section.getBoundingClientRect().top > window.innerHeight : true);
       if (y > 200) {
         setShowHud(true);
         if (fadeTimer) clearTimeout(fadeTimer);
@@ -253,7 +253,7 @@ export default function ThreadPage() {
       </article>
 
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+        <div id="feedback-section" className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[#229DD8]" />
