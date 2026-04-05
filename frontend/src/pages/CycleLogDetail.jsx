@@ -526,18 +526,48 @@ export default function CycleLogDetail() {
           </div>
         )}
 
-        {/* Media Links */}
-        {(media.bloodwork || media.before || media.after) && (
-          <div className="flex flex-wrap gap-3">
-            {media.bloodwork && (
-              <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-[#229DD8] hover:bg-[#229DD8]/10 transition">Bloodwork PDF</a>
+        {/* Progress Photos - Before / Mid-Cycle / After */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {/* Baseline */}
+          <div className="relative group">
+            <p className="text-[9px] uppercase text-slate-500 font-semibold mb-1.5 text-center">Baseline</p>
+            {media.before ? (
+              <a href={media.before} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
+                <img src={media.before} alt="Before" className="w-full h-full object-cover" />
+              </a>
+            ) : (
+              <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
+                <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <span className="text-[8px] text-slate-600">Pending</span>
+              </div>
             )}
-            {media.before && (
-              <a href={media.before} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-[#229DD8] hover:bg-[#229DD8]/10 transition">Before Pic</a>
+          </div>
+          {/* Mid-Cycle */}
+          <div className="relative">
+            <p className="text-[9px] uppercase text-slate-500 font-semibold mb-1.5 text-center">Mid-Cycle</p>
+            <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
+              <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              <span className="text-[8px] text-slate-600">Awaiting</span>
+            </div>
+          </div>
+          {/* Post-Cycle */}
+          <div className="relative group">
+            <p className="text-[9px] uppercase text-slate-500 font-semibold mb-1.5 text-center">Post-Cycle</p>
+            {media.after ? (
+              <a href={media.after} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
+                <img src={media.after} alt="After" className="w-full h-full object-cover" />
+              </a>
+            ) : (
+              <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
+                <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <span className="text-[8px] text-slate-600">Pending</span>
+              </div>
             )}
-            {media.after && (
-              <a href={media.after} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-[#229DD8] hover:bg-[#229DD8]/10 transition">After Pic</a>
-            )}
+          </div>
+        </div>
+        {media.bloodwork && (
+          <div className="mt-2">
+            <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] text-[#229DD8] hover:text-white transition-colors"><Activity className="w-3 h-3" /> View Bloodwork</a>
           </div>
         )}
       </div>
@@ -605,7 +635,7 @@ export default function CycleLogDetail() {
             <h2 className="text-lg font-bold text-white mb-4">Cycle Progress</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {hasWeight && (
-                <div>
+                <div className={!hasBf ? 'sm:col-span-2' : ''}>
                   <p className="text-[10px] uppercase text-slate-500 font-semibold mb-2">Weight (lbs)</p>
                   <div className="h-40 sm:h-48">
                     <ResponsiveContainer width="100%" height="100%">
@@ -621,7 +651,7 @@ export default function CycleLogDetail() {
                 </div>
               )}
               {hasBf && (
-                <div>
+                <div className={!hasWeight ? 'sm:col-span-2' : ''}>
                   <p className="text-[10px] uppercase text-slate-500 font-semibold mb-2">Body Fat %</p>
                   <div className="h-40 sm:h-48">
                     <ResponsiveContainer width="100%" height="100%">
