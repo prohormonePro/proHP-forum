@@ -175,7 +175,7 @@ export default function CycleLogDetail() {
   const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
   const [showHud, setShowHud] = useState(false);
   const [commentBoxAbove, setCommentBoxAbove] = useState(false);
-  const [expandedWeeks, setExpandedWeeks] = useState({});
+  const [expandedWeeks, setExpandedWeeks] = useState({ 0: true });
   const toggleWeek = (i) => setExpandedWeeks(prev => ({...prev, [i]: !prev[i]}));
   const toggleAllWeeks = (open) => { const o = {}; (updates || []).forEach((_, i) => { o[i] = open; }); setExpandedWeeks(o); };
   const [scrollDir, setScrollDir] = useState('down');
@@ -409,7 +409,6 @@ export default function CycleLogDetail() {
   const isOwner = user?.id === cycle.user_id;
   const existingWeeks = (updates || []).map((u) => u.week_number);
   const latestUpdate = (updates || []).length > 0 ? [...updates].sort((a, b) => b.week_number - a.week_number)[0] : null;
-  useEffect(() => { if (updates && updates.length > 0) { setExpandedWeeks(prev => { if (Object.keys(prev).length === 0) { return { [updates.length - 1]: true }; } return prev; }); } }, [updates]);
   const latestWeight = latestUpdate?.weight_lbs || null;
   const posts = threadData?.posts || [];
   const canComment = user && (user.tier === 'inner_circle' || user.tier === 'admin');
