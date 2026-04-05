@@ -52,7 +52,7 @@ export default function ThreadPage() {
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
       const box = document.querySelector('textarea');
-      setCommentBoxAbove(box ? box.getBoundingClientRect().bottom < 0 : false);
+      setCommentBoxAbove(box ? (box.getBoundingClientRect().top > window.innerHeight || box.getBoundingClientRect().bottom < 0) : false);
       if (y > 200) {
         setShowHud(true);
         if (fadeTimer) clearTimeout(fadeTimer);
