@@ -173,6 +173,7 @@ export default function CycleLogDetail() {
   const [collapsedThreads, setCollapsedThreads] = useState({});
   const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
   const [showHud, setShowHud] = useState(false);
+  const [commentBoxAbove, setCommentBoxAbove] = useState(false);
   const [expandedWeeks, setExpandedWeeks] = useState({ 0: true });
   const toggleWeek = (i) => setExpandedWeeks(prev => ({...prev, [i]: !prev[i]}));
   const toggleAllWeeks = (open) => { const o = {}; (updates || []).forEach((_, i) => { o[i] = open; }); setExpandedWeeks(o); };
@@ -188,20 +189,24 @@ export default function CycleLogDetail() {
     }
   }, []);
   useEffect(() => {
-    let showTimer = null;
+    let fadeTimer = null;
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
-      setShowHud(false);
-      if (showTimer) clearTimeout(showTimer);
       const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
+      const box = document.querySelector('textarea');
+      setCommentBoxAbove(box ? box.getBoundingClientRect().bottom < 0 : false);
       if (y > 200 && !atBottom) {
-        showTimer = setTimeout(() => setShowHud(true), 2500);
+        setShowHud(true);
+        if (fadeTimer) clearTimeout(fadeTimer);
+        fadeTimer = setTimeout(() => setShowHud(false), 1500);
+      } else {
+        setShowHud(false);
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { window.removeEventListener('scroll', onScroll); if (showTimer) clearTimeout(showTimer); };
+    return () => { window.removeEventListener('scroll', onScroll); if (fadeTimer) clearTimeout(fadeTimer); };
   }, []);
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
@@ -810,20 +815,20 @@ export default function CycleLogDetail() {
           </>
         )}
       </div>
-      {/* Context-Aware Thread HUD */}
-      {showHud && (
-        <div className="fixed bottom-6 right-6" style={{zIndex: 9999}}>
-          {scrollDir === 'up' ? (
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
-              <ArrowUp className="w-3.5 h-3.5" /> Back to Top
-            </button>
-          ) : (
-            <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 hover:shadow-[0_0_20px_rgba(34,157,216,0.15)] rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl">
-              <MessageSquare className="w-3.5 h-3.5" /> Drop a Comment
-            </button>
-          )}
+      {/* Context-Aware HUD */}
+      {showHud && (scrollDir === 'up' ? (
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
+            <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Top
+          </button>
         </div>
-      )}
+      ) : commentBoxAbove ? (
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+          <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 500); } }} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
+            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Comment
+          </button>
+        </div>
+      ) : null)}
     </div>
   );
 }

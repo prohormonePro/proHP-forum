@@ -31,6 +31,7 @@ export default function ThreadPage() {
   const [reportReason, setReportReason] = useState('');
   const [copiedPost, setCopiedPost] = useState(null);
   const [showHud, setShowHud] = useState(false);
+  const [commentBoxAbove, setCommentBoxAbove] = useState(false);
   const [scrollDir, setScrollDir] = useState('down');
   const lastScrollY = useRef(0);
   const replyBoxRef = useRef(null);
@@ -45,20 +46,24 @@ export default function ThreadPage() {
     }
   }, []);
   useEffect(() => {
-    let showTimer = null;
+    let fadeTimer = null;
     const onScroll = () => {
       const y = window.scrollY;
       setScrollDir(y > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = y;
-      setShowHud(false);
-      if (showTimer) clearTimeout(showTimer);
       const atBottom = (window.innerHeight + y) >= (document.body.scrollHeight - 200);
+      const box = document.querySelector('textarea');
+      setCommentBoxAbove(box ? box.getBoundingClientRect().bottom < 0 : false);
       if (y > 200 && !atBottom) {
-        showTimer = setTimeout(() => setShowHud(true), 2500);
+        setShowHud(true);
+        if (fadeTimer) clearTimeout(fadeTimer);
+        fadeTimer = setTimeout(() => setShowHud(false), 1500);
+      } else {
+        setShowHud(false);
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { window.removeEventListener('scroll', onScroll); if (showTimer) clearTimeout(showTimer); };
+    return () => { window.removeEventListener('scroll', onScroll); if (fadeTimer) clearTimeout(fadeTimer); };
   }, []);
 
   const copyLink = (pid) => { const url = window.location.origin + window.location.pathname + '#comment-' + pid; try { navigator.clipboard.writeText(url); } catch(e) { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); } setCopiedPost(pid); setTimeout(() => setCopiedPost(null), 1500); };
@@ -289,15 +294,20 @@ export default function ThreadPage() {
         {!user && !thread.is_locked && (<div className="mt-6 pt-4 border-t border-white/5 text-center"><p className="text-sm text-slate-400 mb-3">Log in to join the conversation.</p><Link to="/login" className="prohp-btn-primary text-xs">Log in</Link></div>)}
       </div>
 
-      {showHud && (
-        <div className="fixed bottom-6 right-6" style={{zIndex: 9999}}>
-          {scrollDir === 'up' ? (
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl"><ArrowUp className="w-3.5 h-3.5" /> Back to Top</button>
-          ) : (
-            <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 400); } }} className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-xl border border-[#229DD8]/20 text-[#229DD8] hover:border-[#229DD8]/50 rounded-full px-4 py-2.5 text-xs font-bold transition-all shadow-xl"><MessageSquare className="w-3.5 h-3.5" /> Drop a Reply</button>
-          )}
+      {/* Context-Aware HUD */}
+      {showHud && (scrollDir === 'up' ? (
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
+            <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Top
+          </button>
         </div>
-      )}
+      ) : commentBoxAbove ? (
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+          <button onClick={() => { const box = document.querySelector('textarea'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => box.focus(), 500); } }} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
+            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Reply
+          </button>
+        </div>
+      ) : null)}
     </div>
   );
 }
