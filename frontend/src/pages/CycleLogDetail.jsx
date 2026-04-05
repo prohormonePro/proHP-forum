@@ -601,10 +601,10 @@ export default function CycleLogDetail() {
                   <div className="flex items-center gap-3">
                     {update.weight_lbs && <span className="text-[10px] text-slate-400">{update.weight_lbs} lbs</span>}
                     <span className="text-[10px] text-slate-500">{new Date(update.created_at).toLocaleDateString()}</span>
-                    <span className="text-[10px] text-slate-600">{expandedWeeks[idx] ? '-' : '+'}</span>
+                    <span className="text-[10px] text-slate-600">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
                   </div>
                 </button>
-                {expandedWeeks[idx] && <div className="px-5 pb-5">
+                {(expandedWeeks[idx] ?? (idx === updates.length - 1)) && <div className="px-5 pb-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                   {update.weight_lbs && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Weight</p><p className="text-sm text-white">{update.weight_lbs} lbs</p></div>)}
                   {update.body_fat_pct && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-sm text-white">{update.body_fat_pct}%</p></div>)}
