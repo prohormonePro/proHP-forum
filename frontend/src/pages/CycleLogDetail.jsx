@@ -175,9 +175,10 @@ export default function CycleLogDetail() {
   const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
   const [showHud, setShowHud] = useState(false);
   const [commentBoxAbove, setCommentBoxAbove] = useState(false);
-  const [expandedWeeks, setExpandedWeeks] = useState({ 0: true });
+  const [expandedWeeks, setExpandedWeeks] = useState({});
   const toggleWeek = (i) => setExpandedWeeks(prev => ({...prev, [i]: !prev[i]}));
   const toggleAllWeeks = (open) => { const o = {}; (updates || []).forEach((_, i) => { o[i] = open; }); setExpandedWeeks(o); };
+  useEffect(() => { if (updates && updates.length > 0) { setExpandedWeeks(prev => { if (Object.keys(prev).length === 0) { return { [updates.length - 1]: true }; } return prev; }); } }, [updates]);
   const [scrollDir, setScrollDir] = useState('down');
   const lastScrollY = useRef(0);
   const hudLocked = useRef(false);
@@ -475,6 +476,7 @@ export default function CycleLogDetail() {
               {cycle.is_founding && <span className="text-[8px] font-bold text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded">FM</span>}
               <span className="w-1 h-1 rounded-full bg-slate-600" />
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
+              {threadData?.thread?.view_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className="text-[11px] text-slate-500 font-medium">{threadData.thread.view_count.toLocaleString()} tracking</span></>)}
             </div>
           </div>
           <div className="flex items-center gap-3 self-start shrink-0">
@@ -664,7 +666,7 @@ export default function CycleLogDetail() {
                             <stop offset="100%" stopColor="#229DD8" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                        <CartesianGrid stroke="rgba(255,255,255,0)" />
                         <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
                         <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
@@ -687,7 +689,7 @@ export default function CycleLogDetail() {
                             <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
+                        <CartesianGrid stroke="rgba(255,255,255,0)" />
                         <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
                         <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
@@ -779,7 +781,7 @@ export default function CycleLogDetail() {
                     const descendantCount = children.reduce(function cc(s, k) { return s + 1 + (repliesByParent[k.id] || []).reduce(cc, 0); }, 0);
                     return (
                       <div key={p.id} className={depth > 0 ? 'mt-2' : ''} id={'comment-' + p.id}>
-                        <div className={`${marginByDepth[d]} bg-slate-950/50 rounded-xl p-4 border border-white/5 border-l-[3px] ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
+                        <div className={`${marginByDepth[d]} ${p.author_id === cycle.user_id ? 'bg-amber-950/30 border-amber-500/15' : 'bg-slate-950/50 border-white/5'} rounded-xl p-4 border-l-[3px] ${borderByDepth[d]} transition-all hover:border-l-[#229DD8]/40`}>
                           <div className="flex items-start gap-3">
                             <div className="flex flex-col items-center gap-1">
                               <div className={`${avatarSize(d)} rounded-lg ${avatarBg(d)} flex items-center justify-center text-white font-bold flex-shrink-0`}>
