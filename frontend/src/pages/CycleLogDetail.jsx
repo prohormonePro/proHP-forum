@@ -748,8 +748,15 @@ export default function CycleLogDetail() {
                                   {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                                   <div className="flex items-center gap-2">
                                     <button onClick={() => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), parent_id: p.id }).then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
-                                    <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
+                                    <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-[#229DD8] transition-colors"><Activity className="w-3 h-3" /> Attach</button>
+                                    <button onClick={() => { setReplyTo(null); setCommentImage(null); setImagePreview(null); }} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
                                   </div>
+                                  {imagePreview && replyTo === p.id && (
+                                    <div className="mt-2 flex items-center gap-2">
+                                      <img src={imagePreview} alt="Preview" className="max-h-20 rounded-lg border border-white/10" />
+                                      <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               {editingPost === p.id && (
@@ -789,7 +796,7 @@ export default function CycleLogDetail() {
             {/* New Top-Level Comment */}
             {canComment && !replyTo ? (
               <div className="mt-4 pt-4 border-t border-white/5">
-                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
+                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4,video/webm,video/quicktime" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
             {imagePreview && (
               <div className="mb-3 relative inline-block">
                 <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-white/10" />
