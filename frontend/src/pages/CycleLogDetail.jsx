@@ -201,7 +201,7 @@ export default function CycleLogDetail() {
       if (y > 200) {
         setShowHud(true);
         if (fadeTimer) clearTimeout(fadeTimer);
-        fadeTimer = setTimeout(() => setShowHud(false), 1500);
+        fadeTimer = setTimeout(() => setShowHud(false), 3000);
       } else {
         setShowHud(false);
       }
