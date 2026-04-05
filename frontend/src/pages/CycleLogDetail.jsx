@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Activity, CheckCircle, XCircle, Clock, MessageSquare, ArrowUp, ArrowDown, Reply, ThumbsUp, ThumbsDown, Pencil, Trash2, Flag, Link2, Award, Bookmark } from 'lucide-react';
@@ -588,6 +589,63 @@ export default function CycleLogDetail() {
           </div>
         )}
       </div>
+
+      {/* Cycle Master View - Weight & Body Fat Charts */}
+      {(() => {
+        const chartData = (updates || [])
+          .filter(u => u.weight_lbs || u.body_fat_pct)
+          .sort((a, b) => a.week_number - b.week_number)
+          .map(u => ({ week: 'W' + u.week_number, weight: u.weight_lbs ? parseFloat(u.weight_lbs) : null, bf: u.body_fat_pct ? parseFloat(u.body_fat_pct) : null }));
+        if (chartData.length < 2) return null;
+        const hasWeight = chartData.some(d => d.weight !== null);
+        const hasBf = chartData.some(d => d.bf !== null);
+        if (!hasWeight && !hasBf) return null;
+        return (
+          <div className="mb-6 bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-3 sm:p-6 overflow-x-hidden">
+            <h2 className="text-lg font-bold text-white mb-4">Cycle Progress</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {hasWeight && (
+                <div>
+                  <p className="text-[10px] uppercase text-slate-500 font-semibold mb-2">Weight (lbs)</p>
+                  <div className="h-40 sm:h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+                        <YAxis tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} domain={['dataMin - 2', 'dataMax + 2']} />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(34,157,216,0.2)', borderRadius: '8px', fontSize: '12px', color: '#e2e8f0' }} />
+                        <Line type="monotone" dataKey="weight" stroke="#229DD8" strokeWidth={2} dot={{ fill: '#229DD8', r: 4 }} activeDot={{ r: 6, fill: '#229DD8' }} connectNulls />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+              {hasBf && (
+                <div>
+                  <p className="text-[10px] uppercase text-slate-500 font-semibold mb-2">Body Fat %</p>
+                  <div className="h-40 sm:h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+                        <YAxis tick={{ fontSize: 10, fill: '#64748b' }} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} domain={['dataMin - 1', 'dataMax + 1']} />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '8px', fontSize: '12px', color: '#e2e8f0' }} />
+                        <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b', r: 4 }} activeDot={{ r: 6, fill: '#f59e0b' }} connectNulls />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+            </div>
+            {chartData.length >= 2 && (
+              <div className="mt-3 flex items-center gap-4">
+                {hasWeight && <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#229DD8] rounded"></div><span className="text-[10px] text-slate-500">Weight</span></div>}
+                {hasBf && <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-amber-500 rounded"></div><span className="text-[10px] text-slate-500">Body Fat</span></div>}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Complete Cycle */}
       {isOwner && status === 'active' && (
