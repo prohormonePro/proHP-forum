@@ -472,10 +472,10 @@ export default function CycleLogDetail() {
             <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <span className="text-[#229DD8] font-semibold truncate max-w-[150px] sm:max-w-[200px] inline-block align-bottom">{cycle.username}</span>
-              {cycle.is_founding && <span className="text-[8px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded">FM</span>}
+              {cycle.is_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
               <span className="w-1 h-1 rounded-full bg-slate-600" />
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
-              {threadData?.thread?.view_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className="text-[11px] text-slate-500 font-medium">{threadData.thread.view_count.toLocaleString()} tracking</span></>)}
+              {threadData?.thread?.view_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>{threadData.thread.view_count.toLocaleString()} Tracking</span></>)}
             </div>
           </div>
           <div className="flex items-center gap-3 self-start shrink-0">
@@ -539,7 +539,7 @@ export default function CycleLogDetail() {
             ) : (
               <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
                 <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span className="text-[8px] text-slate-600">Pending</span>
+                <span className="text-[8px] text-slate-600">Baseline Pending</span>
               </div>
             )}
           </div>
@@ -561,14 +561,14 @@ export default function CycleLogDetail() {
             ) : (
               <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
                 <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span className="text-[8px] text-slate-600">Pending</span>
+                <span className="text-[8px] text-slate-600">Final Pending</span>
               </div>
             )}
           </div>
         </div>
         {media.bloodwork && (
           <div className="mt-2">
-            <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] text-[#229DD8] hover:text-white transition-colors"><Activity className="w-3 h-3" /> View Bloodwork</a>
+            <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[9px] font-bold text-[#229DD8] bg-[#229DD8]/10 border border-[#229DD8]/20 px-2.5 py-1 rounded-lg hover:bg-[#229DD8]/20 transition-all"><Activity className="w-3 h-3" /> Labs Verified</a>
           </div>
         )}
       </div>
@@ -798,7 +798,7 @@ export default function CycleLogDetail() {
                               <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-sm font-semibold text-[#229DD8] truncate max-w-[120px] sm:max-w-[160px] inline-block align-bottom">{p.author_username}</span>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
-                                {p.author_founding && <span className="text-[8px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded">FM</span>}
+                                {p.author_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
                                 
                                 {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
@@ -924,7 +924,7 @@ export default function CycleLogDetail() {
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
-                <div className="flex flex-wrap items-center gap-3 w-full mt-2">
+                <div className="flex items-center gap-3 w-full mt-1 -mb-1">
                   <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-all px-4 py-2 rounded-lg bg-[#229DD8]/10 hover:bg-[#229DD8]/20 border border-[#229DD8]/20 hover:border-[#229DD8]/40"><Activity className="w-4 h-4" /><span className="text-xs font-medium">Attach</span></button>
                   <span className="text-[11px] text-slate-500">Bloodwork, progress pics, supplement labels, PDFs</span>
                 </div>
