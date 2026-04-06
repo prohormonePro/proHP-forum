@@ -34,8 +34,8 @@ export default function LoginPage() {
           <div className="w-16 h-16 rounded-2xl bg-[#229DD8]/10 border border-[#229DD8]/20 flex items-center justify-center mx-auto mb-5">
             <svg className="w-8 h-8 text-[#229DD8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Access Your Portal</h1>
-          <p className="text-sm text-slate-400">The Inner Circle is where real data meets real results.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Inner Circle Access</h1>
+          <p className="text-sm text-slate-400">Proof over hype. The chain is unbroken.</p>
         </div>
 
         {/* Login Form */}
@@ -47,7 +47,7 @@ export default function LoginPage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" className={ic} required />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" className={ic} required />
             </div>
             {error && <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">{error}</div>}
             <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-bold text-sm rounded-xl py-3.5 transition-all shadow-lg shadow-[#229DD8]/20 hover:shadow-[#229DD8]/40">
@@ -61,16 +61,16 @@ export default function LoginPage() {
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">What you unlock inside</p>
           <div className="space-y-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0"><span className="text-emerald-400 text-sm font-bold">+</span></div>
-              <div><p className="text-sm text-white font-medium">Private Cycle Logs</p><p className="text-[11px] text-slate-500">Real protocols, real data, real results from verified members</p></div>
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0"><span className="text-emerald-400 text-base">&#128218;</span></div>
+              <div><p className="text-sm text-white font-medium">The Encyclopedia</p><p className="text-[11px] text-slate-500">Full access to 101+ deep-dive compound profiles and dosing protocols</p></div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#229DD8]/10 flex items-center justify-center shrink-0"><span className="text-[#229DD8] text-sm font-bold">%</span></div>
-              <div><p className="text-sm text-white font-medium">Bio-Telemetry Analytics</p><p className="text-[11px] text-slate-500">Weight & body fat charts, before/afters, verified bloodwork</p></div>
+              <div className="w-8 h-8 rounded-lg bg-[#229DD8]/10 flex items-center justify-center shrink-0"><span className="text-[#229DD8] text-base">&#9889;</span></div>
+              <div><p className="text-sm text-white font-medium">Speed to Intel</p><p className="text-[11px] text-slate-500">Cut through the bro-science. Find exact cycle setups and verify side effects instantly</p></div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0"><span className="text-amber-400 text-sm font-bold">FM</span></div>
-              <div><p className="text-sm text-white font-medium">Founding Member Community</p><p className="text-[11px] text-slate-500">Direct access to high-performance members running elite stacks</p></div>
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0"><span className="text-amber-400 text-base">&#128176;</span></div>
+              <div><p className="text-sm text-white font-medium">Exclusive ROI</p><p className="text-[11px] text-slate-500">Revolving 10-20% vendor discounts. The membership pays for itself on day one</p></div>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function LoginPage() {
           <p className="text-sm text-slate-300 font-semibold mb-2">Not a member yet?</p>
           <p className="text-xs text-slate-500 mb-4">Full access to threads, cycle logs, bloodwork, and community intel.</p>
           <Link to="/register" className="inline-flex items-center justify-center w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all">
-            Join Inner Circle — $19/mo
+            Join Inner Circle | $19/mo
           </Link>
         </div>
 

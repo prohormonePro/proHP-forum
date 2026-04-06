@@ -92,7 +92,7 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-6 py-3.5 text-sm font-bold text-white shadow-[0_8px_24px_rgba(0,118,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,118,255,.50)] transition-all disabled:opacity-50"
           >
-            {loading ? 'Redirecting to checkout...' : 'Join Inner Circle — $19/mo'}
+            {loading ? 'Redirecting to checkout...' : 'Join Inner Circle | $19/mo'}
           </button>
         </form>
       </div>
