@@ -612,10 +612,10 @@ export default function CycleLogDetail() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                   {update.weight_lbs && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Weight</p><p className="text-base font-bold text-white">{update.weight_lbs} lbs</p></div>)}
                   {update.body_fat_pct && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-base font-bold text-white">{update.body_fat_pct}%</p></div>)}
-                  {update.side_effect_severity && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Side Effects</p><p className="text-base font-bold text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
+                  {update.side_effect_severity && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Impact Level</p><p className="text-base font-bold text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
                 </div>
                 {update.strength_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Strength:</span> {update.strength_notes}</p>}
-                {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Sides:</span> {update.side_effects}</p>}
+                {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Symptoms:</span> {update.side_effects}</p>}
                 {update.mood_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Mood:</span> {update.mood_notes}</p>}
                 {update.general_notes && <p className="text-base text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
                 </div>}
