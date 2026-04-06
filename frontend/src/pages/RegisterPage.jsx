@@ -39,10 +39,10 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Back */}
         <div className="mb-6">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+          <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Back
-          </Link>
+          </button>
         </div>
 
         {/* Hero */}
