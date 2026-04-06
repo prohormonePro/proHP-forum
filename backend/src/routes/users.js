@@ -8,7 +8,7 @@ const router = express.Router();
 // MUST be before /:username to avoid route shadowing
 router.patch('/profile', authenticate, async (req, res) => {
   try {
-    const userId = req.user.sub;
+    const userId = req.user.id;
     const { age, years_lifting, trt_hrt, trt_compound, trt_dose } = req.body;
 
     const result = await query(
