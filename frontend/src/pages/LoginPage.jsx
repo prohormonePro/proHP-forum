@@ -29,6 +29,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 animate-fade-in">
       <div className="w-full max-w-md">
+        {/* Back */}
+        <div className="mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </Link>
+        </div>
+
         {/* Hero */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-[#229DD8]/10 border border-[#229DD8]/20 flex items-center justify-center mx-auto mb-5">
