@@ -645,9 +645,9 @@ export default function CycleLogDetail() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">Cycle Progress Analytics</h2>
-                <div className="flex items-center gap-2">
-                  {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-xs text-slate-400 font-medium">Weight</span></div>}
-                  {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-xs text-slate-400 font-medium">Body Fat</span></div>}
+                <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
+                  {hasWeight && <div className="flex items-center gap-1 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-[10px] sm:text-xs text-slate-400 font-medium">Weight</span></div>}
+                  {hasBf && <div className="flex items-center gap-1 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-[10px] sm:text-xs text-slate-400 font-medium">Body Fat</span></div>}
                 </div>
               </div>
               {(weightDelta || bfDelta) && (
@@ -945,19 +945,33 @@ export default function CycleLogDetail() {
         )}
       </div>
       {/* Context-Aware HUD */}
-      {showHud && (scrollDir === 'up' ? (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
-            <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Top
-          </button>
-        </div>
-      ) : commentBoxAbove ? (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
-          <button onClick={() => { hudLocked.current = true; setShowHud(false); const box = document.getElementById('main-comment-box'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => { box.focus(); hudLocked.current = false; }, 1500); } }} className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium rounded-full px-3 py-2 sm:px-4 sm:py-2.5 border border-white/10 shadow-lg hover:border-[#229DD8]/30 transition-all">
-            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Comment
-          </button>
-        </div>
-      ) : null)}
+      {(() => {
+        const anyWeekOpen = Object.values(expandedWeeks).some(v => v) || (updates && updates.length > 0 && expandedWeeks[updates.length - 1] !== false);
+        const pillClass = "flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium px-3 py-2 sm:px-4 sm:py-2.5 rounded-full border border-white/10 shadow-lg shadow-black/30 hover:bg-slate-800/90 hover:text-white transition-all";
+        if (!showHud) return null;
+        if (anyWeekOpen && scrollDir === 'down') return (
+          <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+            <button onClick={() => { toggleAllWeeks(false); window.scrollTo({ top: document.querySelector('.mb-6 > .flex.items-center.justify-between')?.offsetTop - 80 || 0, behavior: 'smooth' }); }} className={pillClass}>
+              <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Collapse All
+            </button>
+          </div>
+        );
+        if (scrollDir === 'up') return (
+          <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={pillClass}>
+              <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Top
+            </button>
+          </div>
+        );
+        if (commentBoxAbove) return (
+          <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+            <button onClick={() => { hudLocked.current = true; setShowHud(false); const box = document.getElementById('main-comment-box'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); box.focus(); setTimeout(() => { hudLocked.current = false; }, 1000); } }} className={pillClass}>
+              <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Comment
+            </button>
+          </div>
+        );
+        return null;
+      })()}
     </div>
   );
 }
