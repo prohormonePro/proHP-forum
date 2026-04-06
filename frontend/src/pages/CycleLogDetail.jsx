@@ -951,14 +951,15 @@ export default function CycleLogDetail() {
           </>
         )}
       </div>
-      {/* Context-Aware HUD */}
+      {/* Context-Aware HUD — 2 states: Collapse All / Top */}
       {(() => {
         const anyWeekOpen = Object.values(expandedWeeks).some(v => v) || (updates && updates.length > 0 && expandedWeeks[updates.length - 1] !== false);
+        const feedbackVisible = (() => { const el = document.getElementById('feedback-section'); return el ? el.getBoundingClientRect().top < window.innerHeight : false; })();
         const pillClass = "flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium px-3 py-2 sm:px-4 sm:py-2.5 rounded-full border border-white/10 shadow-lg shadow-black/30 hover:bg-slate-800/90 hover:text-white transition-all";
         if (!showHud) return null;
-        if (anyWeekOpen && scrollDir === 'down') return (
+        if (anyWeekOpen && scrollDir === 'down' && !feedbackVisible) return (
           <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
-            <button onClick={() => { toggleAllWeeks(false); window.scrollTo({ top: document.querySelector('.mb-6 > .flex.items-center.justify-between')?.offsetTop - 80 || 0, behavior: 'smooth' }); }} className={pillClass}>
+            <button onClick={() => { toggleAllWeeks(false); }} className={pillClass}>
               <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Collapse All
             </button>
           </div>
@@ -967,13 +968,6 @@ export default function CycleLogDetail() {
           <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
             <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={pillClass}>
               <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Top
-            </button>
-          </div>
-        );
-        if (commentBoxAbove) return (
-          <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
-            <button onClick={() => { hudLocked.current = true; setShowHud(false); const box = document.getElementById('main-comment-box'); if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); box.focus(); setTimeout(() => { hudLocked.current = false; }, 1000); } }} className={pillClass}>
-              <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Comment
             </button>
           </div>
         );
