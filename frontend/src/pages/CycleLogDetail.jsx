@@ -946,7 +946,24 @@ export default function CycleLogDetail() {
                 <Link to="/compounds" className="inline-block bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-semibold rounded-xl px-6 py-2.5 transition-all">Upgrade to Inner Circle</Link>
               </div>
             ) : !user ? (
-              <div className="mt-6 text-center"><p className="text-sm text-slate-400">Sign in to join the discussion.</p></div>
+              <div className="mt-6">
+                <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
+                  <div className="w-14 h-14 rounded-2xl bg-[#229DD8]/10 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-7 h-7 text-[#229DD8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Ready to Level Up Your Performance?</h3>
+                  <p className="text-sm text-slate-400 mb-5 max-w-sm mx-auto">Join the Inner Circle to comment, share cycle data, and connect with verified members running real protocols.</p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Access 24+ exclusive private cycle logs</div>
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500"><span className="w-1.5 h-1.5 rounded-full bg-[#229DD8]"></span>Verified labs & before/afters</div>
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500"><span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Connect with FM members</div>
+                  </div>
+                  <Link to="/login" className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-bold text-sm rounded-xl px-8 py-3 transition-all shadow-lg shadow-[#229DD8]/20 hover:shadow-[#229DD8]/40">
+                    Sign In to Join the Discussion
+                  </Link>
+                  <p className="text-[10px] text-slate-600 mt-4">Not a member? <Link to="/register" className="text-[#229DD8] hover:text-white transition-colors">Join Inner Circle — $19/mo</Link></p>
+                </div>
+              </div>
             ) : null}
           </>
         )}

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/auth';
-import BackButton from '../components/layout/BackButton';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -25,42 +24,70 @@ export default function LoginPage() {
     }
   };
 
+  const ic = "w-full rounded-xl border border-slate-700/50 bg-slate-950/50 py-3 px-4 text-white text-base placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all";
+
   return (
-    <div className="max-w-md mx-auto py-16 px-4 animate-fade-in">
-        <BackButton />
-      <div className="text-center mb-10">
-        <h1 className="text-2xl font-extrabold text-white mb-2">Welcome back.</h1>
-        <p className="text-sm text-slate-400">Log in to access your Inner Circle membership, threads, and cycle logs.</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="prohp-input text-sm" required autoFocus />
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 animate-fade-in">
+      <div className="w-full max-w-md">
+        {/* Hero */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-[#229DD8]/10 border border-[#229DD8]/20 flex items-center justify-center mx-auto mb-5">
+            <svg className="w-8 h-8 text-[#229DD8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Access Your Portal</h1>
+          <p className="text-sm text-slate-400">The Inner Circle is where real data meets real results.</p>
         </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="prohp-input text-sm" required />
-        </div>
-        {error && <div className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{error}</div>}
-        <button type="submit" disabled={loading} className="prohp-btn-primary w-full text-sm py-3">
-          {loading ? 'Logging in...' : 'Log in'}
-        </button>
-      </form>
 
-      <div className="mt-10 pt-8 border-t border-slate-800">
-        <div className="text-center">
+        {/* Login Form */}
+        <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 shadow-xl shadow-black/20">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={ic} required autoFocus />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" className={ic} required />
+            </div>
+            {error && <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">{error}</div>}
+            <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-bold text-sm rounded-xl py-3.5 transition-all shadow-lg shadow-[#229DD8]/20 hover:shadow-[#229DD8]/40">
+              {loading ? 'Logging in...' : 'Log In'}
+            </button>
+          </form>
+        </div>
+
+        {/* What You're Missing */}
+        <div className="mt-6 bg-slate-900/60 backdrop-blur-sm rounded-xl border border-white/5 p-5">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">What you unlock inside</p>
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0"><span className="text-emerald-400 text-sm font-bold">+</span></div>
+              <div><p className="text-sm text-white font-medium">Private Cycle Logs</p><p className="text-[11px] text-slate-500">Real protocols, real data, real results from verified members</p></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#229DD8]/10 flex items-center justify-center shrink-0"><span className="text-[#229DD8] text-sm font-bold">%</span></div>
+              <div><p className="text-sm text-white font-medium">Bio-Telemetry Analytics</p><p className="text-[11px] text-slate-500">Weight & body fat charts, before/afters, verified bloodwork</p></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0"><span className="text-amber-400 text-sm font-bold">FM</span></div>
+              <div><p className="text-sm text-white font-medium">Founding Member Community</p><p className="text-[11px] text-slate-500">Direct access to high-performance members running elite stacks</p></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Join CTA */}
+        <div className="mt-6 text-center">
           <p className="text-sm text-slate-300 font-semibold mb-2">Not a member yet?</p>
-          <p className="text-xs text-slate-500 mb-4">Join the Inner Circle for full access to threads, cycle logs, bloodwork, and community intel.</p>
-          <Link to="/register" className="inline-flex items-center justify-center w-full rounded-xl bg-gradient-to-r from-[#0070f3] to-[#00c6ff] px-6 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(0,118,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,118,255,.50)] transition-all">
-            Join Inner Circle
+          <p className="text-xs text-slate-500 mb-4">Full access to threads, cycle logs, bloodwork, and community intel.</p>
+          <Link to="/register" className="inline-flex items-center justify-center w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all">
+            Join Inner Circle — $19/mo
           </Link>
         </div>
-      </div>
 
-      <p className="text-[10px] text-slate-600 mt-8 text-center leading-relaxed">
-        Proof over hype. The chain is unbroken.
-      </p>
+        <p className="text-[10px] text-slate-600 mt-8 text-center">
+          Proof over hype. The chain is unbroken.
+        </p>
+      </div>
     </div>
   );
 }
