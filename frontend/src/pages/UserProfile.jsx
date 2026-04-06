@@ -121,6 +121,13 @@ export default function UserProfile() {
           </span>
         )}
         <p className="text-slate-400 text-sm" style={{ marginTop: '0.25rem' }}>Joined: {joinDate}</p>
+        {(user.age || user.trt_hrt || user.years_lifting) && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+            {user.age && <span className="text-xs font-bold text-slate-300 bg-slate-800 px-3 py-1 rounded-lg" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>Age: {user.age}</span>}
+            {user.years_lifting && <span className="text-xs font-bold text-slate-300 bg-slate-800 px-3 py-1 rounded-lg" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>{user.years_lifting} Yrs Lifting</span>}
+            {user.trt_hrt && <span className="text-xs font-bold text-amber-400 px-3 py-1 rounded-lg" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}>{user.trt_compound || 'TRT'}{user.trt_dose ? ' \u00b7 ' + user.trt_dose : ''}</span>}
+          </div>
+        )}
         <p style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '0.35rem' }}>
           We search for proof, above the hype.
         </p>
