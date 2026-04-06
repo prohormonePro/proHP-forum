@@ -13,7 +13,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     const offset = (page - 1) * limit;
 
     const threadResult = await query(
-      `SELECT t.*,
+      `SELECT t.*, (SELECT cl.id FROM cycle_logs cl WHERE cl.thread_id = t.id LIMIT 1) AS cycle_log_id,
               u.username AS author_username, u.display_name AS author_display_name,
               u.tier AS author_tier, u.avatar_url AS author_avatar,
               u.is_founding AS author_founding,

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUp, ArrowDown, MessageSquare, CheckCircle, ChevronLeft, Award, Eye, Reply, Pencil, Trash2, Flag, Link2, Bookmark } from 'lucide-react';
 import { api } from '../hooks/api';
@@ -118,6 +118,11 @@ export default function ThreadPage() {
   if (error) return (<div className="max-w-3xl mx-auto text-center py-12"><p className="text-red-400 text-sm mb-2">{error.message}</p><Link to="/" className="prohp-btn-ghost text-xs">Back to home</Link></div>);
 
   const { thread, posts, pagination } = data;
+
+  // If this thread belongs to a cycle log, redirect to the Sovereign Dashboard
+  if (thread?.cycle_log_id) {
+    return <Navigate to={'/cycles/' + thread.cycle_log_id} replace />;
+  }
   const isThreadAuthor = user && user.id === thread.author_id;
   const isAdmin = user && user.tier === 'admin';
   const canComment = user && !thread.is_locked;
