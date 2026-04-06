@@ -92,7 +92,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     const { id } = req.params;
 
     const cycleResult = await query(
-      `SELECT cl.*, u.username, u.display_name, u.tier AS user_tier, u.avatar_url, u.is_founding
+      `SELECT cl.*, u.username, u.display_name, u.tier AS user_tier, u.avatar_url, u.is_founding, u.age, u.years_lifting, u.trt_hrt, u.trt_compound, u.trt_dose
        FROM cycle_logs cl JOIN users u ON u.id = cl.user_id
        WHERE cl.id = $1 AND (cl.is_public = true OR cl.user_id = $2)`,
       [id, req.user?.id || '00000000-0000-0000-0000-000000000000']

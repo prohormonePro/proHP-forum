@@ -477,6 +477,13 @@ export default function CycleLogDetail() {
               <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
               {threadData?.thread?.view_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>{threadData.thread.view_count.toLocaleString()} Tracking</span></>)}
             </div>
+            {(cycle.age || cycle.trt_hrt) && (
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                {cycle.age && <span className="text-[10px] font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md">{cycle.age} yrs old</span>}
+                {cycle.years_lifting && <span className="text-[10px] font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md">{cycle.years_lifting} yrs lifting</span>}
+                {cycle.trt_hrt && <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">{cycle.trt_compound ? cycle.trt_compound : 'TRT'}{cycle.trt_dose ? ' · ' + cycle.trt_dose : ''}</span>}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-3 self-start shrink-0">
             {cycle.would_run_again != null && (
