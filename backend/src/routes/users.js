@@ -1,37 +1,57 @@
 const express = require('express');
 const { query } = require('../config/db');
+const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
+
+// ── PATCH /profile - Update own profile (Genesis Gate) ──
+// MUST be before /:username to avoid route shadowing
+router.patch('/profile', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.sub;
+    const { age, years_lifting, trt_hrt, trt_compound, trt_dose } = req.body;
+
+    const result = await query(
+      `UPDATE users SET
+        age = COALESCE($1, age),
+        years_lifting = COALESCE($2, years_lifting),
+        trt_hrt = COALESCE($3, trt_hrt),
+        trt_compound = $4,
+        trt_dose = $5,
+        profile_complete = true
+      WHERE id = $6
+      RETURNING id, username, age, years_lifting, trt_hrt, trt_compound, trt_dose, profile_complete`,
+      [age || null, years_lifting || null, trt_hrt || false, trt_compound || null, trt_dose || null, userId]
+    );
+
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json({ user: result.rows[0] });
+  } catch (err) {
+    console.error('[PROFILE_UPDATE]', err.message);
+    res.status(500).json({ error: 'Profile update failed' });
+  }
+});
 
 // GET /:username - Public user profile
 router.get('/:username', async (req, res) => {
   try {
     const { username } = req.params;
-
-    // Get user basic info
     const userResult = await query(
-      'SELECT id, username, tier, created_at FROM users WHERE username = $1',
+      'SELECT id, username, tier, age, years_lifting, trt_hrt, trt_compound, trt_dose, is_founding, avatar_url, bio, created_at FROM users WHERE username = $1',
       [username]
     );
-
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-
     const user = userResult.rows[0];
-
-    // Get recent threads
     const threadsResult = await query(
       'SELECT id, title, created_at FROM threads WHERE author_id = $1 ORDER BY created_at DESC LIMIT 5',
       [user.id]
     );
-
-    // Get recent posts
     const postsResult = await query(
       'SELECT id, body, thread_id, created_at FROM posts WHERE author_id = $1 ORDER BY created_at DESC LIMIT 5',
       [user.id]
     );
-
     res.json({
       user: {
         username: user.username,
@@ -51,40 +71,9 @@ router.get('/:username', async (req, res) => {
         posts: postsResult.rows
       }
     });
-
   } catch (error) {
     console.error('[USER_PROFILE_ERROR]', error);
     res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
-// ── PATCH /profile - Update own profile (Genesis Gate) ──
-const { authenticate } = require('../middleware/auth');
-
-router.patch('/profile', authenticate, async (req, res) => {
-  try {
-    const userId = req.user.sub;
-    const { age, years_lifting, trt_hrt, trt_compound, trt_dose } = req.body;
-
-    const result = await query(
-      `UPDATE users SET
-        age = COALESCE($1, age),
-        years_lifting = COALESCE($2, years_lifting),
-        trt_hrt = COALESCE($3, trt_hrt),
-        trt_compound = COALESCE($4, trt_compound),
-        trt_dose = COALESCE($5, trt_dose),
-        profile_complete = true
-      WHERE id = $6
-      RETURNING id, username, age, years_lifting, trt_hrt, trt_compound, trt_dose, profile_complete`,
-      [age || null, years_lifting || null, trt_hrt || false, trt_compound || null, trt_dose || null, userId]
-    );
-
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
-    res.json({ user: result.rows[0] });
-  } catch (err) {
-    console.error('[PROFILE_UPDATE]', err.message);
-    res.status(500).json({ error: 'Profile update failed' });
   }
 });
 

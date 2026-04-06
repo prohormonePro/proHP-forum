@@ -32,7 +32,7 @@ export default function GenesisGate({ onComplete }) {
           trt_dose: trtHrt ? trtDose : null,
         }),
       });
-      if (!res.ok) throw new Error('Save failed');
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Save failed - status ' + res.status); }
       // Refresh user data
       await useAuthStore.getState().fetchMe();
       onComplete?.();
@@ -79,11 +79,11 @@ export default function GenesisGate({ onComplete }) {
             <div className="grid grid-cols-2 gap-4 animate-fade-in">
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">Compound</label>
-                <input type="text" value={trtCompound} onChange={(e) => setTrtCompound(e.target.value)} placeholder="Test Cyp" className={ic} />
+                <input type="text" value={trtCompound} onChange={(e) => setTrtCompound(e.target.value)} placeholder="Test Cyp / Test Prop" maxLength={40} className={ic} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">Dose</label>
-                <input type="text" value={trtDose} onChange={(e) => setTrtDose(e.target.value)} placeholder="140mg/wk" className={ic} />
+                <input type="text" value={trtDose} onChange={(e) => setTrtDose(e.target.value)} placeholder="200mg/week" maxLength={30} className={ic} />
               </div>
             </div>
           )}
