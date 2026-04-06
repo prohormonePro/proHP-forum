@@ -531,37 +531,37 @@ export default function CycleLogDetail() {
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {/* Baseline */}
           <div className="relative group">
-            <p className="text-[9px] uppercase text-slate-500 font-semibold mb-1.5 text-center">Baseline</p>
+            <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Baseline</p>
             {media.before ? (
               <a href={media.before} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
                 <img src={media.before} alt="Before" className="w-full h-full object-cover" />
               </a>
             ) : (
               <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
-                <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span className="text-[8px] text-slate-600">Baseline Pending</span>
+                <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <span className="text-[10px] text-slate-500 font-medium">Baseline Pending</span>
               </div>
             )}
           </div>
           {/* Mid-Cycle */}
           <div className="relative">
-            <p className="text-[9px] uppercase text-slate-500 font-semibold mb-1.5 text-center">Mid-Cycle</p>
+            <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Mid-Cycle</p>
             <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
-              <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              <span className="text-[8px] text-slate-600">Awaiting</span>
+              <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              <span className="text-[10px] text-slate-500 font-medium">Awaiting</span>
             </div>
           </div>
           {/* Post-Cycle */}
           <div className="relative group">
-            <p className="text-[9px] uppercase text-slate-500 font-semibold mb-1.5 text-center">Post-Cycle</p>
+            <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Post-Cycle</p>
             {media.after ? (
               <a href={media.after} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
                 <img src={media.after} alt="After" className="w-full h-full object-cover" />
               </a>
             ) : (
               <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
-                <svg className="w-6 h-6 text-slate-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span className="text-[8px] text-slate-600">Final Pending</span>
+                <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <span className="text-[10px] text-slate-500 font-medium">Final Pending</span>
               </div>
             )}
           </div>
@@ -603,7 +603,7 @@ export default function CycleLogDetail() {
                     {update.side_effects && !update.strength_notes && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {update.body_fat_pct && <span className="text-[10px] font-bold text-amber-400">{update.body_fat_pct}%</span>}
+                    {update.body_fat_pct && <span className="text-[10px] font-bold text-amber-400">{update.body_fat_pct}% BF</span>}
                     {update.weight_lbs && <span className="text-base font-extrabold text-white">{update.weight_lbs} lbs</span>}
                     <span className="text-xs text-slate-600 ml-1">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
                   </div>
@@ -630,7 +630,7 @@ export default function CycleLogDetail() {
         const chartData = (updates || [])
           .filter(u => u.weight_lbs || u.body_fat_pct)
           .sort((a, b) => a.week_number - b.week_number)
-          .map(u => ({ week: 'W' + u.week_number, weight: u.weight_lbs ? parseFloat(u.weight_lbs) : null, bf: u.body_fat_pct ? parseFloat(u.body_fat_pct) : null }));
+          .map(u => ({ week: 'Wk ' + u.week_number, weight: u.weight_lbs ? parseFloat(u.weight_lbs) : null, bf: u.body_fat_pct ? parseFloat(u.body_fat_pct) : null }));
         if (chartData.length < 2) return null;
         const hasWeight = chartData.some(d => d.weight !== null);
         const hasBf = chartData.some(d => d.bf !== null);
@@ -644,25 +644,25 @@ export default function CycleLogDetail() {
           <div className="mb-6 bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/10 p-4 sm:p-6 overflow-x-hidden shadow-lg shadow-[#229DD8]/5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-bold text-white tracking-tight">Cycle Progress</h2>
+                <h2 className="text-lg font-bold text-white tracking-tight">Cycle Progress Analytics</h2>
                 <div className="flex items-center gap-2">
-                  {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-[10px] text-slate-500 font-medium">Weight</span></div>}
-                  {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-[10px] text-slate-500 font-medium">Body Fat</span></div>}
+                  {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-xs text-slate-400 font-medium">Weight</span></div>}
+                  {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-xs text-slate-400 font-medium">Body Fat</span></div>}
                 </div>
               </div>
               {(weightDelta || bfDelta) && (
-                <div className="flex flex-wrap gap-1.5">
-                  {weightDelta && <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div>}
-                  {bfDelta && <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div>}
-                  {bfLowest && bfVals.length >= 2 && <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}%</div>}
+                <div className="flex flex-wrap gap-2 items-center">
+                  {weightDelta && <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div>}
+                  {bfDelta && <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div>}
+                  {bfLowest && bfVals.length >= 2 && <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}% BF</div>}
                 </div>
               )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {hasWeight && (
                 <div className={!hasBf ? 'sm:col-span-2' : ''}>
-                  <p className="text-[9px] uppercase text-slate-600 font-semibold mb-2 tracking-widest">Weight (lbs)</p>
-                  <div className="h-44 sm:h-52">
+                  <p className="text-xs uppercase text-slate-400 font-bold mb-2 tracking-widest">Body Weight</p>
+                  <div className="h-52 sm:h-60">
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
                         <defs>
@@ -673,8 +673,8 @@ export default function CycleLogDetail() {
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
                         <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
-                        <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
+                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 3', 'dataMax + 3']} allowDecimals={false} tickCount={5} />
+                        <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} content={({ active, payload, label }) => { if (!active || !payload?.length) return null; const v = payload.find(p => p.dataKey === 'weight'); return v ? (<div style={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.2)', borderRadius: '10px', padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}><div style={{ color: '#64748b', fontSize: '11px', marginBottom: '2px' }}>{label}</div><div style={{ color: '#229DD8', fontSize: '15px', fontWeight: 700 }}>{v.value} lbs</div></div>) : null; }} />
                         <Area type="monotone" dataKey="weight" fill="url(#weightGrad)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="weight" stroke="#229DD8" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#229DD8', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#229DD8', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
                       </ComposedChart>
@@ -684,8 +684,8 @@ export default function CycleLogDetail() {
               )}
               {hasBf && (
                 <div className={!hasWeight ? 'sm:col-span-2' : ''}>
-                  <p className="text-[9px] uppercase text-slate-600 font-semibold mb-2 tracking-widest">Body Fat %</p>
-                  <div className="h-44 sm:h-52">
+                  <p className="text-xs uppercase text-slate-400 font-bold mb-2 tracking-widest">Body Fat %</p>
+                  <div className="h-52 sm:h-60">
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
                         <defs>
@@ -696,8 +696,8 @@ export default function CycleLogDetail() {
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
                         <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
-                        <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
+                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} allowDecimals={false} tickCount={5} />
+                        <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} content={({ active, payload, label }) => { if (!active || !payload?.length) return null; const v = payload.find(p => p.dataKey === 'bf'); return v ? (<div style={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}><div style={{ color: '#64748b', fontSize: '11px', marginBottom: '2px' }}>{label}</div><div style={{ color: '#f59e0b', fontSize: '15px', fontWeight: 700 }}>{v.value}% BF</div></div>) : null; }} />
                         <Area type="monotone" dataKey="bf" fill="url(#bfGrad)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#f59e0b', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#f59e0b', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
                       </ComposedChart>
@@ -750,7 +750,7 @@ export default function CycleLogDetail() {
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[#229DD8]/20 flex items-center justify-center text-[#229DD8] font-bold text-sm shrink-0">{cycle.username?.charAt(0).toUpperCase()}</div>
-              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><span className="text-[#229DD8]">{cycle.username}</span><span className="text-slate-400">'s </span><span className="text-white break-words">{cycle.compound_name} Log</span></h3>
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><span className="text-[#229DD8]">{cycle.username}</span><span className="text-slate-400">'s </span><Link to={'/compounds/' + (cycle.compound_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-white hover:text-[#229DD8] transition-colors break-words">{cycle.compound_name} Log</Link></h3>
             </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
           </div>
@@ -800,12 +800,12 @@ export default function CycleLogDetail() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-sm font-semibold text-[#229DD8] truncate max-w-[120px] sm:max-w-[160px] inline-block align-bottom">{p.author_username}</span>
+                                <span className="text-sm font-semibold text-[#229DD8] truncate max-w-[140px] sm:max-w-[200px] inline-block align-bottom">{p.author_username}</span>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 {p.author_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
                                 
-                                {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edit #{p.edit_count}</span>}
+                                {p.edit_count > 0 && <span className="text-[9px] text-amber-500/70 bg-amber-500/5 px-1.5 py-0.5 rounded font-medium">Edited</span>}
                                 {isCollapsed && descendantCount > 0 && (
                                   <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCollapse(p.id); }} className="text-[10px] text-slate-500 hover:text-[#229DD8] bg-slate-800/50 px-2 py-0.5 rounded-md transition-colors">+{descendantCount} more</button>
                                 )}
@@ -817,7 +817,7 @@ export default function CycleLogDetail() {
                                 ) : null;
                               })()}
                               {!isCollapsed && (<>
-                              <div className={`text-sm leading-relaxed mb-2 ${p.is_deleted ? 'text-slate-600 italic' : 'text-slate-300'}`}>
+                              <div className={`text-base leading-relaxed mb-2 ${p.is_deleted ? 'text-slate-600 italic' : 'text-slate-300'}`}>
                                 {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                               </div>
                               {p.image_url && !p.is_deleted && (
