@@ -597,14 +597,16 @@ export default function CycleLogDetail() {
             {updates.map((update, idx) => (
               <div key={update.id} className="prohp-card border border-white/5 overflow-hidden">
                 <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-colors text-left">
-                  <div className="flex items-center gap-3 flex-wrap min-w-0">
-                    <span className="text-sm font-bold text-[#229DD8]">Week {update.week_number}</span>
-                    {update.weight_lbs && <span className="text-base font-extrabold text-white">{update.weight_lbs} lbs</span>}
-                    {update.body_fat_pct && <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">{update.body_fat_pct}% BF</span>}
-                    {update.strength_notes && <span className="text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded truncate max-w-[120px] sm:max-w-[180px]">{update.strength_notes}</span>}
-                    {update.side_effects && !update.strength_notes && <span className="text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded truncate max-w-[120px] sm:max-w-[180px]">{update.side_effects}</span>}
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-sm font-bold text-[#229DD8] shrink-0">W{update.week_number}</span>
+                    {update.strength_notes && <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded truncate max-w-[100px] sm:max-w-[180px]">{update.strength_notes}</span>}
+                    {update.side_effects && !update.strength_notes && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
                   </div>
-                  <span className="text-xs text-slate-600 shrink-0 ml-2">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {update.body_fat_pct && <span className="text-[10px] font-bold text-amber-400">{update.body_fat_pct}%</span>}
+                    {update.weight_lbs && <span className="text-base font-extrabold text-white">{update.weight_lbs} lbs</span>}
+                    <span className="text-xs text-slate-600 ml-1">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
+                  </div>
                 </button>
                 {(expandedWeeks[idx] ?? (idx === updates.length - 1)) && <div className="px-5 pb-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
@@ -670,8 +672,8 @@ export default function CycleLogDetail() {
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
-                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
+                        <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
                         <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
                         <Area type="monotone" dataKey="weight" fill="url(#weightGrad)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="weight" stroke="#229DD8" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#229DD8', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#229DD8', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
@@ -693,8 +695,8 @@ export default function CycleLogDetail() {
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
-                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
+                        <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
                         <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.2)', strokeWidth: 1 }} contentStyle={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '12px', fontSize: '11px', color: '#e2e8f0', padding: '8px 12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
                         <Area type="monotone" dataKey="bf" fill="url(#bfGrad)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#f59e0b', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#f59e0b', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
@@ -747,14 +749,14 @@ export default function CycleLogDetail() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-[#229DD8]" />
-              <h3 className="text-lg font-bold text-white">Feedback on {cycle.username}'s {cycle.compound_name} Log</h3>
+              <div className="w-8 h-8 rounded-lg bg-[#229DD8]/20 flex items-center justify-center text-[#229DD8] font-bold text-sm shrink-0">{cycle.username?.charAt(0).toUpperCase()}</div>
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><span className="text-[#229DD8]">{cycle.username}</span><span className="text-slate-400">'s </span><span className="text-white break-words">{cycle.compound_name} Log</span></h3>
             </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 flex-1 min-w-0 sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
-            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-[10px] bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 shrink-0 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
+            <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-xs bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 flex-1 min-w-0 sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
+            <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="text-xs bg-slate-800 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 shrink-0 focus:outline-none focus:border-[#229DD8]/30" style={{colorScheme: 'dark'}}>
               <option value="best">Best</option>
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -811,7 +813,7 @@ export default function CycleLogDetail() {
                               {depth >= 1 && (() => {
                                 const parent = posts.find(x => x.id === p.parent_id);
                                 return parent ? (
-                                  <div className="mb-1"><span className="text-[10px] font-medium"><span className="text-slate-600">replying to </span><span className="text-[#229DD8]/70">@{parent.author_username}</span></span></div>
+                                  <div className="mb-1"><span className="text-xs font-medium"><span className="text-slate-500">replying to </span><span className="text-[#229DD8]/70">@{parent.author_username}</span></span></div>
                                 ) : null;
                               })()}
                               {!isCollapsed && (<>
@@ -922,8 +924,8 @@ export default function CycleLogDetail() {
                 <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">x</button>
               </div>
             )}
-            <p className="text-[9px] text-slate-600 mb-1.5">Your results help the next guy make a better decision.</p>
-            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
+            <p className="text-xs text-slate-500 mb-2">Your results help the next guy make a better decision.</p>
+            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-base placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
                 <div className="flex items-center gap-3 w-full mt-1 -mb-1">
