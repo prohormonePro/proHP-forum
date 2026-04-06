@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import useAuthStore from './stores/auth';
+import GenesisGate from './components/GenesisGate';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Home from './pages/Home';
@@ -32,6 +33,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen overflow-x-hidden max-w-[100vw] flex items-center justify-center bg-slate-950">
+        {user && !user.profile_complete && <GenesisGate onComplete={() => fetchMe()} />}
         <div className="text-prohp-500 font-bold tracking-wider animate-pulse">PROHP</div>
       </div>
     );

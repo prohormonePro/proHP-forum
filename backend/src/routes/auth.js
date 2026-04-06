@@ -67,7 +67,7 @@ router.post('/register', async (req, res) => {
     const result = await query(
       `INSERT INTO users (email, username, password_hash, display_name, is_founding)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, email, username, display_name, tier, is_founding, created_at`,
+       RETURNING id, email, username, display_name, tier, is_founding, age, years_lifting, trt_hrt, trt_compound, trt_dose, profile_complete, avatar_url, created_at`,
       [email.toLowerCase(), username.toLowerCase(), passwordHash, display_name || username, isFounding]
     );
 
@@ -102,7 +102,7 @@ router.post('/login', async (req, res) => {
     }
 
     const result = await query(
-      'SELECT id, email, username, display_name, password_hash, tier, is_founding, is_banned FROM users WHERE email = $1',
+      'SELECT id, email, username, display_name, password_hash, tier, is_founding, is_banned, age, years_lifting, trt_hrt, trt_compound, trt_dose, profile_complete, avatar_url FROM users WHERE email = $1',
       [email.toLowerCase()]
     );
 
