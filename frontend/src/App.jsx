@@ -27,13 +27,13 @@ import ScrollToTop from './components/ScrollToTop';
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const loading = useAuthStore((s) => s.loading);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => { fetchMe(); }, []);
 
   if (loading) {
     return (
       <div className="min-h-screen overflow-x-hidden max-w-[100vw] flex items-center justify-center bg-slate-950">
-        {user && !user.profile_complete && <GenesisGate onComplete={() => fetchMe()} />}
         <div className="text-prohp-500 font-bold tracking-wider animate-pulse">PROHP</div>
       </div>
     );
@@ -41,6 +41,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen overflow-x-hidden max-w-[100vw] bg-slate-950">
+      {user && !user.profile_complete && <GenesisGate onComplete={() => fetchMe()} />}
       <Navbar />
       <ScrollToTop />
       <div className="flex max-w-7xl mx-auto">
