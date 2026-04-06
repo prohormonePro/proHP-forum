@@ -578,9 +578,9 @@ export default function CycleLogDetail() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-white">Weekly Updates</h2>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">{(updates || []).length} update{(updates || []).length !== 1 ? 's' : ''}</span>
+            
             {(updates || []).length > 2 && (
-              <button onClick={() => toggleAllWeeks(!Object.values(expandedWeeks).some(v => v))} className="text-[10px] text-slate-500 hover:text-[#229DD8] transition-colors">{Object.values(expandedWeeks).some(v => v) ? 'Collapse All' : 'Expand All'}</button>
+              <button onClick={() => toggleAllWeeks(!Object.values(expandedWeeks).some(v => v))} className="text-xs font-semibold text-slate-500 hover:text-[#229DD8] transition-colors">{Object.values(expandedWeeks).some(v => v) ? 'Collapse All' : 'Expand All'}</button>
             )}
           </div>
         </div>
@@ -596,23 +596,25 @@ export default function CycleLogDetail() {
           <div className="space-y-3">
             {updates.map((update, idx) => (
               <div key={update.id} className="prohp-card border border-white/5 overflow-hidden">
-                <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-5 hover:bg-slate-800/30 transition-colors text-left">
-                  <span className="text-sm font-bold text-[#229DD8]">Week {update.week_number}</span>
-                  <div className="flex items-center gap-3">
-                    {update.weight_lbs && <span className="text-[10px] text-slate-400">{update.weight_lbs} lbs</span>}
-                    <span className="text-[10px] text-slate-500">{new Date(update.created_at).toLocaleDateString()}</span>
-                    <span className="text-[10px] text-slate-600">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
+                <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-colors text-left">
+                  <div className="flex items-center gap-3 flex-wrap min-w-0">
+                    <span className="text-sm font-bold text-[#229DD8]">Week {update.week_number}</span>
+                    {update.weight_lbs && <span className="text-base font-extrabold text-white">{update.weight_lbs} lbs</span>}
+                    {update.body_fat_pct && <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">{update.body_fat_pct}% BF</span>}
+                    {update.strength_notes && <span className="text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded truncate max-w-[120px] sm:max-w-[180px]">{update.strength_notes}</span>}
+                    {update.side_effects && !update.strength_notes && <span className="text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded truncate max-w-[120px] sm:max-w-[180px]">{update.side_effects}</span>}
                   </div>
+                  <span className="text-xs text-slate-600 shrink-0 ml-2">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
                 </button>
                 {(expandedWeeks[idx] ?? (idx === updates.length - 1)) && <div className="px-5 pb-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
-                  {update.weight_lbs && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Weight</p><p className="text-sm text-white">{update.weight_lbs} lbs</p></div>)}
-                  {update.body_fat_pct && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-sm text-white">{update.body_fat_pct}%</p></div>)}
+                  {update.weight_lbs && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Weight</p><p className="text-base font-bold text-white">{update.weight_lbs} lbs</p></div>)}
+                  {update.body_fat_pct && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-base font-bold text-white">{update.body_fat_pct}%</p></div>)}
                   {update.side_effect_severity && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Side Effects</p><p className="text-sm text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
                 </div>
-                {update.strength_notes && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Strength:</span> {update.strength_notes}</p>}
-                {update.side_effects && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Sides:</span> {update.side_effects}</p>}
-                {update.mood_notes && <p className="text-sm text-slate-300 mb-1"><span className="text-slate-500">Mood:</span> {update.mood_notes}</p>}
+                {update.strength_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Strength:</span> {update.strength_notes}</p>}
+                {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Sides:</span> {update.side_effects}</p>}
+                {update.mood_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Mood:</span> {update.mood_notes}</p>}
                 {update.general_notes && <p className="text-sm text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
                 </div>}
               </div>
@@ -746,7 +748,7 @@ export default function CycleLogDetail() {
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[#229DD8]" />
-              <h3 className="text-lg font-bold text-white">Community Feedback</h3>
+              <h3 className="text-lg font-bold text-white">Feedback on {cycle.username}'s {cycle.compound_name} Log</h3>
             </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
           </div>
