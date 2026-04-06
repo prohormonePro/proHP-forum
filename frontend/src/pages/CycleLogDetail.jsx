@@ -496,26 +496,26 @@ export default function CycleLogDetail() {
 
           {cycle.dose && (
             <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Dose</p>
-              <p className="text-sm font-bold text-white">{cycle.dose}</p>
+              <p className="text-xs uppercase text-slate-500 font-semibold mb-1">Dose</p>
+              <p className="text-base font-bold text-white">{cycle.dose}</p>
             </div>
           )}
           {cycle.duration_weeks && (
             <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Duration</p>
-              <p className="text-sm font-bold text-white">{cycle.duration_weeks} weeks</p>
+              <p className="text-xs uppercase text-slate-500 font-semibold mb-1">Duration</p>
+              <p className="text-base font-bold text-white">{cycle.duration_weeks} weeks</p>
             </div>
           )}
           {weekProgress && (
             <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Progress</p>
-              <p className="text-sm font-bold text-[#229DD8]">Week {weekProgress.current} / {weekProgress.total}</p>
+              <p className="text-xs uppercase text-slate-500 font-semibold mb-1">Progress</p>
+              <p className="text-base font-bold text-[#229DD8]">Week {weekProgress.current} / {weekProgress.total}</p>
             </div>
           )}
           {latestWeight && (
             <div className="bg-slate-950/50 rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase text-slate-500 font-semibold mb-1">Latest Weight</p>
-              <p className="text-sm font-bold text-white">{latestWeight} lbs</p>
+              <p className="text-xs uppercase text-slate-500 font-semibold mb-1">Latest Weight</p>
+              <p className="text-base font-bold text-white">{latestWeight} lbs</p>
             </div>
           )}
         </div>
@@ -598,26 +598,26 @@ export default function CycleLogDetail() {
               <div key={update.id} className="prohp-card border border-white/5 overflow-hidden">
                 <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-colors text-left">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm font-bold text-[#229DD8] shrink-0">W{update.week_number}</span>
-                    {update.strength_notes && <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded truncate max-w-[100px] sm:max-w-[180px]">{update.strength_notes}</span>}
-                    {update.side_effects && !update.strength_notes && <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
+                    <span className="text-sm font-bold text-[#229DD8] shrink-0">Wk {update.week_number}</span>
+                    {update.strength_notes && <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.strength_notes}</span>}
+                    {update.side_effects && !update.strength_notes && <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {update.body_fat_pct && <span className="text-[10px] font-bold text-amber-400">{update.body_fat_pct}% BF</span>}
+                    {update.body_fat_pct && <span className="text-xs font-bold text-amber-400">{update.body_fat_pct}% BF</span>}
                     {update.weight_lbs && <span className="text-base font-extrabold text-white">{update.weight_lbs} lbs</span>}
                     <span className="text-xs text-slate-600 ml-1">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
                   </div>
                 </button>
                 {(expandedWeeks[idx] ?? (idx === updates.length - 1)) && <div className="px-5 pb-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
-                  {update.weight_lbs && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Weight</p><p className="text-base font-bold text-white">{update.weight_lbs} lbs</p></div>)}
-                  {update.body_fat_pct && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-base font-bold text-white">{update.body_fat_pct}%</p></div>)}
-                  {update.side_effect_severity && (<div><p className="text-[10px] uppercase text-slate-500 font-semibold">Side Effects</p><p className="text-sm text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
+                  {update.weight_lbs && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Weight</p><p className="text-base font-bold text-white">{update.weight_lbs} lbs</p></div>)}
+                  {update.body_fat_pct && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-base font-bold text-white">{update.body_fat_pct}%</p></div>)}
+                  {update.side_effect_severity && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Side Effects</p><p className="text-base font-bold text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
                 </div>
                 {update.strength_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Strength:</span> {update.strength_notes}</p>}
                 {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Sides:</span> {update.side_effects}</p>}
                 {update.mood_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Mood:</span> {update.mood_notes}</p>}
-                {update.general_notes && <p className="text-sm text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
+                {update.general_notes && <p className="text-base text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
                 </div>}
               </div>
             ))}
@@ -651,10 +651,10 @@ export default function CycleLogDetail() {
                 </div>
               </div>
               {(weightDelta || bfDelta) && (
-                <div className="flex flex-wrap gap-2 items-center">
-                  {weightDelta && <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div>}
-                  {bfDelta && <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div>}
-                  {bfLowest && bfVals.length >= 2 && <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}% BF</div>}
+                <div className="flex flex-wrap gap-3 items-center">
+                  {weightDelta && <div className="flex flex-col items-center gap-0.5"><span className="text-[7px] uppercase text-slate-600 font-bold tracking-[0.2em] hidden sm:block">Weight Gain</span><div className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border ${parseFloat(weightDelta) > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{parseFloat(weightDelta) > 0 ? '+' : ''}{weightDelta} lbs</div></div>}
+                  {bfDelta && <div className="flex flex-col items-center gap-0.5"><span className="text-[7px] uppercase text-slate-600 font-bold tracking-[0.2em] hidden sm:block">Fat Reduction</span><div className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border ${parseFloat(bfDelta) < 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>{parseFloat(bfDelta) > 0 ? '+' : ''}{bfDelta}% BF</div></div>}
+                  {bfLowest && bfVals.length >= 2 && <div className="flex flex-col items-center gap-0.5"><span className="text-[7px] uppercase text-slate-600 font-bold tracking-[0.2em] hidden sm:block">Peak Performance</span><div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8]">Best: {bfLowest}% BF</div></div>}
                 </div>
               )}
             </div>
@@ -673,7 +673,7 @@ export default function CycleLogDetail() {
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
                         <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 3', 'dataMax + 3']} allowDecimals={false} tickCount={5} />
+                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={[(d) => Math.floor(d / 5) * 5, (d) => Math.ceil(d / 5) * 5]} allowDecimals={false} tickCount={5} />
                         <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} content={({ active, payload, label }) => { if (!active || !payload?.length) return null; const v = payload.find(p => p.dataKey === 'weight'); return v ? (<div style={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.2)', borderRadius: '10px', padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}><div style={{ color: '#64748b', fontSize: '11px', marginBottom: '2px' }}>{label}</div><div style={{ color: '#229DD8', fontSize: '15px', fontWeight: 700 }}>{v.value} lbs</div></div>) : null; }} />
                         <Area type="monotone" dataKey="weight" fill="url(#weightGrad)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="weight" stroke="#229DD8" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#229DD8', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#229DD8', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
@@ -696,7 +696,7 @@ export default function CycleLogDetail() {
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
                         <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} allowDecimals={false} tickCount={5} />
+                        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} tickFormatter={(v) => v + '%'} axisLine={false} tickLine={false} domain={[(d) => Math.floor(d), (d) => Math.ceil(d) + 1]} allowDecimals={false} tickCount={5} />
                         <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} content={({ active, payload, label }) => { if (!active || !payload?.length) return null; const v = payload.find(p => p.dataKey === 'bf'); return v ? (<div style={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}><div style={{ color: '#64748b', fontSize: '11px', marginBottom: '2px' }}>{label}</div><div style={{ color: '#f59e0b', fontSize: '15px', fontWeight: 700 }}>{v.value}% BF</div></div>) : null; }} />
                         <Area type="monotone" dataKey="bf" fill="url(#bfGrad)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#f59e0b', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#f59e0b', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
@@ -800,7 +800,7 @@ export default function CycleLogDetail() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-sm font-semibold text-[#229DD8] truncate max-w-[140px] sm:max-w-[200px] inline-block align-bottom">{p.author_username}</span>
+                                <Link to={'/u/' + p.author_username} className="text-sm font-semibold text-[#229DD8] hover:text-white truncate max-w-[140px] sm:max-w-[200px] inline-block align-bottom transition-colors">{p.author_username}</Link>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 {p.author_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
@@ -833,8 +833,8 @@ export default function CycleLogDetail() {
                                         )}
                                       </div>
                                       <div className="px-3 pb-2 flex items-center justify-between border-t border-white/5 pt-1.5">
-                                        <span className="text-[9px] text-slate-600">Click to view full screen</span>
-                                        <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="text-[9px] text-[#229DD8] hover:text-white transition-colors font-medium">Open original</a>
+                                        <span className="text-[10px] text-slate-500">Click to expand</span>
+                                        <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#229DD8] hover:text-white transition-colors font-medium">Open original</a>
                                       </div>
                                     </div>
                                   </div>
@@ -864,7 +864,7 @@ export default function CycleLogDetail() {
                               </div>
                               {replyTo === p.id && canComment && (
                                 <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-[#229DD8]/20">
-                                  <div className="mb-2 pl-3 border-l-2 border-[#229DD8]/30 text-[10px] text-slate-500 italic line-clamp-2">{p.body.length > 120 ? p.body.substring(0, 120) + '...' : p.body}</div>
+                                  <div className="mb-2 pl-3 border-l-2 border-[#229DD8]/30 text-xs text-slate-500 italic line-clamp-2">{p.body.length > 120 ? p.body.substring(0, 120) + '...' : p.body}</div>
                                   <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
                                   {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                                   <div className="flex items-center gap-2">
@@ -891,7 +891,7 @@ export default function CycleLogDetail() {
                               )}
                               {reportingPost === p.id && (
                                 <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-red-500/20">
-                                  <p className="text-[10px] text-slate-400 mb-2">Why are you reporting this?</p>
+                                  <p className="text-xs text-slate-400 mb-2">Why are you reporting this?</p>
                                   <textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} rows={2} placeholder="Spam, harassment, misinformation..." className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all resize-none mb-2" />
                                   <div className="flex items-center gap-2">
                                     <button onClick={() => reportPost.mutate({ postId: p.id, reason: reportReason })} disabled={!reportReason.trim() || reportPost.isPending} className="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{reportPost.isPending ? '...' : 'Submit Report'}</button>
@@ -930,7 +930,7 @@ export default function CycleLogDetail() {
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
                 <div className="flex items-center gap-3 w-full mt-1 -mb-1">
                   <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-all px-4 py-2 rounded-lg bg-[#229DD8]/10 hover:bg-[#229DD8]/20 border border-[#229DD8]/20 hover:border-[#229DD8]/40"><Activity className="w-4 h-4" /><span className="text-xs font-medium">Attach</span></button>
-                  <span className="text-[11px] text-slate-500">Bloodwork, progress pics, supplement labels, PDFs</span>
+                  <span className="text-xs text-slate-500">Bloodwork, progress pics, supplement labels, PDFs</span>
                 </div>
               </div>
             ) : !canComment && user ? (
