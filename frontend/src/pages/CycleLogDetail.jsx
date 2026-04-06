@@ -534,7 +534,7 @@ export default function CycleLogDetail() {
             <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Baseline</p>
             {media.before ? (
               <a href={media.before} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
-                <img src={media.before} alt="Before" className="w-full h-full object-cover" />
+                {/\.(jpg|jpeg|png|gif|webp)$/i.test(media.before) ? <img src={media.before} alt="Before" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80"><svg className="w-8 h-8 text-[#229DD8] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-4.5H18m0 0l3-3m-3 3V3" /></svg><span className="text-[10px] text-[#229DD8] font-medium">View Baseline</span></div>}
               </a>
             ) : (
               <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
@@ -556,7 +556,7 @@ export default function CycleLogDetail() {
             <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Post-Cycle</p>
             {media.after ? (
               <a href={media.after} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
-                <img src={media.after} alt="After" className="w-full h-full object-cover" />
+                {/\.(jpg|jpeg|png|gif|webp)$/i.test(media.after) ? <img src={media.after} alt="After" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80"><svg className="w-8 h-8 text-emerald-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-4.5H18m0 0l3-3m-3 3V3" /></svg><span className="text-[10px] text-emerald-400 font-medium">View Results</span></div>}
               </a>
             ) : (
               <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
@@ -612,7 +612,7 @@ export default function CycleLogDetail() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                   {update.weight_lbs && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Weight</p><p className="text-base font-bold text-white">{update.weight_lbs} lbs</p></div>)}
                   {update.body_fat_pct && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-base font-bold text-white">{update.body_fat_pct}%</p></div>)}
-                  {update.side_effect_severity && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Impact Level</p><p className="text-base font-bold text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
+                  {update.side_effect_severity && (<div className="flex items-center gap-2"><p className="text-xs uppercase text-slate-500 font-semibold whitespace-nowrap">Impact Level</p><p className="text-base font-bold text-white">{SEVERITY_LABELS[update.side_effect_severity] || update.side_effect_severity}/5</p></div>)}
                 </div>
                 {update.strength_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Strength:</span> {update.strength_notes}</p>}
                 {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Symptoms:</span> {update.side_effects}</p>}
@@ -630,7 +630,7 @@ export default function CycleLogDetail() {
         const chartData = (updates || [])
           .filter(u => u.weight_lbs || u.body_fat_pct)
           .sort((a, b) => a.week_number - b.week_number)
-          .map(u => ({ week: 'Wk ' + u.week_number, weight: u.weight_lbs ? parseFloat(u.weight_lbs) : null, bf: u.body_fat_pct ? parseFloat(u.body_fat_pct) : null }));
+          .map(u => ({ week: u.week_number, weight: u.weight_lbs ? parseFloat(u.weight_lbs) : null, bf: u.body_fat_pct ? parseFloat(u.body_fat_pct) : null }));
         if (chartData.length < 2) return null;
         const hasWeight = chartData.some(d => d.weight !== null);
         const hasBf = chartData.some(d => d.bf !== null);
@@ -644,7 +644,7 @@ export default function CycleLogDetail() {
           <div className="mb-6 bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/10 p-4 sm:p-6 overflow-x-hidden shadow-lg shadow-[#229DD8]/5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-bold text-white tracking-tight">Cycle Progress Analytics</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">Cycle Progress Analytics</h2>
                 <div className="flex items-center gap-2">
                   {hasWeight && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#229DD8] shadow-sm shadow-[#229DD8]/50"></div><span className="text-xs text-slate-400 font-medium">Weight</span></div>}
                   {hasBf && <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50"></div><span className="text-xs text-slate-400 font-medium">Body Fat</span></div>}
@@ -667,12 +667,12 @@ export default function CycleLogDetail() {
                       <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
                         <defs>
                           <linearGradient id="weightGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#229DD8" stopOpacity={0.25} />
+                            <stop offset="0%" stopColor="#229DD8" stopOpacity={0.3} />
                             <stop offset="100%" stopColor="#229DD8" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
-                        <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={(v) => 'Wk ' + v} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} domain={[(d) => Math.floor(d / 5) * 5, (d) => Math.ceil(d / 5) * 5]} allowDecimals={false} tickCount={5} />
                         <Tooltip cursor={{ stroke: 'rgba(34,157,216,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} content={({ active, payload, label }) => { if (!active || !payload?.length) return null; const v = payload.find(p => p.dataKey === 'weight'); return v ? (<div style={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(34,157,216,0.2)', borderRadius: '10px', padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}><div style={{ color: '#64748b', fontSize: '11px', marginBottom: '2px' }}>{label}</div><div style={{ color: '#229DD8', fontSize: '15px', fontWeight: 700 }}>{v.value} lbs</div></div>) : null; }} />
                         <Area type="monotone" dataKey="weight" fill="url(#weightGrad)" stroke="none" connectNulls />
@@ -689,16 +689,16 @@ export default function CycleLogDetail() {
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
                         <defs>
-                          <linearGradient id="bfGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.2} />
-                            <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
+                          <linearGradient id="bfGradFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.35} />
+                            <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="rgba(255,255,255,0)" />
-                        <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={(v) => 'Wk ' + v} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} tickFormatter={(v) => v + '%'} axisLine={false} tickLine={false} domain={[(d) => Math.floor(d), (d) => Math.ceil(d) + 1]} allowDecimals={false} tickCount={5} />
                         <Tooltip cursor={{ stroke: 'rgba(245,158,11,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} content={({ active, payload, label }) => { if (!active || !payload?.length) return null; const v = payload.find(p => p.dataKey === 'bf'); return v ? (<div style={{ backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}><div style={{ color: '#64748b', fontSize: '11px', marginBottom: '2px' }}>{label}</div><div style={{ color: '#f59e0b', fontSize: '15px', fontWeight: 700 }}>{v.value}% BF</div></div>) : null; }} />
-                        <Area type="monotone" dataKey="bf" fill="url(#bfGrad)" stroke="none" connectNulls />
+                        <Area type="monotone" dataKey="bf" fill="url(#bfGradFill)" stroke="none" connectNulls />
                         <Line type="monotone" dataKey="bf" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#0f172a', stroke: '#f59e0b', strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: '#f59e0b', stroke: '#0f172a', strokeWidth: 2 }} connectNulls />
                       </ComposedChart>
                     </ResponsiveContainer>
@@ -750,7 +750,7 @@ export default function CycleLogDetail() {
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[#229DD8]/20 flex items-center justify-center text-[#229DD8] font-bold text-sm shrink-0">{cycle.username?.charAt(0).toUpperCase()}</div>
-              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><span className="text-[#229DD8]">{cycle.username}</span><span className="text-slate-400">'s </span><Link to={'/compounds/' + (cycle.compound_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-white hover:text-[#229DD8] transition-colors break-words">{cycle.compound_name} Log</Link></h3>
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><span className="text-[#229DD8]">{cycle.username}</span><span className="text-slate-400">'s </span><Link to={'/compounds/' + (cycle.compound_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-white hover:text-[#229DD8] transition-colors" style={{wordBreak: 'keep-all', overflowWrap: 'normal'}}>{cycle.compound_name} Log</Link></h3>
             </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
           </div>
