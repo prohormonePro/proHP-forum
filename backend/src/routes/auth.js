@@ -205,7 +205,9 @@ router.get('/me', authenticate, async (req, res) => {
   try {
     const result = await query(
       `SELECT id, email, username, display_name, bio, avatar_url, tier,
-              stripe_sub_status, reputation, is_founding, is_verified, created_at
+              stripe_sub_status, reputation, is_founding, is_verified,
+              age, years_lifting, trt_hrt, trt_compound, trt_dose, profile_complete,
+              created_at
        FROM users WHERE id = $1`,
       [req.user.id]
     );
