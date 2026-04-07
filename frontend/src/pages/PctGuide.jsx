@@ -291,16 +291,21 @@ export default function PctGuide() {
           {fBtn('otc', '\uD83D\uDFE1 OTC PCT')}
           {fBtn('none', '\uD83D\uDFE2 No PCT')}
         </div>
+        <div className="hidden sm:grid grid-cols-[220px_120px_1fr] gap-2 px-3 mb-2">
+          <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Compound Name</span>
+          <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Status</span>
+          <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Protocol Description</span>
+        </div>
         <div className="space-y-1.5">
           {filtered.map((c, i) => {
             const b = pctBadge[c.pct];
             return (
-              <div key={i} className="bg-slate-950/50 rounded-lg p-3 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-2">
-                <div className="shrink-0 min-w-[200px]">
+              <div key={i} className="bg-slate-950/50 rounded-lg p-3 border border-white/5 grid grid-cols-1 sm:grid-cols-[220px_120px_1fr] sm:items-center gap-2">
+                <div>
                   <CLinkBold slug={c.slug}>{c.name}</CLinkBold>
                   <span className="text-xs text-slate-600 ml-2">{c.cat}</span>
                 </div>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-md shrink-0 ${b.cls}`}>{b.label}</span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-md w-fit ${b.cls}`}>{b.label}</span>
                 <span className="text-sm text-slate-400 flex-1">{c.notes}</span>
               </div>
             );
