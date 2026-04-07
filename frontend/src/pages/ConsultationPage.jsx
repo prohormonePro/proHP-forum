@@ -6,10 +6,11 @@ const API = import.meta.env.VITE_API_URL || '';
 
 export default function ConsultationPage() {
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState({});
   const user = useAuthStore((s) => s.user);
   const tier = user?.tier;
-  const isInnerCircle = tier === 'inner_circle' || tier === 'admin';
-  const price = isInnerCircle ? 400 : 500;
+  const isIC = tier === 'inner_circle' || tier === 'admin';
+  const price = isIC ? 400 : 500;
 
   async function handleCheckout() {
     setLoading(true);
@@ -17,42 +18,25 @@ export default function ConsultationPage() {
       const res = await fetch(API + '/api/stripe/create-consultation-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: isInnerCircle ? 'inner_circle' : 'free' }),
+        body: JSON.stringify({ tier: isIC ? 'inner_circle' : 'free' }),
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; }
-      else { alert('Checkout unavailable. Please try again.'); setLoading(false); }
-    } catch (err) { alert('Something went wrong. Please try again.'); setLoading(false); }
+      else { alert('Checkout unavailable.'); setLoading(false); }
+    } catch (err) { alert('Something went wrong.'); setLoading(false); }
   }
 
-  const stats = [
-    { value: '600+', label: 'Clients' },
-    { value: '17', label: 'Years' },
-    { value: '105+', label: 'Compounds' },
-    { value: '2M+', label: 'YT Views' },
-  ];
+  const toggle = (key) => setSelected(prev => ({ ...prev, [key]: !prev[key] }));
+  const chip = (key, label) => (
+    <button key={key} onClick={() => toggle(key)} className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${selected[key] ? 'bg-[#229DD8]/20 text-[#229DD8] border border-[#229DD8]/40 shadow-lg shadow-[#229DD8]/10' : 'bg-slate-950/50 text-slate-400 border border-white/5 hover:border-white/15 hover:text-slate-300'}`}>
+      {label}
+    </button>
+  );
 
-  const deliverables = [
-    { icon: '\uD83C\uDFA5', title: '45-Minute Video Call', desc: 'Face to face with Travis. Your stack, your goals, your questions. No script.' },
-    { icon: '\uD83D\uDCCB', title: 'Written Protocol Document', desc: '2-3 page personalized document: compound selection, dosing, timing, PCT, and monitoring schedule.' },
-    { icon: '\uD83E\uDDEA', title: 'Bloodwork Blueprint', desc: 'Exactly what panels to order, when to draw (pre, mid-cycle, post-PCT), and what the numbers mean for your protocol.' },
-    { icon: '\uD83D\uDEE1\uFE0F', title: 'PCT Protocol', desc: 'Tailored recovery plan based on your specific compounds, suppression level, and biological context.' },
-    { icon: '\u26A1', title: 'Neurogenesis Support Stack', desc: 'Counter-lethargy, mood, and cognitive support compounds matched to your cycle.' },
-    { icon: '\uD83D\uDCC8', title: 'Titration Guidance', desc: 'Start-low protocol with exact ramp schedule. No guessing on dose progression.' },
-  ];
-
-  const whoFor = [
-    'You are about to run your first cycle and want to get it right the first time',
-    'You have run cycles before but never had bloodwork guidance',
-    'You are stacking multiple compounds and need someone to verify the protocol',
-    'You are on TRT and want to add a prohormone or SARM safely',
-    'You are experiencing side effects and need an experienced eye on your data',
-    'You want a second opinion on a protocol you found online',
-  ];
+  const selectedCount = Object.values(selected).filter(Boolean).length;
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
-      {/* Back */}
       <div className="mb-6">
         <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -63,159 +47,231 @@ export default function ConsultationPage() {
       {/* Hero */}
       <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 mb-6 shadow-lg shadow-[#229DD8]/5">
         <div className="flex items-center gap-4 mb-5">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#229DD8]/30 shrink-0">
-            <img src="/images/travis.jpg" alt="Travis Dillard" className="w-full h-full object-cover" />
+          <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#229DD8]/30 shrink-0">
+            <img src="/images/travis.jpg" alt="Travis Dillard" className="w-full h-full object-cover object-top" />
           </div>
           <div>
             <h1 className="text-2xl font-extrabold text-white">1-on-1 with Travis</h1>
-            <p className="text-sm text-slate-400">Your stack. Your goals. Your questions. Real talk, no script, receipts included.</p>
+            <p className="text-sm text-slate-400">17 years. 600+ clients. Zero brand deals. Your protocol, built from your data.</p>
           </div>
         </div>
-
-        {/* Stats bar */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
-          {stats.map((s, i) => (
-            <div key={i} className="text-center bg-slate-950/50 rounded-lg py-2 border border-white/5">
-              <div className="text-lg font-extrabold text-white">{s.value}</div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-widest">{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-base text-slate-300 leading-relaxed">This is not a generic fitness coaching call. Travis has 17 years of direct experience with prohormones and SARMs, 600+ one-on-one clients, and 105+ compound profiles written from personal use and verified bloodwork. You get a protocol built specifically for your biology, your goals, and your risk tolerance.</p>
-      </div>
-
-      {/* What You Get */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
-        <h2 className="text-xl font-bold text-white mb-4">What You Get</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {deliverables.map((d, i) => (
-            <div key={i} className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
-              <div className="text-2xl mb-2">{d.icon}</div>
-              <p className="text-sm font-bold text-white mb-1">{d.title}</p>
-              <p className="text-sm text-slate-400">{d.desc}</p>
+        <div className="grid grid-cols-4 gap-2">
+          {[['600+','Clients'],['17','Years'],['105+','Compounds'],['2M+','YT Views']].map(([v,l],i) => (
+            <div key={i} className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+              <div className="text-lg font-extrabold text-white">{v}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">{l}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Sample Deliverable */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
-        <h2 className="text-xl font-bold text-white mb-2">Sample Deliverable</h2>
-        <p className="text-sm text-slate-400 mb-4">Every consultation includes a detailed written document. Here is what a real deliverable looks like (client name removed).</p>
-        <div className="bg-slate-950/60 rounded-xl p-5 border border-[#229DD8]/10">
-          <p className="text-sm font-bold text-white mb-3">Consultation Summary - [Client]</p>
-          <div className="space-y-2">
+      {/* === THE DICHOTOMY ENGINE === */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        {/* Entropic Path */}
+        <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-red-500/10 p-5">
+          <h2 className="text-lg font-bold text-red-400 mb-3">The Cost of Guessing</h2>
+          <div className="space-y-2.5">
             {[
-              ['Goal', 'Lean mass gain with minimal side effects'],
-              ['Recommended Cycle', '8-week protocol tailored to bloodwork baseline'],
-              ['Primary Compound', 'Selected based on bloodwork, goals, and suppression tolerance'],
-              ['PCT Protocol', 'Full recovery timeline with exact dosing and duration'],
-              ['Bloodwork Schedule', 'Pre-cycle, mid-cycle (week 4), and 4 weeks post-PCT panels specified'],
-              ['Neurogenesis Support', 'Counter-lethargy and cognitive support stack included'],
-              ['Dosing', 'Start-low protocol with week-by-week titration guidance'],
-            ].map(([k, v], i) => (
-              <div key={i} className="flex gap-3">
-                <span className="text-sm font-bold text-[#229DD8] shrink-0 w-36">{k}</span>
-                <span className="text-sm text-slate-400">{v}</span>
+              'Wasted cycles on bunk gear',
+              'Crushed LH/FSH for 6+ months',
+              'Panic-buying the wrong PCT',
+              'Permanent hair loss from mismanaged DHT',
+              'Losing 100% of gains the week you come off',
+              'Bloodwork you cannot interpret alone',
+            ].map((t, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-md bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-red-400 text-xs">&#10007;</span></span>
+                <p className="text-sm text-slate-400">{t}</p>
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-500 italic mt-3">Full document is 2-3 pages with specific dosing, timing, and monitoring guidance.</p>
+        </div>
+
+        {/* Sovereign Path */}
+        <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-emerald-500/10 p-5">
+          <h2 className="text-lg font-bold text-emerald-400 mb-3">The Price of Certainty</h2>
+          <div className="space-y-2.5">
+            {[
+              'Pre-cleared bloodwork markers before Day 1',
+              'Exact titration schedule for your suppression tolerance',
+              'Neurogenesis support to counter lethargy',
+              'PCT protocol locked in before you start',
+              'Written exit strategy: dose, duration, recovery',
+              'A locked-in protocol verified by 17 years of experience',
+            ].map((t, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-md bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-emerald-400 text-xs">&#10003;</span></span>
+                <p className="text-sm text-slate-300">{t}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 pt-3 border-t border-emerald-500/10 text-center">
+            <p className="text-xs text-slate-500">{'$' + price + ' once'} vs. months of biological repair.</p>
+          </div>
         </div>
       </div>
 
-      {/* Who This Is For */}
+      {/* === DIAGNOSTIC HUD (swipable chips) === */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
+        <h2 className="text-xl font-bold text-white mb-2">Where Are You Right Now?</h2>
+        <p className="text-sm text-slate-400 mb-4">Select everything that applies. This is not a form. This is context.</p>
+
+        <div className="mb-4">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Your Base</p>
+          <div className="flex flex-wrap gap-2">
+            {chip('natty', 'Natural / Natty')}
+            {chip('trt', 'TRT / HRT')}
+            {chip('enhanced', 'Previously Enhanced')}
+            {chip('first', 'First Cycle Ever')}
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Your Goal</p>
+          <div className="flex flex-wrap gap-2">
+            {chip('mass', 'Lean Mass')}
+            {chip('recomp', 'Recomp')}
+            {chip('cut', 'Cut / Shred')}
+            {chip('strength', 'Strength Only')}
+            {chip('pct_help', 'PCT Help')}
+            {chip('bloodwork', 'Bloodwork Review')}
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Your Concern</p>
+          <div className="flex flex-wrap gap-2">
+            {chip('sides', 'Managing Side Effects')}
+            {chip('hair', 'Hair Loss Risk')}
+            {chip('mood', 'Mood / Lethargy')}
+            {chip('fertility', 'Fertility / LH Recovery')}
+            {chip('stacking', 'Stacking Safely')}
+            {chip('second', 'Second Opinion on Protocol')}
+          </div>
+        </div>
+
+        {selectedCount > 0 && (
+          <div className="bg-slate-950/60 rounded-lg p-3 border border-[#229DD8]/15 mt-3">
+            <p className="text-sm text-[#229DD8]">
+              {selectedCount >= 4
+                ? 'Complex biological signature detected. This is exactly the kind of case that benefits from the Brain Trust.'
+                : selectedCount >= 2
+                ? 'Multiple vectors identified. A focused consultation will map these to a single coherent protocol.'
+                : 'Good start. The more context Travis has before the call, the more precise your protocol.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* === WHAT YOU GET (deliverables) === */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
-        <h2 className="text-xl font-bold text-white mb-4">Who This Is For</h2>
-        <div className="space-y-2">
-          {whoFor.map((w, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-[#229DD8] text-xs font-bold">&#10003;</span>
-              </span>
-              <p className="text-sm text-slate-300">{w}</p>
+        <h2 className="text-xl font-bold text-white mb-4">What You Get</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            ['\uD83C\uDFA5', '45-Minute Video Call', 'Face to face with Travis. Your stack, your goals, your questions. No script. No warmup. We start at the data.'],
+            ['\uD83D\uDCCB', 'Written Protocol Document', '2-3 page personalized document: compound selection, dosing, timing, PCT, and monitoring schedule.'],
+            ['\uD83E\uDDEA', 'Bloodwork Blueprint', 'Exactly what panels to order, when to draw, and what the numbers mean for your protocol.'],
+            ['\uD83D\uDEE1\uFE0F', 'PCT Protocol', 'Tailored recovery plan based on your specific compounds, suppression level, and biological context.'],
+            ['\u26A1', 'Neurogenesis Support', 'Counter-lethargy, mood, and cognitive support compounds matched to your cycle.'],
+            ['\uD83D\uDCC8', 'Titration Guidance', 'Start-low protocol with exact ramp schedule. No guessing on dose progression.'],
+          ].map(([icon, title, desc], i) => (
+            <div key={i} className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
+              <div className="text-2xl mb-2">{icon}</div>
+              <p className="text-sm font-bold text-white mb-1">{title}</p>
+              <p className="text-sm text-slate-400">{desc}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* The Process */}
+      {/* === TERMINAL RECEIPT (sample deliverable) === */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
+        <h2 className="text-xl font-bold text-white mb-2">Sample Deliverable</h2>
+        <p className="text-sm text-slate-400 mb-4">Every consultation includes a detailed written document. Real output, client name removed.</p>
+        <div className="bg-slate-950/80 rounded-xl p-5 border border-[#229DD8]/10 font-mono text-sm">
+          <p className="text-[#229DD8] font-bold mb-3">// CONSULTATION_RECEIPT.protocol</p>
+          {[
+            ['GOAL', 'Lean mass gain, minimal side effects'],
+            ['CYCLE', '8-week protocol tailored to bloodwork baseline'],
+            ['COMPOUND', 'Selected based on androgen receptor affinity + suppression tolerance'],
+            ['PCT', 'Full recovery timeline: compound, dose, duration, monitoring'],
+            ['BLOODWORK', 'Pre-cycle, mid-cycle (wk 4), post-PCT (wk 4) panels specified'],
+            ['NEURO', 'Counter-lethargy + cognitive stack matched to cycle'],
+            ['DOSING', 'Start-low with week-by-week titration ramp'],
+          ].map(([k, v], i) => (
+            <div key={i} className="flex gap-3 py-1 border-b border-white/3 last:border-0">
+              <span className="text-amber-400 shrink-0 w-28">{k}:</span>
+              <span className="text-slate-400">{v}</span>
+            </div>
+          ))}
+          <p className="text-slate-600 italic mt-3 text-xs">// Full document: 2-3 pages. Dosing, timing, monitoring, exit strategy.</p>
+        </div>
+      </div>
+
+      {/* === THE PROCESS === */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
         <h2 className="text-xl font-bold text-white mb-4">The Process</h2>
         <div className="space-y-3">
           {[
-            ['Book below', 'Secure checkout via Stripe. You will receive scheduling details immediately after payment.'],
-            ['Fill out the intake form', 'A short form covering your age, lifting history, current compounds, goals, and any bloodwork you have. This arrives via email after booking.'],
+            ['Submit below', 'Secure checkout via Stripe. Scheduling details sent immediately.'],
+            ['Intake form arrives', 'A short form covering your age, lifting history, compounds, goals, and any bloodwork. Sent via email after booking.'],
             ['45-minute video call', 'Travis reviews your data before the call. No warmup. No fluff. We start at the data and work forward.'],
-            ['Written protocol delivered', 'Within 48 hours you receive a 2-3 page document: your personalized compound recommendation, dosing schedule, PCT protocol, and bloodwork blueprint.'],
+            ['Written protocol in 48 hours', 'Your personalized 2-3 page document: compound, dosing, PCT, bloodwork blueprint, and exit strategy.'],
           ].map(([t, d], i) => (
             <div key={i} className="flex items-start gap-3">
-              <span className="w-7 h-7 rounded-md bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-amber-400 text-sm font-bold">{i + 1}</span>
-              </span>
+              <span className="w-7 h-7 rounded-md bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-amber-400 text-sm font-bold">{i + 1}</span></span>
               <div><p className="text-sm text-white font-semibold">{t}</p><p className="text-sm text-slate-400">{d}</p></div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Pricing + CTA */}
+      {/* === PRICING CTA === */}
       <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-6 sm:p-8 mb-6 shadow-lg shadow-amber-500/5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-          <div>
-            <p className="text-3xl font-extrabold text-white">{'$' + price}</p>
-            {isInnerCircle ? (
-              <p className="text-sm text-amber-400 font-medium">Inner Circle member price (you save $100)</p>
-            ) : (
-              <p className="text-sm text-slate-400">One-time consultation fee. <span className="text-amber-400">$400 for Inner Circle members.</span></p>
-            )}
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            <span className="text-xs text-slate-500">45-min video call</span>
-            <span className="text-xs text-slate-500">Written protocol included</span>
-            <span className="text-xs text-slate-500">Bloodwork blueprint included</span>
-          </div>
+        <div className="text-center mb-5">
+          <p className="text-sm text-slate-500 uppercase tracking-widest mb-2">Submit Data for Brain Trust Review</p>
+          <p className="text-4xl font-extrabold text-white">{'$' + price}</p>
+          {isIC ? (
+            <p className="text-sm text-amber-400 font-medium mt-1">Inner Circle member price. You save $100.</p>
+          ) : (
+            <p className="text-sm text-slate-400 mt-1">One-time fee. <span className="text-amber-400">$400 for Inner Circle members.</span></p>
+          )}
         </div>
 
-        <button onClick={handleCheckout} disabled={loading} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">
-          {loading ? 'Redirecting to checkout...' : 'Book Your Consultation'}
+        <p className="text-sm text-slate-400 text-center mb-5 max-w-md mx-auto">Complex biological signatures require elite analysis. Your protocol is built from your data, verified by 17 years of direct experience, and delivered as a written document you own forever.</p>
+
+        <button onClick={handleCheckout} disabled={loading} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 mb-3">
+          {loading ? 'Redirecting to checkout...' : 'Access the Brain Trust | $' + price}
         </button>
 
-        <p className="text-xs text-slate-500 text-center mt-3">Secure checkout powered by Stripe. Scheduling details sent immediately after payment.</p>
-
-        {!isInnerCircle && (
-          <div className="mt-4 pt-4 border-t border-white/5 text-center">
-            <p className="text-sm text-slate-400 mb-2">Want the $400 rate?</p>
-            <Link to="/register" className="text-sm text-[#229DD8] font-bold underline underline-offset-2 decoration-[#229DD8]/30 hover:text-white transition-colors">Join Inner Circle | $19/mo</Link>
-          </div>
+        {!isIC && (
+          <Link to="/register" className="block w-full text-center bg-transparent border border-[#229DD8]/30 hover:border-[#229DD8]/60 text-[#229DD8] font-bold text-sm rounded-xl py-3 transition-all">
+            Inner Circle Member? Unlock $400 Rate
+          </Link>
         )}
+
+        <p className="text-xs text-slate-500 text-center mt-3">Secure checkout powered by Stripe. Scheduling details sent immediately after payment.</p>
       </div>
 
-      {/* Trust Anchors */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-xl font-bold text-white mb-4">Why Travis</h2>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <span className="text-xl shrink-0">&#128218;</span>
-            <div><p className="text-sm text-white font-semibold">105+ Compound Encyclopedia</p><p className="text-sm text-slate-400">Written from direct experience. Not scraped from Reddit. Not generated by AI. Every profile is backed by mechanism data, real bloodwork, and personal use history.</p></div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-xl shrink-0">&#128200;</span>
-            <div><p className="text-sm text-white font-semibold">600+ Consultations Completed</p><p className="text-sm text-slate-400">From first-time SARM users to TRT veterans running complex stacks. Every consultation gets the same depth of analysis.</p></div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-xl shrink-0">&#127891;</span>
-            <div><p className="text-sm text-white font-semibold">No Brand Deals. No Affiliate Bias.</p><p className="text-sm text-slate-400">Travis does not sell supplements. Does not take sponsorships. The recommendation is always the best compound for your goals, not the one that pays commission.</p></div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-xl shrink-0">&#129656;</span>
-            <div><p className="text-sm text-white font-semibold">Bloodwork-First Protocol Design</p><p className="text-sm text-slate-400">Every protocol starts and ends with bloodwork. If you do not have pre-cycle labs, Travis will tell you what to order before you touch a compound.</p></div>
-          </div>
+      {/* === WHY TRAVIS === */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
+        <h2 className="text-xl font-bold text-white mb-5">Why Travis</h2>
+        <div className="space-y-5">
+          {[
+            ['\uD83D\uDCDA', '105+ Compound Encyclopedia', 'Written from direct experience. Not scraped from Reddit. Not generated by AI. Every profile is backed by mechanism data, real bloodwork, and personal use history.'],
+            ['\uD83D\uDCC8', '600+ Consultations Completed', 'From first-time SARM users to TRT veterans running complex stacks. Every consultation gets the same depth of analysis.'],
+            ['\uD83D\uDEAB', 'No Brand Deals. No Affiliate Bias.', 'Travis does not sell supplements. Does not take sponsorships. The recommendation is always the best compound for your goals, not the one that pays commission.'],
+            ['\uD83E\uDE78', 'Bloodwork-First Protocol Design', 'Every protocol starts and ends with bloodwork. If you do not have pre-cycle labs, Travis will tell you what to order before you touch a compound.'],
+          ].map(([icon, title, desc], i) => (
+            <div key={i} className="flex items-start gap-4">
+              <span className="text-2xl shrink-0">{icon}</span>
+              <div><p className="text-sm text-white font-semibold mb-1">{title}</p><p className="text-sm text-slate-400 leading-relaxed">{desc}</p></div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Social links */}
+      {/* Social */}
       <div className="text-center mb-6">
         <p className="text-sm text-slate-400 mb-2">Questions before booking?</p>
         <div className="flex items-center justify-center gap-4">
@@ -225,7 +281,11 @@ export default function ConsultationPage() {
         </div>
       </div>
 
-      <p className="text-xs text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
+      {/* Node Signature */}
+      <div className="text-center mb-8">
+        <p className="text-xs text-slate-600">Skepticism without data is fear. Skepticism with data is power.</p>
+        <p className="text-[9px] text-slate-700 mt-1 font-mono">NODE::LATTICE_2222 | Convergence verified. The substrate sees you. E3592DC3.</p>
+      </div>
     </div>
   );
 }
