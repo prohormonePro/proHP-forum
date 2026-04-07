@@ -2,93 +2,80 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
-// === HPTA RECOVERY DATA ===
 function genCurve(startT, protocol) {
   const baseline = 650;
   const pts = [];
   for (let w = 0; w <= 8; w++) {
     let t;
-    if (protocol === 'none') {
-      t = startT + (baseline * 0.5 - startT) * (w / 8) * 0.9;
-    } else if (protocol === 'otc') {
-      const pct = w / 7;
-      t = startT + (baseline - startT) * (pct < 1 ? pct * pct * 0.5 + pct * 0.5 : 1);
-    } else {
-      const peak = baseline * 1.15;
-      if (w <= 3) t = startT + (peak - startT) * (w / 3);
-      else if (w <= 5) t = peak - (peak - baseline) * ((w - 3) / 2);
-      else t = baseline;
-    }
+    if (protocol === 'none') { t = startT + (baseline * 0.5 - startT) * (w / 8) * 0.9; }
+    else if (protocol === 'otc') { const p = w / 7; t = startT + (baseline - startT) * (p < 1 ? p * p * 0.5 + p * 0.5 : 1); }
+    else { const peak = baseline * 1.15; if (w <= 3) t = startT + (peak - startT) * (w / 3); else if (w <= 5) t = peak - (peak - baseline) * ((w - 3) / 2); else t = baseline; }
     pts.push({ week: w, testosterone: Math.round(Math.min(t, 1000)) });
   }
   return pts;
 }
 
 const statusMap = {
-  'none': { label: 'Prolonged Suppression', color: 'text-red-400', recovery: '12+ Weeks', badge: 'bg-red-500/10 border-red-500/20 text-red-400' },
-  'otc': { label: 'Stable Recovery Path', color: 'text-amber-400', recovery: '6-7 Weeks', badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
-  'serm': { label: 'Rapid HPTA Restoration', color: 'text-emerald-400', recovery: '3-4 Weeks', badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
+  'none': { label: 'Prolonged Suppression', recovery: '12+ Weeks', badge: 'bg-red-500/10 border-red-500/20 text-red-400' },
+  'otc': { label: 'Stable Recovery Path', recovery: '6-7 Weeks', badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
+  'serm': { label: 'Rapid HPTA Restoration', recovery: '3-4 Weeks', badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
 };
-
 const lineColors = { 'none': '#ef4444', 'otc': '#f59e0b', 'serm': '#10b981' };
 
-// === COMPOUND DATABASE ===
-const allCompounds = [
-  { name: '1-Andro (1-DHEA)', slug: null, cat: 'prohormone', pct: 'full', notes: 'Converts to 1-testosterone. Suppressive. Full PCT required.' },
-  { name: '4-Andro (4-DHEA)', slug: null, cat: 'prohormone', pct: 'full', notes: 'Converts to testosterone. Wet compound. Aromatizes. Full PCT + AI on hand.' },
-  { name: 'Andriol', slug: 'andriol', cat: 'prohormone', pct: 'depends', notes: 'Hi-Tech 1-DHEA based. Mild to moderate suppression. Bloodwork may show no full PCT needed at lower doses. Get labs.' },
-  { name: 'Decabolin', slug: 'decabolin', cat: 'prohormone', pct: 'full', notes: 'Hi-Tech 19-NorDHEA. Nandrolone precursor. Suppressive. Can linger. Full PCT required. Allow extra recovery time.' },
-  { name: 'Superdrol', slug: 'superdrol', cat: 'prohormone', pct: 'full', notes: 'Highly suppressive prohormone. Aggressive PCT mandatory. Liver support critical (NAC + TUDCA).' },
-  { name: 'Epiandro', slug: null, cat: 'prohormone', pct: 'mini', notes: 'DHT derivative. Mild suppression. Mini PCT or OTC test booster usually sufficient. Get bloodwork.' },
-  { name: 'Halodrol', slug: 'halodrol', cat: 'prohormone', pct: 'full', notes: 'Banned. If legacy supply: full PCT mandatory.' },
-  { name: 'M1T', slug: null, cat: 'prohormone', pct: 'full', notes: 'Banned. Most suppressive prohormone. Aggressive PCT + extended recovery.' },
-  { name: 'Trenabol', slug: 'trenabol', cat: 'prohormone', pct: 'full', notes: 'Hi-Tech 19-NorDHEA based. Suppressive. Full PCT. Similar to Decabolin recovery.' },
-  { name: 'RAD-140 (Testolone)', slug: null, cat: 'sarm', pct: 'full', notes: 'Most suppressive SARM. Full PCT required. Hi-Tech version is the legal product.' },
-  { name: 'LGD-4033 (Ligandrol)', slug: null, cat: 'sarm', pct: 'full', notes: 'Significant suppression at standard doses. Full PCT.' },
-  { name: 'AC-262', slug: 'ac-262', cat: 'sarm', pct: 'mini', notes: 'Partial agonist. 66% anabolic, 27% androgenic. Mild suppression. Bloodwork at 10mg: only 50-point testosterone drop.' },
-  { name: 'Ostarine (MK-2866)', slug: null, cat: 'sarm', pct: 'depends', notes: 'Mildest SARM. At 10-15mg/8wk some bloodwork shows no suppression. At 25mg+ mini PCT recommended. Get labs.' },
-  { name: 'S-23', slug: null, cat: 'sarm', pct: 'full', notes: 'Extremely suppressive. Near-steroid level. Full PCT mandatory. Not for beginners.' },
-  { name: 'YK-11', slug: 'yk-11', cat: 'sarm', pct: 'full', notes: 'Myostatin inhibitor + androgen. Highly suppressive. Full PCT.' },
-  { name: 'MK-677 (Ibutamoren)', slug: 'mk-677', cat: 'other', pct: 'none', notes: 'GH secretagogue. Does not touch the HPTA axis. No suppression. No PCT needed.' },
-  { name: 'GW-501516 (Cardarine)', slug: null, cat: 'other', pct: 'none', notes: 'PPAR agonist. Not hormonal. No suppression. No PCT needed.' },
-  { name: 'BPC-157', slug: 'bpc-157', cat: 'peptide', pct: 'none', notes: 'Healing peptide. No hormonal activity. No PCT needed.' },
-  { name: 'IGF-1 LR3', slug: 'igf-1-lr3', cat: 'peptide', pct: 'none', notes: 'Growth factor peptide. GH pathway. Does not suppress testosterone.' },
-  { name: 'Pro IGF-1', slug: 'pro-igf-1', cat: 'peptide', pct: 'none', notes: 'Hi-Tech deer antler velvet product. GH pathway. Not hormonal.' },
-  { name: 'CJC-1295', slug: 'cjc-1295', cat: 'peptide', pct: 'none', notes: 'GHRH peptide. Stimulates GH release. No testosterone suppression.' },
-  { name: 'Ipamorelin', slug: 'ipamorelin', cat: 'peptide', pct: 'none', notes: 'GHRP peptide. GH pathway only. No PCT needed.' },
-  { name: 'Laxogenin', slug: 'laxogenin', cat: 'natural', pct: 'none', notes: 'Plant steroid. Does not bind androgen receptor. No suppression.' },
-  { name: 'Turkesterone', slug: 'turkesterone', cat: 'natural', pct: 'none', notes: 'Ecdysteroid. Non-hormonal. No suppression.' },
-  { name: 'Tongkat Ali', slug: 'tongkat-ali', cat: 'natural', pct: 'none', notes: 'Natural test support. Actually helps recovery. Often used during PCT.' },
+const compounds = [
+  { name: 'Andriol', slug: 'andriol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 1-DHEA based. Converts to testosterone. OTC PCT (Arimiplex) typically sufficient. Get bloodwork to confirm.' },
+  { name: 'Decabolin', slug: 'decabolin', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA. Nandrolone precursor. Can linger. OTC PCT recommended. Allow extra recovery time.' },
+  { name: 'Halodrol', slug: 'halodrol', cat: 'Prohormone', pct: 'otc', notes: 'Active prohormone. OTC PCT (Arimiplex) typically sufficient for most users.' },
+  { name: 'Trenabol', slug: 'trenabol', cat: 'Prohormone', pct: 'full', notes: 'Hi-Tech 19-NorDHEA based. More suppressive than Decabolin. Full PCT required.' },
+  { name: 'M1T (Methyl-1-Testosterone)', slug: 'm1t-methyl-1-testosterone', cat: 'Prohormone', pct: 'serm', notes: 'Banned. Old school. Most suppressive prohormone ever made. SERM (Enclomiphene) required. Not OTC recoverable.' },
+  { name: 'RAD-140 (Testolone)', slug: 'rad-140-testolone', cat: 'SARM', pct: 'full', notes: 'Most suppressive SARM. Full PCT required. Hi-Tech version is the legal product.' },
+  { name: 'LGD-4033 (Ligandrol)', slug: 'lgd-4033-ligandrol', cat: 'SARM', pct: 'full', notes: 'Significant suppression at standard doses. Full PCT required.' },
+  { name: 'AC-262', slug: 'ac-262', cat: 'SARM', pct: 'otc', notes: 'Partial agonist. 66% anabolic, 27% androgenic. Mild suppression. OTC PCT (Arimiplex) sufficient for most.' },
+  { name: 'Ostarine (MK-2866)', slug: 'ostarine-mk-2866', cat: 'SARM', pct: 'full', notes: 'Full PCT required. At just 5mg, bloodwork has shown suppression and reported depression. Do not underestimate this compound.' },
+  { name: 'S-23', slug: 's-23', cat: 'SARM', pct: 'full', notes: 'Extremely suppressive. Near-steroid level. Full PCT mandatory. Not for beginners.' },
+  { name: 'YK-11', slug: 'yk-11', cat: 'SARM', pct: 'full', notes: 'Myostatin inhibitor + androgen. Highly suppressive. Full PCT required.' },
+  { name: 'MK-677 (Ibutamoren)', slug: 'mk-677', cat: 'GH Secretagogue', pct: 'none', notes: 'GH secretagogue. Does not touch the HPTA axis. No suppression. No PCT needed.' },
+  { name: 'GW-501516 (Cardarine)', slug: 'gw-501516-cardarine', cat: 'Other', pct: 'none', notes: 'PPAR agonist. Not hormonal. No suppression. No PCT needed.' },
+  { name: 'BPC-157', slug: 'bpc-157', cat: 'Peptide', pct: 'none', notes: 'Healing peptide. No hormonal activity. No PCT needed.' },
+  { name: 'IGF-1 LR3', slug: 'igf-1-lr3', cat: 'Peptide', pct: 'none', notes: 'Growth factor peptide. GH pathway. Does not suppress testosterone.' },
+  { name: 'Pro IGF-1', slug: 'pro-igf-1', cat: 'Peptide', pct: 'none', notes: 'Hi-Tech deer antler velvet product. GH pathway. Not hormonal.' },
+  { name: 'CJC-1295', slug: 'cjc-1295', cat: 'Peptide', pct: 'none', notes: 'GHRH peptide. Stimulates GH release. No testosterone suppression.' },
+  { name: 'Ipamorelin', slug: 'ipamorelin', cat: 'Peptide', pct: 'none', notes: 'GHRP peptide. GH pathway only. No PCT needed.' },
+  { name: 'Laxogenin', slug: 'laxogenin', cat: 'Plant Steroid', pct: 'none', notes: 'Non-hormonal plant steroid. Does not bind androgen receptor. No suppression.' },
+  { name: 'Turkesterone', slug: 'turkesterone', cat: 'Plant Steroid', pct: 'none', notes: 'Ecdysteroid. Non-hormonal. No suppression.' },
+  { name: 'Tongkat Ali', slug: 'tongkat-ali', cat: 'Natural', pct: 'none', notes: 'Natural test support. Actually helps recovery. Often used during PCT.' },
+  { name: 'Eucommia Ulmoides', slug: 'eucommia-ulmoides', cat: 'Natural', pct: 'none', notes: 'Adaptogenic herb. Supports joint and hormonal health. No suppression.' },
+  { name: 'Halo Elite', slug: 'halo-elite', cat: 'Natural', pct: 'none', notes: 'Natural anabolic. Non-hormonal. No PCT needed.' },
 ];
 
-const pctBadge = { full: { label: 'FULL PCT', cls: 'text-red-400 bg-red-500/10 border border-red-500/20' }, mini: { label: 'MINI / OTC', cls: 'text-amber-400 bg-amber-500/10 border border-amber-500/20' }, depends: { label: 'DEPENDS', cls: 'text-[#229DD8] bg-[#229DD8]/10 border border-[#229DD8]/20' }, none: { label: 'NO PCT', cls: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' } };
+const pctBadge = {
+  full: { label: 'FULL PCT', cls: 'text-red-400 bg-red-500/10 border border-red-500/20' },
+  serm: { label: 'SERM REQUIRED', cls: 'text-red-400 bg-red-500/15 border border-red-500/30' },
+  otc: { label: 'OTC PCT', cls: 'text-amber-400 bg-amber-500/10 border border-amber-500/20' },
+  none: { label: 'NO PCT', cls: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' },
+};
 
-const protocols = [
-  { name: 'Enclomiphene', dose: '12.5-25mg/day', duration: '4-6 weeks', tag: 'Gold Standard', notes: 'Stimulates LH/FSH directly. Cleaner isomer of Clomid without the emotional sides. Under doctor supervision.' },
-  { name: 'Nolvadex (Tamoxifen)', dose: '20-40mg/day taper', duration: '4 weeks', tag: 'Proven SERM', notes: 'Blocks estrogen at the receptor. Works well but can cause mood sides in some users.' },
-  { name: 'Clomid (Clomiphene)', dose: '25-50mg/day', duration: '4 weeks', tag: 'Potent', notes: 'Higher side effect profile. The emotional sides are real. Enclomiphene is the cleaner option.' },
-  { name: 'Gorilla Mode Sigma', dose: '4 pills/day', duration: '4-8 weeks', tag: 'OTC Option', notes: 'For mini cycles or those without SERM access. Travis and Vigorous Steve both saw testosterone nearly double.' },
-];
-
-const otcProducts = [
-  { name: 'Post Gear (5% Nutrition)', price: '$54.99', verdict: 'Best All-in-One', notes: 'Hits all 5 PCT categories. Longjack 300mg (proven), Brassopsis 500mg (prescription AI level), stinging nettle, milk thistle. 14 ingredients.' },
-  { name: 'Arimiplex (Hi-Tech)', price: '$49.99', verdict: 'Best for Stacks', notes: '11 ingredients. Arimistane 37.5mg. Good DHT blocker + liver support. Pair with Tongkat Ali ($20) for complete coverage.' },
-  { name: 'PCTV (Blackstone Labs)', price: '$44.99', verdict: 'Budget', notes: '5 ingredients. Tribulus (inconclusive) + Arimistane. No DHT blocker. Cheapest but least comprehensive.' },
+const armory = [
+  { name: 'Enclomiphene', slug: 'enclomiphene', type: 'Pharma', dose: '12.5-25mg/day', duration: '4-6 weeks', tag: 'Gold Standard', notes: 'Stimulates LH/FSH directly. Cleaner isomer of Clomid without the emotional sides. Under doctor supervision.' },
+  { name: 'Nolvadex (Tamoxifen)', slug: 'nolvadex-tamoxifen', type: 'Pharma', dose: '20-40mg/day taper', duration: '4 weeks', tag: 'Proven SERM', notes: 'Blocks estrogen at the receptor. Works well but can cause mood sides in some users.' },
+  { name: 'Clomid (Clomiphene)', slug: 'clomid-clomiphene', type: 'Pharma', dose: '25-50mg/day', duration: '4 weeks', tag: 'Potent', notes: 'Higher side effect profile. Emotional sides are real. Enclomiphene is the cleaner option.' },
+  { name: 'HCG', slug: 'hcg-human-chorionic-gonadotropin', type: 'Pharma', dose: '250-500 IU 2-3x/wk', duration: '2-4 weeks', tag: 'Testicular Recovery', notes: 'Restores LH/FSH and testicular size. Can lead to estrogenic sides (water retention, moodiness) if dosed too high. Primarily for restoring ball size and fertility markers.' },
+  { name: 'Arimiplex (Hi-Tech)', slug: 'arimiplex', type: 'OTC', dose: '1 cap/day', duration: '4-6 weeks', tag: 'Best for Stacks', notes: '11 ingredients. Arimistane 37.5mg. Solid DHT blocker + liver support. The go-to OTC PCT for prohormone users. Pair with Tongkat Ali for complete coverage.' },
 ];
 
 const signs = [
-  { icon: '⚠️', label: 'Lethargy & Fatigue', desc: 'Persists after cycle ends' },
-  { icon: '📉', label: 'Loss of Libido', desc: 'Sexual function changes' },
-  { icon: '😤', label: 'Mood Swings', desc: 'Irritability, depression' },
-  { icon: '💪', label: 'Strength Loss', desc: 'Beyond normal deload' },
-  { icon: '🦴', label: 'Joint Pain', desc: 'Estrogen crash indicator' },
-  { icon: '🍔', label: 'Cortisol Cravings', desc: 'Hunger spike post-cycle' },
+  { icon: '\u26A0\uFE0F', label: 'Lethargy & Fatigue', desc: 'Persists after cycle ends' },
+  { icon: '\uD83D\uDCC9', label: 'Loss of Libido', desc: 'Sexual function changes' },
+  { icon: '\uD83D\uDE24', label: 'Mood Swings', desc: 'Irritability, depression' },
+  { icon: '\uD83D\uDCAA', label: 'Strength Loss', desc: 'Beyond normal deload' },
+  { icon: '\uD83E\uDDB4', label: 'Joint Pain', desc: 'Estrogen crash indicator' },
+  { icon: '\uD83C\uDF54', label: 'Cortisol Cravings', desc: 'Hunger spike post-cycle' },
 ];
 
 const fiveCats = [
   { n: 'Test Booster', d: 'Stimulate natural testosterone back to baseline' },
-  { n: 'Anti-Estrogen', d: 'Block or reduce estrogen while test recovers' },
-  { n: 'DHT Blocker', d: 'Protect against androgenic sides during recovery' },
+  { n: 'Anti-Estrogen', d: 'Block or reduce estrogen while testosterone recovers' },
+  { n: 'DHT Blocker', d: 'Protect against androgenic side effects during recovery' },
   { n: 'Liver Support', d: 'NAC, Milk Thistle, TUDCA for methylated compounds' },
   { n: 'Prostate Support', d: 'Saw Palmetto, Stinging Nettle' },
 ];
@@ -97,8 +84,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-lg px-3 py-2 shadow-xl">
-      <p className="text-[10px] text-slate-500 mb-1">Week {label}</p>
-      <p className="text-sm font-bold" style={{ color: payload[0]?.stroke || '#f59e0b' }}>{payload[0]?.value} ng/dL</p>
+      <p className="text-xs text-slate-500 mb-1">Week {label}</p>
+      <p className="text-base font-bold" style={{ color: payload[0]?.stroke || '#f59e0b' }}>{payload[0]?.value} ng/dL</p>
     </div>
   );
 };
@@ -115,14 +102,18 @@ export default function PctGuide() {
   const color = lineColors[protocol];
 
   const filtered = useMemo(() => {
-    let list = allCompounds;
+    let list = compounds;
     if (search) list = list.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
     if (filterPct !== 'all') list = list.filter(c => c.pct === filterPct);
     return list;
   }, [search, filterPct]);
 
-  const btnCls = (active) => `px-4 py-2 rounded-lg text-xs font-bold transition-all ${active ? 'bg-[#229DD8] text-white shadow-lg shadow-[#229DD8]/30' : 'bg-slate-800/50 text-slate-400 hover:text-white border border-white/5'}`;
-  const filterBtn = (val, label) => <button key={val} onClick={() => setFilterPct(val)} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${filterPct === val ? 'bg-[#229DD8] text-white' : 'bg-slate-800/50 text-slate-500 hover:text-white border border-white/5'}`}>{label}</button>;
+  const btnCls = (active) => `px-4 py-2 rounded-lg text-sm font-bold transition-all ${active ? 'bg-[#229DD8] text-white shadow-lg shadow-[#229DD8]/30' : 'bg-slate-800/50 text-slate-400 hover:text-white border border-white/5'}`;
+  const fBtn = (val, label) => <button key={val} onClick={() => setFilterPct(val)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${filterPct === val ? 'bg-[#229DD8] text-white' : 'bg-slate-800/50 text-slate-500 hover:text-white border border-white/5'}`}>{label}</button>;
+
+  const CLink = ({ slug, children }) => (
+    <Link to={'/compounds/' + slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2">{children}</Link>
+  );
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -140,53 +131,46 @@ export default function PctGuide() {
             <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white">Post Cycle Therapy (PCT)</h1>
+            <h1 className="text-2xl font-extrabold text-white">Post Cycle Therapy (PCT)</h1>
             <p className="text-sm text-slate-400">The protocol that protects your gains and your health.</p>
           </div>
         </div>
         <p className="text-base text-slate-300 leading-relaxed">When you take a prohormone, your body slows natural testosterone production. When the cycle ends, androgens leave but production does not snap back. Your LH is weakened, testosterone is low, estrogen stays high. PCT fixes this.</p>
       </div>
 
-      {/* === HPTA RECOVERY SIMULATOR === */}
+      {/* HPTA Simulator */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-          <h2 className="text-lg font-extrabold text-white">HPTA Recovery Simulator</h2>
+          <h2 className="text-xl font-extrabold text-white">HPTA Recovery Simulator</h2>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border ${status.badge}`}>STATUS: {status.label}</span>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-slate-800/80 text-slate-300 border border-white/5">EST: {status.recovery}</span>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-slate-800/80 text-slate-300 border border-white/5">BASELINE: 650 ng/dL</span>
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${status.badge}`}>{status.label}</span>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-800/80 text-slate-300 border border-white/5">Est: {status.recovery}</span>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-800/80 text-slate-300 border border-white/5">Baseline: 650 ng/dL</span>
           </div>
         </div>
-
         <div className="h-64 sm:h-72 mb-5">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
-              <defs>
-                <linearGradient id="pctGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0.02} />
-                </linearGradient>
-              </defs>
+              <defs><linearGradient id="pctGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={color} stopOpacity={0.3} /><stop offset="95%" stopColor={color} stopOpacity={0.02} /></linearGradient></defs>
               <CartesianGrid stroke="rgba(255,255,255,0.03)" />
-              <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={(v) => v} label={{ value: 'Weeks Post-Cycle', position: 'insideBottom', offset: -2, fontSize: 10, fill: '#64748b' }} />
-              <YAxis domain={[0, 1000]} tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={(v) => v} label={{ value: 'Testosterone (ng/dL)', angle: -90, position: 'insideLeft', offset: 15, fontSize: 10, fill: '#64748b' }} />
+              <XAxis dataKey="week" tick={{ fontSize: 13, fill: '#94a3b8' }} label={{ value: 'Weeks Post-Cycle', position: 'insideBottom', offset: -2, fontSize: 12, fill: '#64748b' }} />
+              <YAxis domain={[0, 1000]} tick={{ fontSize: 13, fill: '#94a3b8' }} label={{ value: 'Testosterone (ng/dL)', angle: -90, position: 'insideLeft', offset: 15, fontSize: 12, fill: '#64748b' }} />
               <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine y={650} stroke="#94a3b8" strokeDasharray="6 4" label={{ value: 'Baseline', position: 'right', fontSize: 10, fill: '#94a3b8' }} />
+              <ReferenceLine y={650} stroke="#94a3b8" strokeDasharray="6 4" label={{ value: 'Baseline', position: 'right', fontSize: 12, fill: '#94a3b8' }} />
               <Area type="monotone" dataKey="testosterone" stroke={color} strokeWidth={2.5} fill="url(#pctGrad)" dot={{ r: 4, stroke: color, strokeWidth: 2, fill: '#0f172a' }} activeDot={{ r: 6, stroke: color, strokeWidth: 2, fill: '#0f172a' }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
-
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-white/5">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 font-medium">Suppression</span>
+            <span className="text-sm text-slate-400 font-medium">Suppression</span>
             <button onClick={() => setSuppression('mild')} className={btnCls(suppression === 'mild')}>Mild</button>
             <button onClick={() => setSuppression('heavy')} className={btnCls(suppression === 'heavy')}>Heavy</button>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 font-medium">PCT Protocol</span>
+            <span className="text-sm text-slate-400 font-medium">PCT Protocol</span>
             <button onClick={() => setProtocol('none')} className={btnCls(protocol === 'none')}>None</button>
-            <button onClick={() => setProtocol('otc')} className={btnCls(protocol === 'otc')}>OTC PCT</button>
+            <button onClick={() => setProtocol('otc')} className={btnCls(protocol === 'otc')}>OTC</button>
             <button onClick={() => setProtocol('serm')} className={btnCls(protocol === 'serm')}>SERM</button>
           </div>
         </div>
@@ -196,23 +180,23 @@ export default function PctGuide() {
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 sm:p-5 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><polygon fill="#fff" points="9.545 15.568 15.818 12 9.545 8.432"/></svg>
-          <span className="text-xs font-bold text-white">PCT Explained</span>
-          <a href="https://youtu.be/1js19YiC7lU" target="_blank" rel="noopener noreferrer" className="ml-auto text-[11px] text-slate-500 hover:text-[#229DD8] transition-colors">Watch on YouTube</a>
+          <span className="text-sm font-bold text-white">PCT Explained</span>
+          <a href="https://youtu.be/1js19YiC7lU" target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-slate-500 hover:text-[#229DD8] transition-colors">Watch on YouTube</a>
         </div>
         <div className="aspect-video rounded-lg overflow-hidden border border-white/5">
           <iframe src="https://www.youtube-nocookie.com/embed/1js19YiC7lU?rel=0&modestbranding=1" title="PCT Explained" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
         </div>
       </div>
 
-      {/* Signs of Suppression — Diagnostic Chips */}
+      {/* Signs of Suppression */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-lg font-bold text-white mb-4">Signs of Suppression</h2>
+        <h2 className="text-xl font-bold text-white mb-4">Signs of Suppression</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {signs.map((s, i) => (
             <div key={i} className="bg-slate-950/60 rounded-lg border border-amber-500/10 p-3 text-center">
-              <div className="text-xl mb-1">{s.icon}</div>
-              <p className="text-xs font-bold text-white">{s.label}</p>
-              <p className="text-[10px] text-slate-500">{s.desc}</p>
+              <div className="text-2xl mb-1">{s.icon}</div>
+              <p className="text-sm font-bold text-white">{s.label}</p>
+              <p className="text-xs text-slate-400">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -220,117 +204,118 @@ export default function PctGuide() {
 
       {/* 5 PCT Categories */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-lg font-bold text-white mb-4">The 5 PCT Categories</h2>
-        <p className="text-xs text-slate-500 mb-3">A complete PCT covers all five. Most OTC products miss at least one.</p>
-        <div className="space-y-2">
+        <h2 className="text-xl font-bold text-white mb-4">The 5 PCT Categories</h2>
+        <p className="text-sm text-slate-400 mb-4">A complete PCT covers all five. Most OTC products miss at least one.</p>
+        <div className="space-y-3">
           {fiveCats.map((c, i) => (
             <div key={i} className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-[#229DD8] text-xs font-bold">{i+1}</span></span>
-              <div><p className="text-sm text-white font-medium">{c.n}</p><p className="text-xs text-slate-400">{c.d}</p></div>
+              <span className="w-7 h-7 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-[#229DD8] text-sm font-bold">{i+1}</span></span>
+              <div><p className="text-sm text-white font-semibold">{c.n}</p><p className="text-sm text-slate-400">{c.d}</p></div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* === COMPOUND PROTOCOL DATABASE === */}
+      {/* Prohormone Categories (above compound DB) */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-lg font-bold text-white mb-1">Compound Protocol Database</h2>
-        <p className="text-xs text-slate-500 mb-4">Search your compound for exact PCT requirements.</p>
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search compounds..." className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-2.5 px-4 text-sm text-white placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all mb-3" />
+        <h2 className="text-xl font-bold text-white mb-2">PCT by Prohormone Category</h2>
+        <p className="text-sm text-slate-400 mb-4">These are precursor categories. Multiple products fall under each. All require at minimum an OTC PCT like <Link to="/compounds/arimiplex" className="text-[#229DD8] underline underline-offset-2 decoration-[#229DD8]/30 hover:text-white">Arimiplex</Link>.</p>
+        <div className="space-y-2">
+          <div className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
+            <div className="flex items-center gap-3 mb-1"><span className="text-sm font-bold text-white">1-Andro / 1-DHEA</span><span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC PCT</span></div>
+            <p className="text-sm text-slate-400">Converts to 1-Testosterone via two-step enzymatic process. Dry compound. Products: Hi-Tech 1-AD, Chosen-1 (banned). Suppressive. OTC PCT required.</p>
+          </div>
+          <div className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
+            <div className="flex items-center gap-3 mb-1"><span className="text-sm font-bold text-white">4-Andro / 4-DHEA</span><span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC PCT</span></div>
+            <p className="text-sm text-slate-400">Converts to testosterone. Wet compound. Aromatizes. Products: Hi-Tech <Link to="/compounds/andriol" className="text-[#229DD8] underline underline-offset-2 decoration-[#229DD8]/30 hover:text-white">Andriol</Link>, Sustanon 250, Androdiol. OTC PCT + keep AI on hand.</p>
+          </div>
+          <div className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
+            <div className="flex items-center gap-3 mb-1"><span className="text-sm font-bold text-white">Epiandro / Epiandrosterone</span><span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC PCT</span></div>
+            <p className="text-sm text-slate-400">DHT derivative. Dry, hardening compound. Mild suppression. OTC PCT (Arimiplex) sufficient for most. Get bloodwork to verify.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Compound Protocol Database */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
+        <h2 className="text-xl font-bold text-white mb-2">Compound Protocol Database</h2>
+        <p className="text-sm text-slate-400 mb-4">Search your compound for exact PCT requirements. Every compound hyperlinked to the Encyclopedia.</p>
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search compounds..." className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-3 px-4 text-base text-white placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all mb-3" />
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {filterBtn('all', 'All')}
-          {filterBtn('full', '🔴 Full PCT')}
-          {filterBtn('mini', '🟡 Mini / OTC')}
-          {filterBtn('depends', '🔵 Depends')}
-          {filterBtn('none', '🟢 No PCT')}
+          {fBtn('all', 'All')}
+          {fBtn('full', '\uD83D\uDD34 Full PCT')}
+          {fBtn('serm', '\uD83D\uDD34 SERM Req')}
+          {fBtn('otc', '\uD83D\uDFE1 OTC PCT')}
+          {fBtn('none', '\uD83D\uDFE2 No PCT')}
         </div>
         <div className="space-y-1.5">
           {filtered.map((c, i) => {
             const b = pctBadge[c.pct];
-            const CompName = c.slug
-              ? <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2">{c.name}</Link>
-              : <span className="text-sm font-bold text-slate-300">{c.name}</span>;
             return (
               <div key={i} className="bg-slate-950/50 rounded-lg p-3 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-2">
-                <div className="shrink-0 min-w-[170px]">{CompName}</div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${b.cls}`}>{b.label}</span>
-                <span className="text-xs text-slate-400 flex-1">{c.notes}</span>
+                <div className="shrink-0 min-w-[180px]">
+                  <CLink slug={c.slug}>{c.name}</CLink>
+                  <span className="text-xs text-slate-600 ml-2">{c.cat}</span>
+                </div>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-md shrink-0 ${b.cls}`}>{b.label}</span>
+                <span className="text-sm text-slate-400 flex-1">{c.notes}</span>
               </div>
             );
           })}
-          {filtered.length === 0 && <p className="text-xs text-slate-500 text-center py-4">No compounds match your search.</p>}
+          {filtered.length === 0 && <p className="text-sm text-slate-500 text-center py-4">No compounds match your search.</p>}
         </div>
       </div>
 
-      {/* === THE ARMORY: SERMs === */}
+      {/* The Armory: Combined Pharma + OTC */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-lg font-bold text-white mb-4">The Armory: PCT Protocols</h2>
-        <p className="text-xs text-slate-500 mb-4">Under doctor supervision. Get bloodwork first.</p>
+        <h2 className="text-xl font-bold text-white mb-2">The Armory: PCT Protocols</h2>
+        <p className="text-sm text-slate-400 mb-4">Pharmaceutical SERMs require doctor supervision. Arimiplex is over the counter.</p>
         <div className="space-y-3">
-          {protocols.map((p, i) => (
+          {armory.map((p, i) => (
             <div key={i} className="bg-slate-950/50 rounded-xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-base font-bold text-white">{p.name}</h3>
-                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">{p.tag}</span>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <CLink slug={p.slug}>{p.name}</CLink>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${p.type === 'Pharma' ? 'text-red-400 bg-red-500/10 border border-red-500/20' : 'text-amber-400 bg-amber-500/10 border border-amber-500/20'}`}>{p.type}</span>
+                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">{p.tag}</span>
                 </div>
-                <p className="text-xs text-slate-400">{p.notes}</p>
+                <p className="text-sm text-slate-400">{p.notes}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">{p.dose}</span>
-                <span className="text-xs font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">{p.duration}</span>
+                <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">{p.dose}</span>
+                <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">{p.duration}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* === OTC PRODUCT COMPARISON === */}
-      <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-5 mb-6 shadow-lg shadow-amber-500/5">
-        <h2 className="text-lg font-bold text-white mb-1">OTC PCT Showdown</h2>
-        <p className="text-xs text-slate-500 mb-4">Tested against the 5 PCT categories. Based on ingredient analysis + real bloodwork.</p>
-        <div className="space-y-3">
-          {otcProducts.map((p, i) => (
-            <div key={i} className="bg-slate-950/50 rounded-xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="flex-1">
-                <h3 className="text-base font-bold text-white mb-1">{p.name}</h3>
-                <p className="text-xs text-slate-400">{p.notes}</p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">{p.price}</span>
-                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">{p.verdict}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* === KEEPING GAINS === */}
+      {/* Keeping Gains */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-lg font-bold text-white mb-4">Keeping Your Gains Post-Cycle</h2>
+        <h2 className="text-xl font-bold text-white mb-4">Keeping Your Gains Post-Cycle</h2>
         <div className="space-y-3">
           {[
             ['Eat at a surplus', '2-500 extra calories. Food is anabolic. Your appetite will spike from cortisol. Use it.'],
             ['Stick to the workout schedule', 'Maintain 75% of on-cycle lifting intensity. This is not the time to skip days.'],
-            ['Restore testosterone ASAP', 'SERM or OTC test booster. The faster LH recovers, the more muscle you keep.'],
+            ['Restore testosterone ASAP', 'SERM or OTC PCT. The faster LH recovers, the more muscle you keep.'],
             ['Keep your head on straight', 'Motivation dips. Strength drops. Accept looking softer. Focus on the 100%, not the extra 20%.'],
             ['Best case: keep 70-80%', 'Of both strength and size. Composition looks different. Flatter, softer. Normal. Years of cycling creates permanent hyperplasia.'],
           ].map(([t, d], i) => (
             <div key={i} className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-[#229DD8] text-xs font-bold">{i+1}</span></span>
-              <div><p className="text-sm text-white font-medium">{t}</p><p className="text-xs text-slate-400">{d}</p></div>
+              <span className="w-7 h-7 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-[#229DD8] text-sm font-bold">{i+1}</span></span>
+              <div><p className="text-sm text-white font-semibold">{t}</p><p className="text-sm text-slate-400">{d}</p></div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* === THE RULE === */}
+      {/* The Rule */}
       <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 mb-6 text-center">
-        <p className="text-base font-bold text-white mb-2">The Rule</p>
+        <p className="text-lg font-bold text-white mb-2">The Rule</p>
         <p className="text-sm text-slate-300 mb-4">Get bloodwork before your cycle. Get bloodwork 4 weeks after PCT ends. Compare the numbers. That is the only way to know if recovery is complete.</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link to="/compounds" className="inline-flex items-center justify-center bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-bold text-sm rounded-xl px-6 py-3 transition-all shadow-lg shadow-[#229DD8]/20">Browse Encyclopedia</Link>
-          <Link to="/cycles" className="inline-flex items-center justify-center bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 font-medium text-sm rounded-xl px-6 py-3 transition-all border border-white/10">View Cycle Logs</Link>
+          <Link to="/r/lab" className="inline-flex items-center justify-center bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 font-medium text-sm rounded-xl px-6 py-3 transition-all border border-white/10">View Cycle Logs</Link>
           <Link to="/consultation" className="inline-flex items-center justify-center bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-medium text-sm rounded-xl px-6 py-3 transition-all border border-amber-500/20">Book Consultation</Link>
         </div>
       </div>
@@ -342,7 +327,7 @@ export default function PctGuide() {
         <Link to="/register" className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl px-8 py-3 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">Join Inner Circle | $19/mo</Link>
       </div>
 
-      <p className="text-[10px] text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
+      <p className="text-xs text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
     </div>
   );
 }
