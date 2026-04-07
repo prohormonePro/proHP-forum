@@ -24,15 +24,16 @@ const lineColors = { 'none': '#ef4444', 'otc': '#f59e0b', 'serm': '#10b981' };
 
 const compounds = [
   { name: 'Andriol', slug: 'andriol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 1-DHEA based. Converts to testosterone. OTC PCT (Arimiplex) typically sufficient. Get bloodwork to confirm.' },
-  { name: 'Decabolin', slug: 'decabolin', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA. Nandrolone precursor. Can linger. OTC PCT recommended. Allow extra recovery time.' },
+  { name: 'Hi-Tech Decadurabolin', slug: 'decabolin', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA. Nandrolone precursor. Can linger. OTC PCT recommended. Allow extra recovery time.' },
   { name: 'Halodrol', slug: 'halodrol', cat: 'Prohormone', pct: 'otc', notes: 'Active prohormone. OTC PCT (Arimiplex) typically sufficient for most users.' },
-  { name: 'Trenabol', slug: 'trenabol', cat: 'Prohormone', pct: 'full', notes: 'Hi-Tech 19-NorDHEA based. More suppressive than Decabolin. Full PCT required.' },
+  { name: 'Trenabol', slug: 'trenabol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA based. Suppressive. OTC PCT (Arimiplex) sufficient for recovery.' },
   { name: 'M1T (Methyl-1-Testosterone)', slug: 'm1t-methyl-1-testosterone', cat: 'Prohormone', pct: 'serm', notes: 'Banned. Old school. Most suppressive prohormone ever made. SERM (Enclomiphene) required. Not OTC recoverable.' },
+  { name: 'Superdrol (Methasterone)', slug: 'superdrol', cat: 'Prohormone', pct: 'serm', notes: 'Banned. One of the most toxic and highly suppressive designer steroids ever produced. Aggressive SERM protocol mandatory. Liver support critical.' },
   { name: 'RAD-140 (Testolone)', slug: 'rad-140-testolone', cat: 'SARM', pct: 'full', notes: 'Most suppressive SARM. Full PCT required. Hi-Tech version is the legal product.' },
   { name: 'LGD-4033 (Ligandrol)', slug: 'lgd-4033-ligandrol', cat: 'SARM', pct: 'full', notes: 'Significant suppression at standard doses. Full PCT required.' },
   { name: 'AC-262', slug: 'ac-262', cat: 'SARM', pct: 'otc', notes: 'Partial agonist. 66% anabolic, 27% androgenic. Mild suppression. OTC PCT (Arimiplex) sufficient for most.' },
   { name: 'Ostarine (MK-2866)', slug: 'ostarine-mk-2866', cat: 'SARM', pct: 'full', notes: 'Full PCT required. At just 5mg, bloodwork has shown suppression and reported depression. Do not underestimate this compound.' },
-  { name: 'S-23', slug: 's-23', cat: 'SARM', pct: 'full', notes: 'Extremely suppressive. Near-steroid level. Full PCT mandatory. Not for beginners.' },
+  { name: 'S-23', slug: 's-23', cat: 'SARM', pct: 'serm', notes: 'Extremely suppressive. Developed as a potential male contraceptive. Near-steroid level shutdown. Do not attempt to recover with OTC products. SERM required.' },
   { name: 'YK-11', slug: 'yk-11', cat: 'SARM', pct: 'full', notes: 'Myostatin inhibitor + androgen. Highly suppressive. Full PCT required.' },
   { name: 'MK-677 (Ibutamoren)', slug: 'mk-677', cat: 'GH Secretagogue', pct: 'none', notes: 'GH secretagogue. Does not touch the HPTA axis. No suppression. No PCT needed.' },
   { name: 'GW-501516 (Cardarine)', slug: 'gw-501516-cardarine', cat: 'Other', pct: 'none', notes: 'PPAR agonist. Not hormonal. No suppression. No PCT needed.' },
@@ -54,14 +55,6 @@ const pctBadge = {
   otc: { label: 'OTC PCT', cls: 'text-amber-400 bg-amber-500/10 border border-amber-500/20' },
   none: { label: 'NO PCT', cls: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' },
 };
-
-const armory = [
-  { name: 'Enclomiphene', slug: 'enclomiphene', type: 'Pharma', dose: '12.5-25mg/day', duration: '4-6 weeks', tag: 'Gold Standard', notes: 'Stimulates LH/FSH directly. Cleaner isomer of Clomid without the emotional sides. Under doctor supervision.' },
-  { name: 'Nolvadex (Tamoxifen)', slug: 'nolvadex-tamoxifen', type: 'Pharma', dose: '20-40mg/day taper', duration: '4 weeks', tag: 'Proven SERM', notes: 'Blocks estrogen at the receptor. Works well but can cause mood sides in some users.' },
-  { name: 'Clomid (Clomiphene)', slug: 'clomid-clomiphene', type: 'Pharma', dose: '25-50mg/day', duration: '4 weeks', tag: 'Potent', notes: 'Higher side effect profile. Emotional sides are real. Enclomiphene is the cleaner option.' },
-  { name: 'HCG', slug: 'hcg-human-chorionic-gonadotropin', type: 'Pharma', dose: '250-500 IU 2-3x/wk', duration: '2-4 weeks', tag: 'Testicular Recovery', notes: 'Restores LH/FSH and testicular size. Can lead to estrogenic sides (water retention, moodiness) if dosed too high. Primarily for restoring ball size and fertility markers.' },
-  { name: 'Arimiplex (Hi-Tech)', slug: 'arimiplex', type: 'OTC', dose: '1 cap/day', duration: '4-6 weeks', tag: 'Best for Stacks', notes: '11 ingredients. Arimistane 37.5mg. Solid DHT blocker + liver support. The go-to OTC PCT for prohormone users. Pair with Tongkat Ali for complete coverage.' },
-];
 
 const signs = [
   { icon: '\u26A0\uFE0F', label: 'Lethargy & Fatigue', desc: 'Persists after cycle ends' },
@@ -95,6 +88,7 @@ export default function PctGuide() {
   const [protocol, setProtocol] = useState('otc');
   const [search, setSearch] = useState('');
   const [filterPct, setFilterPct] = useState('all');
+  const [showHandoff, setShowHandoff] = useState(false);
 
   const startT = suppression === 'mild' ? 300 : 100;
   const chartData = useMemo(() => genCurve(startT, protocol), [startT, protocol]);
@@ -112,8 +106,25 @@ export default function PctGuide() {
   const fBtn = (val, label) => <button key={val} onClick={() => setFilterPct(val)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${filterPct === val ? 'bg-[#229DD8] text-white' : 'bg-slate-800/50 text-slate-500 hover:text-white border border-white/5'}`}>{label}</button>;
 
   const CLink = ({ slug, children }) => (
+    <Link to={'/compounds/' + slug} className="text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2">{children}</Link>
+  );
+
+  const CLinkBold = ({ slug, children }) => (
     <Link to={'/compounds/' + slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2">{children}</Link>
   );
+
+  const downloadHandoff = () => {
+    const handoff = {
+      _sovereign: { anchor: 'E3592DC3', source: 'forum.prohormonepro.com', format: 'PCT_DATABASE_V1', doctrine: 'Proof Over Hype' },
+      _ai_context: { role: 'You are analyzing a PCT database from ProHormonePro. Use this data to build a week-by-week recovery protocol for the user based on their specific cycle. Cross-reference with their Cycle Log AI Handoff if provided.', warning: 'These are prohormones and SARMs sold as supplements, NOT anabolic steroids. Do not confuse product names with pharmaceutical compounds.' },
+      compounds: compounds.map(c => ({ name: c.name, category: c.cat, pct_level: c.pct, notes: c.notes })),
+      protocols: { otc: { name: 'Arimiplex (Hi-Tech)', dose: '1 cap/day', duration: '4-6 weeks', use_case: 'All prohormone cycles' }, serm: { name: 'Enclomiphene', dose: '12.5-25mg/day', duration: '4-6 weeks', use_case: 'Heavy cycles, SARMs, or when OTC is insufficient' }, hcg: { name: 'HCG', dose: '250-500 IU 2-3x/wk', duration: '2-4 weeks', use_case: 'Testicular atrophy, fertility restoration' } },
+      categories: fiveCats.map(c => ({ name: c.n, description: c.d })),
+    };
+    const blob = new Blob([JSON.stringify(handoff, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'PCT-Database-' + new Date().toISOString().slice(0,10) + '.json'; a.click(); URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -124,19 +135,47 @@ export default function PctGuide() {
         </button>
       </div>
 
-      {/* Hero */}
+      {/* Hero + AI Handoff Button */}
       <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-emerald-500/15 p-6 sm:p-8 mb-6 shadow-lg shadow-emerald-500/5">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-            <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold text-white">Post Cycle Therapy (PCT)</h1>
+              <p className="text-sm text-slate-400">The protocol that protects your gains and your health.</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-white">Post Cycle Therapy (PCT)</h1>
-            <p className="text-sm text-slate-400">The protocol that protects your gains and your health.</p>
-          </div>
+          <button onClick={() => setShowHandoff(true)} className="shrink-0 flex items-center gap-1.5 bg-[#229DD8]/10 hover:bg-[#229DD8]/20 text-[#229DD8] text-xs font-bold px-3 py-2 rounded-lg border border-[#229DD8]/20 transition-all">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            AI Handoff
+          </button>
         </div>
         <p className="text-base text-slate-300 leading-relaxed">When you take a prohormone, your body slows natural testosterone production. When the cycle ends, androgens leave but production does not snap back. Your LH is weakened, testosterone is low, estrogen stays high. PCT fixes this.</p>
       </div>
+
+      {/* AI Handoff Modal */}
+      {showHandoff && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowHandoff(false)}>
+          <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-lg w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-xl font-extrabold text-white mb-3">Generate Your Recovery Protocol</h2>
+            <p className="text-sm text-slate-400 mb-4">Do not guess on your PCT. This tool exports the entire PCT Database alongside your specific cycle data so an AI can build you a flawless recovery timeline.</p>
+            <div className="space-y-3 mb-5">
+              <div className="flex items-start gap-3"><span className="w-6 h-6 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0"><span className="text-[#229DD8] text-xs font-bold">1</span></span><p className="text-sm text-slate-300">Download the PCT Database JSON below.</p></div>
+              <div className="flex items-start gap-3"><span className="w-6 h-6 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0"><span className="text-[#229DD8] text-xs font-bold">2</span></span><p className="text-sm text-slate-300">Go to your <Link to="/cycles" className="text-[#229DD8] underline underline-offset-2" onClick={() => setShowHandoff(false)}>Active Cycle Log</Link> and download your Cycle Log AI Handoff.</p></div>
+              <div className="flex items-start gap-3"><span className="w-6 h-6 rounded-md bg-[#229DD8]/10 flex items-center justify-center shrink-0"><span className="text-[#229DD8] text-xs font-bold">3</span></span><p className="text-sm text-slate-300">Paste BOTH files into ChatGPT, Claude, or Gemini with this prompt:</p></div>
+            </div>
+            <div className="bg-slate-950/80 rounded-lg p-3 mb-5 border border-white/5">
+              <p className="text-xs text-slate-400 italic">"I am finishing the cycle detailed in [Cycle_Log.json]. Using the rules and compound data provided in [PCT_Database.json], give me a week-by-week recovery protocol, including exact dosages and when to get my post-cycle bloodwork."</p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={downloadHandoff} className="flex-1 bg-gradient-to-r from-[#229DD8] to-[#1b87bc] text-white font-bold text-sm rounded-xl py-3 transition-all shadow-lg shadow-[#229DD8]/20">Download PCT JSON</button>
+              <button onClick={() => setShowHandoff(false)} className="px-4 bg-slate-800/50 text-slate-400 text-sm rounded-xl border border-white/5">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* HPTA Simulator */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6 shadow-xl">
@@ -216,22 +255,22 @@ export default function PctGuide() {
         </div>
       </div>
 
-      {/* Prohormone Categories (above compound DB) */}
+      {/* Prohormone Categories */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
         <h2 className="text-xl font-bold text-white mb-2">PCT by Prohormone Category</h2>
-        <p className="text-sm text-slate-400 mb-4">These are precursor categories. Multiple products fall under each. All require at minimum an OTC PCT like <Link to="/compounds/arimiplex" className="text-[#229DD8] underline underline-offset-2 decoration-[#229DD8]/30 hover:text-white">Arimiplex</Link>.</p>
+        <p className="text-sm text-slate-400 mb-4">These are precursor categories. Multiple products fall under each. All require at minimum an OTC PCT like <CLink slug="arimiplex">Arimiplex</CLink>.</p>
         <div className="space-y-2">
           <div className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
             <div className="flex items-center gap-3 mb-1"><span className="text-sm font-bold text-white">1-Andro / 1-DHEA</span><span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC PCT</span></div>
-            <p className="text-sm text-slate-400">Converts to 1-Testosterone via two-step enzymatic process. Dry compound. Products: Hi-Tech 1-AD, Chosen-1 (banned). Suppressive. OTC PCT required.</p>
+            <p className="text-sm text-slate-400">Converts to 1-Testosterone via two-step enzymatic process. Dry compound. Products: Hi-Tech <CLink slug="1-ad">1-AD</CLink>, <CLink slug="chosen-1">Chosen-1</CLink> (banned). Suppressive. OTC PCT required.</p>
           </div>
           <div className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
             <div className="flex items-center gap-3 mb-1"><span className="text-sm font-bold text-white">4-Andro / 4-DHEA</span><span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC PCT</span></div>
-            <p className="text-sm text-slate-400">Converts to testosterone. Wet compound. Aromatizes. Products: Hi-Tech <Link to="/compounds/andriol" className="text-[#229DD8] underline underline-offset-2 decoration-[#229DD8]/30 hover:text-white">Andriol</Link>, Sustanon 250, Androdiol. OTC PCT + keep AI on hand.</p>
+            <p className="text-sm text-slate-400">Converts to testosterone. Wet compound. Aromatizes. Products: Hi-Tech <CLink slug="andriol">Andriol</CLink>, <CLink slug="sustanon-250">Sustanon 250</CLink>, <CLink slug="androdiol">Androdiol</CLink>. OTC PCT + keep AI (<CLink slug="arimistane">Arimistane</CLink>) on hand.</p>
           </div>
           <div className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
             <div className="flex items-center gap-3 mb-1"><span className="text-sm font-bold text-white">Epiandro / Epiandrosterone</span><span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC PCT</span></div>
-            <p className="text-sm text-slate-400">DHT derivative. Dry, hardening compound. Mild suppression. OTC PCT (Arimiplex) sufficient for most. Get bloodwork to verify.</p>
+            <p className="text-sm text-slate-400">DHT derivative. Dry, hardening compound. Mild suppression. OTC PCT (<CLink slug="arimiplex">Arimiplex</CLink>) sufficient for most. Products include Hi-Tech <CLink slug="dymethazine">Dymethazine</CLink> (2-step converting prohormone to DHT) and <CLink slug="superstrol-7">Superstrol-7</CLink> (Epiandro + anti-cortisol). Get bloodwork to verify.</p>
           </div>
         </div>
       </div>
@@ -239,7 +278,7 @@ export default function PctGuide() {
       {/* Compound Protocol Database */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
         <h2 className="text-xl font-bold text-white mb-2">Compound Protocol Database</h2>
-        <p className="text-sm text-slate-400 mb-4">Search your compound for exact PCT requirements. Every compound hyperlinked to the Encyclopedia.</p>
+        <p className="text-sm text-slate-400 mb-4">Search the most popular compounds in the encyclopedia for exact PCT requirements. Every compound hyperlinked to the Encyclopedia.</p>
         <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search compounds..." className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-3 px-4 text-base text-white placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all mb-3" />
         <div className="flex flex-wrap gap-1.5 mb-4">
           {fBtn('all', 'All')}
@@ -254,7 +293,7 @@ export default function PctGuide() {
             return (
               <div key={i} className="bg-slate-950/50 rounded-lg p-3 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-2">
                 <div className="shrink-0 min-w-[180px]">
-                  <CLink slug={c.slug}>{c.name}</CLink>
+                  <CLinkBold slug={c.slug}>{c.name}</CLinkBold>
                   <span className="text-xs text-slate-600 ml-2">{c.cat}</span>
                 </div>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-md shrink-0 ${b.cls}`}>{b.label}</span>
@@ -266,27 +305,93 @@ export default function PctGuide() {
         </div>
       </div>
 
-      {/* The Armory: Combined Pharma + OTC */}
+      {/* === THE ARMORY: Tiered PCT Protocols === */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-xl font-bold text-white mb-2">The Armory: PCT Protocols</h2>
-        <p className="text-sm text-slate-400 mb-4">Pharmaceutical SERMs require doctor supervision. Arimiplex is over the counter.</p>
-        <div className="space-y-3">
-          {armory.map((p, i) => (
-            <div key={i} className="bg-slate-950/50 rounded-xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <CLink slug={p.slug}>{p.name}</CLink>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${p.type === 'Pharma' ? 'text-red-400 bg-red-500/10 border border-red-500/20' : 'text-amber-400 bg-amber-500/10 border border-amber-500/20'}`}>{p.type}</span>
-                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">{p.tag}</span>
-                </div>
-                <p className="text-sm text-slate-400">{p.notes}</p>
+        <h2 className="text-xl font-bold text-white mb-5">The Armory: PCT Protocols</h2>
+
+        {/* Tier 1: For Prohormones */}
+        <h3 className="text-sm font-bold text-amber-400 uppercase tracking-widest mb-3">Tier 1: For Prohormones</h3>
+        <div className="bg-slate-950/50 rounded-xl p-4 border border-amber-500/10 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <CLinkBold slug="arimiplex">Arimiplex (Hi-Tech)</CLinkBold>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md text-amber-400 bg-amber-500/10 border border-amber-500/20">OTC</span>
+                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">Best for Stacks</span>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">{p.dose}</span>
-                <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">{p.duration}</span>
-              </div>
+              <p className="text-sm text-slate-400">11 ingredients. <CLink slug="arimistane">Arimistane</CLink> 37.5mg. Solid DHT blocker + liver support. The go-to OTC PCT for prohormone users. Pair with <CLink slug="tongkat-ali">Tongkat Ali</CLink> for complete coverage.</p>
             </div>
-          ))}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">1 cap/day</span>
+              <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">4-6 weeks</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Tier 2: For Heavy Cycles & SARMs */}
+        <h3 className="text-sm font-bold text-red-400 uppercase tracking-widest mb-3">Tier 2: For Heavy Prohormone Runs and SARMs</h3>
+        <div className="bg-slate-950/50 rounded-xl p-4 border border-red-500/10 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <CLinkBold slug="enclomiphene">Enclomiphene</CLinkBold>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md text-red-400 bg-red-500/10 border border-red-500/20">Pharma</span>
+                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">Gold Standard</span>
+              </div>
+              <p className="text-sm text-slate-400">Stimulates LH/FSH directly. Cleaner isomer of <CLink slug="clomid-clomiphene">Clomid</CLink> without the emotional sides. The safest bet for SARMs or heavy prohormone runs. Under doctor supervision.</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">12.5-25mg/day</span>
+              <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">4-6 weeks</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Tier 3: Specialized */}
+        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Tier 3: Specialized and Everything Else</h3>
+        <div className="space-y-3">
+          <div className="bg-slate-950/50 rounded-xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <CLinkBold slug="nolvadex-tamoxifen">Nolvadex (Tamoxifen)</CLinkBold>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md text-red-400 bg-red-500/10 border border-red-500/20">Pharma</span>
+                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">Proven SERM</span>
+              </div>
+              <p className="text-sm text-slate-400">Blocks estrogen at the receptor. Works well but can cause mood sides in some users.</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">20-40mg/day taper</span>
+              <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">4 weeks</span>
+            </div>
+          </div>
+          <div className="bg-slate-950/50 rounded-xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <CLinkBold slug="clomid-clomiphene">Clomid (Clomiphene)</CLinkBold>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md text-red-400 bg-red-500/10 border border-red-500/20">Pharma</span>
+                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">Potent</span>
+              </div>
+              <p className="text-sm text-slate-400">Higher side effect profile. The zuclomiphene isomer is what makes Clomid "wet" and causes the highly emotional side effects. It is commonly used to stimulate egg growth in women. <CLink slug="enclomiphene">Enclomiphene</CLink> is the isolated clean isomer and the much better option.</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">25-50mg/day</span>
+              <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">4 weeks</span>
+            </div>
+          </div>
+          <div className="bg-slate-950/50 rounded-xl p-4 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <CLinkBold slug="hcg-human-chorionic-gonadotropin">HCG (Human Chorionic Gonadotropin)</CLinkBold>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md text-red-400 bg-red-500/10 border border-red-500/20">Pharma</span>
+                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">Testicular Recovery</span>
+              </div>
+              <p className="text-sm text-slate-400">Restores LH/FSH and testicular size. Can lead to estrogenic sides (water retention, moodiness) if dosed too high. Primarily for restoring ball size and fertility markers.</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-sm font-bold text-[#229DD8] bg-[#229DD8]/10 px-3 py-1.5 rounded-lg border border-[#229DD8]/20">250-500 IU 2-3x/wk</span>
+              <span className="text-sm font-bold text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-white/5">2-4 weeks</span>
+            </div>
+          </div>
         </div>
       </div>
 
