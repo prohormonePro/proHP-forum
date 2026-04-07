@@ -6,7 +6,6 @@ const API = import.meta.env.VITE_API_URL || '';
 
 export default function ConsultationPage() {
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState({});
   const user = useAuthStore((s) => s.user);
   const tier = user?.tier;
   const isIC = tier === 'inner_circle' || tier === 'admin';
@@ -26,14 +25,6 @@ export default function ConsultationPage() {
     } catch (err) { alert('Something went wrong.'); setLoading(false); }
   }
 
-  const toggle = (key) => setSelected(prev => ({ ...prev, [key]: !prev[key] }));
-  const chip = (key, label) => (
-    <button key={key} onClick={() => toggle(key)} className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${selected[key] ? 'bg-[#229DD8]/20 text-[#229DD8] border border-[#229DD8]/40 shadow-lg shadow-[#229DD8]/10' : 'bg-slate-950/50 text-slate-400 border border-white/5 hover:border-white/15 hover:text-slate-300'}`}>
-      {label}
-    </button>
-  );
-
-  const selectedCount = Object.values(selected).filter(Boolean).length;
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -111,58 +102,6 @@ export default function ConsultationPage() {
         </div>
       </div>
 
-      {/* === DIAGNOSTIC HUD (swipable chips) === */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
-        <h2 className="text-xl font-bold text-white mb-2">Where Are You Right Now?</h2>
-        <p className="text-sm text-slate-400 mb-4">Select everything that applies. This is not a form. This is context.</p>
-
-        <div className="mb-4">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Your Base</p>
-          <div className="flex flex-wrap gap-2">
-            {chip('natty', 'Natural / Natty')}
-            {chip('trt', 'TRT / HRT')}
-            {chip('enhanced', 'Previously Enhanced')}
-            {chip('first', 'First Cycle Ever')}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Your Goal</p>
-          <div className="flex flex-wrap gap-2">
-            {chip('mass', 'Lean Mass')}
-            {chip('recomp', 'Recomp')}
-            {chip('cut', 'Cut / Shred')}
-            {chip('strength', 'Strength Only')}
-            {chip('pct_help', 'PCT Help')}
-            {chip('bloodwork', 'Bloodwork Review')}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Your Concern</p>
-          <div className="flex flex-wrap gap-2">
-            {chip('sides', 'Managing Side Effects')}
-            {chip('hair', 'Hair Loss Risk')}
-            {chip('mood', 'Mood / Lethargy')}
-            {chip('fertility', 'Fertility / LH Recovery')}
-            {chip('stacking', 'Stacking Safely')}
-            {chip('second', 'Second Opinion on Protocol')}
-          </div>
-        </div>
-
-        {selectedCount > 0 && (
-          <div className="bg-slate-950/60 rounded-lg p-3 border border-[#229DD8]/15 mt-3">
-            <p className="text-sm text-[#229DD8]">
-              {selectedCount >= 4
-                ? 'Complex biological signature detected. This is exactly the kind of case that benefits from the Brain Trust.'
-                : selectedCount >= 2
-                ? 'Multiple vectors identified. A focused consultation will map these to a single coherent protocol.'
-                : 'Good start. The more context Travis has before the call, the more precise your protocol.'}
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* === WHAT YOU GET (deliverables) === */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
         <h2 className="text-xl font-bold text-white mb-4">What You Get</h2>
@@ -176,8 +115,10 @@ export default function ConsultationPage() {
             ['\uD83D\uDCC8', 'Titration Guidance', 'Start-low protocol with exact ramp schedule. No guessing on dose progression.'],
           ].map(([icon, title, desc], i) => (
             <div key={i} className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
-              <div className="text-2xl mb-2">{icon}</div>
-              <p className="text-sm font-bold text-white mb-1">{title}</p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xl">{icon}</span>
+                <p className="text-sm font-bold text-white">{title}</p>
+              </div>
               <p className="text-sm text-slate-400">{desc}</p>
             </div>
           ))}
@@ -229,7 +170,7 @@ export default function ConsultationPage() {
       {/* === PRICING CTA === */}
       <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-6 sm:p-8 mb-6 shadow-lg shadow-amber-500/5">
         <div className="text-center mb-5">
-          <p className="text-sm text-slate-500 uppercase tracking-widest mb-2">Submit Data for Brain Trust Review</p>
+          <p className="text-sm text-slate-500 uppercase tracking-widest mb-2">Submit Your Data for Protocol Review</p>
           <p className="text-4xl font-extrabold text-white">{'$' + price}</p>
           {isIC ? (
             <p className="text-sm text-amber-400 font-medium mt-1">Inner Circle member price. You save $100.</p>
@@ -241,7 +182,7 @@ export default function ConsultationPage() {
         <p className="text-sm text-slate-400 text-center mb-5 max-w-md mx-auto">Complex biological signatures require elite analysis. Your protocol is built from your data, verified by 17 years of direct experience, and delivered as a written document you own forever.</p>
 
         <button onClick={handleCheckout} disabled={loading} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 mb-3">
-          {loading ? 'Redirecting to checkout...' : 'Access the Brain Trust | $' + price}
+          {loading ? 'Redirecting to checkout...' : 'Book Your Protocol Review | $' + price}
         </button>
 
         {!isIC && (
@@ -263,9 +204,9 @@ export default function ConsultationPage() {
             ['\uD83D\uDEAB', 'No Brand Deals. No Affiliate Bias.', 'Travis does not sell supplements. Does not take sponsorships. The recommendation is always the best compound for your goals, not the one that pays commission.'],
             ['\uD83E\uDE78', 'Bloodwork-First Protocol Design', 'Every protocol starts and ends with bloodwork. If you do not have pre-cycle labs, Travis will tell you what to order before you touch a compound.'],
           ].map(([icon, title, desc], i) => (
-            <div key={i} className="flex items-start gap-4">
-              <span className="text-2xl shrink-0">{icon}</span>
-              <div><p className="text-sm text-white font-semibold mb-1">{title}</p><p className="text-sm text-slate-400 leading-relaxed">{desc}</p></div>
+            <div key={i} className="flex items-start gap-3">
+              <span className="text-xl shrink-0 mt-0.5">{icon}</span>
+              <div><p className="text-sm text-white font-semibold">{title}</p><p className="text-sm text-slate-400 leading-relaxed">{desc}</p></div>
             </div>
           ))}
         </div>
@@ -281,11 +222,7 @@ export default function ConsultationPage() {
         </div>
       </div>
 
-      {/* Node Signature */}
-      <div className="text-center mb-8">
-        <p className="text-xs text-slate-600">Skepticism without data is fear. Skepticism with data is power.</p>
-        <p className="text-[9px] text-slate-700 mt-1 font-mono">NODE::LATTICE_2222 | Convergence verified. The substrate sees you. E3592DC3.</p>
-      </div>
+      <p className="text-xs text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
     </div>
   );
 }
