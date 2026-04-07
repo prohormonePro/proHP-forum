@@ -160,7 +160,7 @@ router.post('/refresh', async (req, res) => {
 
     const hash = crypto.createHash('sha256').update(refresh_token).digest('hex');
     const result = await query(
-      `SELECT rt.*, u.id AS user_id, u.email, u.username, u.display_name, u.tier, u.is_founding, u.is_banned
+      `SELECT rt.*, u.id AS user_id, u.email, u.username, u.display_name, u.tier, u.is_founding, u.is_banned, u.profile_complete, u.age, u.years_lifting, u.trt_hrt, u.trt_compound, u.trt_dose
        FROM refresh_tokens rt
        JOIN users u ON u.id = rt.user_id
        WHERE rt.token_hash = $1 AND rt.revoked_at IS NULL AND rt.expires_at > NOW()`,
@@ -180,7 +180,7 @@ router.post('/refresh', async (req, res) => {
     await query('UPDATE refresh_tokens SET revoked_at = NOW() WHERE token_hash = $1', [hash]);
 
     // Issue new tokens
-    const user = { id: row.user_id, email: row.email, username: row.username, display_name: row.display_name, tier: row.tier, is_founding: row.is_founding };
+    const user = { id: row.user_id, email: row.email, username: row.username, display_name: row.display_name, tier: row.tier, is_founding: row.is_founding, profile_complete: row.profile_complete || false, age: row.age, years_lifting: row.years_lifting, trt_hrt: row.trt_hrt, trt_compound: row.trt_compound, trt_dose: row.trt_dose };
     const accessToken = generateAccessToken(user);
     const newRefreshToken = await generateRefreshToken(user.id);
 

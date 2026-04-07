@@ -22,6 +22,7 @@ import ClaimAccountPage from "./pages/ClaimAccountPage";
 import SearchPage from "./pages/SearchPage";
 import CommunityIntel from "./pages/CommunityIntel";
 import ConsultationPage from './pages/ConsultationPage';
+import PctGuide from './pages/PctGuide';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import ScrollToTop from './components/ScrollToTop';
 export default function App() {
@@ -65,6 +66,7 @@ export default function App() {
             <Route path="/u/:username" element={<UserProfile />} />
             <Route path="/community-intel" element={<CommunityIntel />} />
             <Route path="/consultation" element={<ConsultationPage />} />
+            <Route path="/pct" element={<PctGuide />} />
           </Routes>
         </main>
       </div>

@@ -50,7 +50,7 @@ export default function Sidebar() {
             <MessageSquare className="w-3.5 h-3.5" />
             <span>Community Intel</span>
           </Link>
-          <Link to="/r/library" className={linkClass('/r/library', false)}>
+          <Link to="/pct" className={linkClass('/pct', false)}>
             <Shield className="w-3.5 h-3.5" />
             <span>PCT Guide</span>
           </Link>
