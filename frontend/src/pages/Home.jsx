@@ -41,9 +41,10 @@ export default function Home() {
             <h1 className="text-lg font-bold text-[var(--text-primary)] mb-1">
               Welcome back, {user.display_name || user.username}.
             </h1>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--text-secondary)] mb-3">
               105+ compounds reviewed. 2M+ views. Every claim receipted.
             </p>
+            <p className="text-xs text-slate-500 italic">Skepticism without data is fear. Skepticism with data is power.</p>
           </div>
         ) : (
           <div>
@@ -51,7 +52,7 @@ export default function Home() {
               Real compounds. Real logs. No guessing.
             </h1>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              52+ compounds reviewed. 2M+ YouTube views. 200+ consultations.
+              105+ compounds reviewed. 2M+ YouTube views. 600+ consultations.
               Every claim receipted, every protocol questioned, every side effect documented.
               No unverified claims. Just the work.
             </p>
@@ -64,6 +65,7 @@ export default function Home() {
                 Browse the Forum
               </Link>
             </div>
+            <p className="text-xs text-slate-500 italic mt-4">Skepticism without data is fear. Skepticism with data is power.</p>
           </div>
         )}
       </div>
@@ -73,7 +75,7 @@ export default function Home() {
       {/* ── Encyclopedia Teaser ── */}
       <Link
         to="/compounds"
-        className="prohp-card flex items-center justify-between p-4 mb-8 group"
+        className="bg-gradient-to-r from-slate-900/90 to-slate-950/80 backdrop-blur-md rounded-xl border border-[#229DD8]/15 flex items-center justify-between p-5 mb-8 group shadow-lg shadow-[#229DD8]/5 hover:border-[#229DD8]/30 transition-all"
       >
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-[var(--prohp-glow)] flex items-center justify-center">
@@ -84,7 +86,7 @@ export default function Home() {
               Compound Encyclopedia
             </div>
             <div className="text-[11px] text-[var(--text-muted)]">
-              52 compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
+              105+ compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
             </div>
           </div>
         </div>
@@ -201,8 +203,8 @@ export default function Home() {
 
       {/* ── Cycle Logs + Inner Circle CTA ── */}
       <div className="max-w-5xl mx-auto px-4 pt-2 pb-6">
-        <div className="prohp-card p-5">
-          <h2 className="text-base font-bold mb-1.5">Community Cycle Logs</h2>
+        <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-5 shadow-lg shadow-amber-500/5">
+          <h2 className="text-base font-bold text-white mb-1.5">Community Cycle Logs</h2>
           <p className="text-xs text-[var(--text-secondary)] mb-4">
             Real protocols. Real bloodwork. Real results. See what the community is running and how they respond.
           </p>
@@ -225,7 +227,7 @@ export default function Home() {
               </Link>
             </div>
           )}
-          <p className="text-[9px] text-[var(--text-secondary)] mt-2.5">
+          <p className="text-xs text-[var(--text-secondary)] mt-2.5">
             Inner Circle members get full cycle log access, compound deep dives, and community intel.
           </p>
         </div>
@@ -250,7 +252,7 @@ export default function Home() {
             <div className="stat-label">Views</div>
           </div>
           <div className="text-center">
-            <div className="stat-value">13K+</div>
+            <div className="stat-value">14K+</div>
             <div className="stat-label">Subscribers</div>
           </div>
           <div className="text-center">
@@ -281,9 +283,9 @@ export default function Home() {
       <div className="prohp-card p-5 mb-8">
         <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">About Travis</h3>
         <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-          I built ProHormonePro to cut through hype and give people straight answers. Real-world context,
-          real risk discussion, real receipts. The goal here is simple: make this the place where people
-          can learn, verify, and make better decisions without getting sold fantasy.
+          17 years in the space. 600+ one-on-one clients. 105+ compound profiles written from direct experience.
+          I built ProHormonePro because nobody else would do the work. Real risk discussion. Real receipts.
+          No brand deals. No affiliate bias. Just the data and the experience to interpret it.
         </p>
       </div>
 
