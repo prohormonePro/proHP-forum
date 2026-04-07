@@ -14,11 +14,9 @@ const otcProducts = [
 ];
 
 const needsPct = [
-  { compound: '1-Andro (1-DHEA)', slug: '1-andro-1-dhea', pct: 'Yes', notes: 'Converts to 1-testosterone. Suppressive. Full PCT required.' },
-  { compound: '4-Andro (4-DHEA)', slug: '4-andro-4-dhea', pct: 'Yes', notes: 'Converts to testosterone. Wet compound. Aromatizes. Full PCT + AI on hand.' },
   { compound: 'Andriol', slug: 'andriol', pct: 'Depends', notes: 'Hi-Tech 1-DHEA based. Mild to moderate suppression. Bloodwork may show you do not need full PCT at lower doses. Get labs.' },
   { compound: 'Decabolin', slug: 'decabolin', pct: 'Yes', notes: 'Hi-Tech 19-NorDHEA. Nandrolone precursor. Suppressive. Can linger. Full PCT required. Allow extra recovery time.' },
-  { compound: 'Superdrol', slug: 'superdrol', pct: 'Yes', notes: 'Methylated. Highly suppressive. Aggressive PCT mandatory. Liver support critical.' },
+  { compound: 'Superdrol', slug: 'superdrol', pct: 'Yes', notes: 'Highly suppressive prohormone. Aggressive PCT mandatory. Liver support critical (NAC + TUDCA recommended).' },
   { compound: 'Epiandro', slug: 'epiandro-epiandrosterone', pct: 'Mini PCT', notes: 'DHT derivative. Mild suppression. Mini PCT or OTC test booster usually sufficient. Get bloodwork to confirm.' },
   { compound: 'Halodrol', slug: 'halodrol', pct: 'Yes', notes: 'Banned. Methylated. If you have legacy supply: full PCT mandatory.' },
   { compound: 'M1T', slug: 'm1t-methyl-1-testosterone', pct: 'Yes', notes: 'Banned. Most suppressive prohormone. Aggressive PCT + extended recovery.' },
@@ -91,6 +89,18 @@ export default function PctGuide() {
         <p className="text-sm text-slate-400">Not every compound needs PCT. Some barely touch the HPTA axis. Some crush it. The compound determines the PCT. The bloodwork confirms it.</p>
       </div>
 
+      {/* PCT Video */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 sm:p-5 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><polygon fill="#fff" points="9.545 15.568 15.818 12 9.545 8.432"/></svg>
+          <span className="text-xs font-bold text-white">PCT Explained</span>
+          <a href="https://youtu.be/1js19YiC7lU" target="_blank" rel="noopener noreferrer" className="ml-auto text-[11px] text-slate-500 hover:text-[#229DD8] transition-colors">Watch on YouTube</a>
+        </div>
+        <div className="aspect-video rounded-lg overflow-hidden border border-white/5">
+          <iframe src="https://www.youtube-nocookie.com/embed/1js19YiC7lU?rel=0&modestbranding=1" title="PCT Explained" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+        </div>
+      </div>
+
       {/* The 5 Categories */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-6 mb-6">
         <h2 className="text-lg font-bold text-white mb-4">The 5 PCT Categories</h2>
@@ -125,7 +135,7 @@ export default function PctGuide() {
         <div className="space-y-2">
           {needsPct.map((c, i) => (
             <div key={i} className="bg-slate-950/50 rounded-lg p-3 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-2">
-              <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors shrink-0 min-w-[160px]">{c.compound}</Link>
+              <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2 shrink-0 min-w-[160px]">{c.compound}</Link>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${c.pct === 'Yes' ? 'text-red-400 bg-red-500/10' : c.pct === 'Mini PCT' ? 'text-amber-400 bg-amber-500/10' : 'text-[#229DD8] bg-[#229DD8]/10'}`}>{c.pct}</span>
               <span className="text-xs text-slate-400 flex-1">{c.notes}</span>
             </div>
@@ -139,7 +149,7 @@ export default function PctGuide() {
         <div className="space-y-2">
           {sarmsNeedsPct.map((c, i) => (
             <div key={i} className="bg-slate-950/50 rounded-lg p-3 border border-white/5 flex flex-col sm:flex-row sm:items-center gap-2">
-              <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors shrink-0 min-w-[160px]">{c.compound}</Link>
+              <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2 shrink-0 min-w-[160px]">{c.compound}</Link>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${c.pct === 'Yes' ? 'text-red-400 bg-red-500/10' : c.pct === 'Mini PCT' ? 'text-amber-400 bg-amber-500/10' : 'text-[#229DD8] bg-[#229DD8]/10'}`}>{c.pct}</span>
               <span className="text-xs text-slate-400 flex-1">{c.notes}</span>
             </div>
@@ -156,7 +166,7 @@ export default function PctGuide() {
             <div key={i} className="flex items-start gap-3">
               <span className="w-5 h-5 rounded-md bg-emerald-500/10 flex items-center justify-center shrink-0 mt-1"><span className="text-emerald-400 text-[10px]">&#10003;</span></span>
               <div>
-                <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors">{c.compound}</Link>
+                <Link to={'/compounds/' + c.slug} className="text-sm font-bold text-[#229DD8] hover:text-white transition-colors underline decoration-[#229DD8]/30 hover:decoration-white/50 underline-offset-2">{c.compound}</Link>
                 <p className="text-xs text-slate-400">{c.notes}</p>
               </div>
             </div>
@@ -223,6 +233,11 @@ export default function PctGuide() {
         </div>
       </div>
 
+            <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-6 mb-6 text-center shadow-lg shadow-amber-500/5">
+        <h3 className="text-lg font-bold text-white mb-2">Get the Full Picture</h3>
+        <p className="text-sm text-slate-400 mb-4">Inner Circle members get unrestricted access to every cycle log, verified bloodwork, and the complete 105+ Compound Encyclopedia.</p>
+        <Link to="/register" className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl px-8 py-3 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">Join Inner Circle | $19/mo</Link>
+      </div>
       <p className="text-[10px] text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
     </div>
   );
