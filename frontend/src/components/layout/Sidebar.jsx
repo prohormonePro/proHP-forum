@@ -73,7 +73,7 @@ export default function Sidebar() {
             >
               <FlaskConical className="w-3.5 h-3.5" />
               <span>Encyclopedia</span>
-              <span className="ml-auto text-[10px] font-mono text-[var(--text-muted)]">52</span>
+              <span className="ml-auto text-[10px] font-mono text-[var(--text-muted)]">105</span>
             </Link>
             <Link
               to="/cycles"
@@ -89,7 +89,7 @@ export default function Sidebar() {
         </div>
 
         <div className="px-2 pt-2 border-t border-[var(--border-subtle)]">
-          <p className="text-[9px] font-mono tracking-wider text-[var(--text-muted)] leading-relaxed">
+          <p className="text-[10px] font-mono tracking-wider text-[var(--text-muted)] leading-relaxed">
             Proof Over Hype.<br />
             The Chain Is Unbroken.<br />
             <span className="text-[var(--prohp-blue)]">E3592DC3</span>
