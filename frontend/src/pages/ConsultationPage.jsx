@@ -170,7 +170,7 @@ export default function ConsultationPage() {
       {/* === PRICING CTA === */}
       <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-6 sm:p-8 mb-6 shadow-lg shadow-amber-500/5">
         <div className="text-center mb-5">
-          <p className="text-sm text-slate-500 uppercase tracking-widest mb-2">Submit Your Data for Protocol Review</p>
+          <p className="text-sm text-slate-500 uppercase tracking-widest mb-2">1-on-1 Consultation with Travis</p>
           <p className="text-4xl font-extrabold text-white">{'$' + price}</p>
           {isIC ? (
             <p className="text-sm text-amber-400 font-medium mt-1">Inner Circle member price. You save $100.</p>
@@ -179,10 +179,10 @@ export default function ConsultationPage() {
           )}
         </div>
 
-        <p className="text-sm text-slate-400 text-center mb-5 max-w-md mx-auto">Complex biological signatures require elite analysis. Your protocol is built from your data, verified by 17 years of direct experience, and delivered as a written document you own forever.</p>
+        <p className="text-sm text-slate-400 text-center mb-5 max-w-md mx-auto">Your stack, your goals, your data. 45 minutes with Travis, plus a written protocol document you own forever.</p>
 
         <button onClick={handleCheckout} disabled={loading} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 mb-3">
-          {loading ? 'Redirecting to checkout...' : 'Book Your Protocol Review | $' + price}
+          {loading ? 'Redirecting to checkout...' : 'Book Your Consultation | $' + price}
         </button>
 
         {!isIC && (
