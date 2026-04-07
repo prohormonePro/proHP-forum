@@ -42,7 +42,7 @@ export default function ConsultationPage() {
             <img src="/images/travis.jpg" alt="Travis Dillard" className="w-full h-full object-cover object-top" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-white">1-on-1 with Travis</h1>
+            <h1 className="text-2xl font-extrabold text-white">1-on-1 Consultation with Travis</h1>
             <p className="text-sm text-slate-400">17 years. 600+ clients. Zero brand deals. Your protocol, built from your data.</p>
           </div>
         </div>
