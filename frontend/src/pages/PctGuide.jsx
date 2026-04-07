@@ -23,11 +23,11 @@ const statusMap = {
 const lineColors = { 'none': '#ef4444', 'otc': '#f59e0b', 'serm': '#10b981' };
 
 const compounds = [
-  { name: 'Andriol', slug: 'andriol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 1-DHEA based. Converts to testosterone. OTC PCT (Arimiplex) typically sufficient. Get bloodwork to confirm.' },
+  { name: 'Hi-Tech Andriol', slug: 'andriol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 1-DHEA based. Converts to testosterone. OTC PCT (Arimiplex) typically sufficient. Get bloodwork to confirm.' },
   { name: 'Hi-Tech Decadurabolin', slug: 'decabolin', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA. Nandrolone precursor. Can linger. OTC PCT recommended. Allow extra recovery time.' },
-  { name: 'Halodrol', slug: 'halodrol', cat: 'Prohormone', pct: 'otc', notes: 'Active prohormone. OTC PCT (Arimiplex) typically sufficient for most users.' },
-  { name: 'Trenabol', slug: 'trenabol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA based. Suppressive. OTC PCT (Arimiplex) sufficient for recovery.' },
-  { name: 'M1T (Methyl-1-Testosterone)', slug: 'm1t-methyl-1-testosterone', cat: 'Prohormone', pct: 'serm', notes: 'Banned. Old school. Most suppressive prohormone ever made. SERM (Enclomiphene) required. Not OTC recoverable.' },
+  { name: 'Hi-Tech Halodrol', slug: 'halodrol', cat: 'Prohormone', pct: 'otc', notes: 'Active prohormone. OTC PCT (Arimiplex) typically sufficient for most users.' },
+  { name: 'Hi-Tech Trenabol', slug: 'trenabol', cat: 'Prohormone', pct: 'otc', notes: 'Hi-Tech 19-NorDHEA based. Suppressive. OTC PCT (Arimiplex) sufficient for recovery.' },
+  { name: 'M1T', slug: 'm1t-methyl-1-testosterone', cat: 'Prohormone', pct: 'serm', notes: 'Methyl-1-Testosterone. Banned. Old school. Most suppressive prohormone ever made. SERM (Enclomiphene) required. Not OTC recoverable.' },
   { name: 'Trenavar', slug: 'trenavar', cat: 'Prohormone', pct: 'serm', notes: 'Converts directly to trenbolone in the body. Extremely suppressive. Aggressive SERM protocol required. Liver support critical. Not recoverable with OTC PCT alone.' },
   { name: 'RAD-140 (Testolone)', slug: 'rad-140-testolone', cat: 'SARM', pct: 'full', notes: 'Most suppressive SARM. Full PCT required. Hi-Tech version is the legal product.' },
   { name: 'LGD-4033 (Ligandrol)', slug: 'lgd-4033-ligandrol', cat: 'SARM', pct: 'full', notes: 'Significant suppression at standard doses. Full PCT required.' },
@@ -427,6 +427,13 @@ export default function PctGuide() {
           <Link to="/r/lab" className="inline-flex items-center justify-center bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 font-medium text-sm rounded-xl px-6 py-3 transition-all border border-white/10">View Cycle Logs</Link>
           <Link to="/consultation" className="inline-flex items-center justify-center bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-medium text-sm rounded-xl px-6 py-3 transition-all border border-amber-500/20">Book Consultation</Link>
         </div>
+      </div>
+
+      {/* Why Peptides Don't Need PCT */}
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
+        <h2 className="text-xl font-bold text-white mb-3">Why Peptides Don't Require PCT</h2>
+        <p className="text-sm text-slate-300 leading-relaxed mb-3">Peptides like <CLink slug="bpc-157">BPC-157</CLink>, <CLink slug="igf-1-lr3">IGF-1 LR3</CLink>, <CLink slug="cjc-1295">CJC-1295</CLink>, and <CLink slug="ipamorelin">Ipamorelin</CLink> operate on the growth hormone (GH) pathway. They stimulate GH release from the pituitary gland or act as growth factors downstream. They do not interact with the androgen receptor and do not suppress the HPTA axis (the hypothalamic-pituitary-testicular feedback loop that controls testosterone production).</p>
+        <p className="text-sm text-slate-300 leading-relaxed">Because testosterone production is never disrupted, there is nothing to recover. No suppression means no PCT. The same applies to non-hormonal compounds like <CLink slug="laxogenin">Laxogenin</CLink>, <CLink slug="turkesterone">Turkesterone</CLink>, and <CLink slug="tongkat-ali">Tongkat Ali</CLink>, which work through entirely different mechanisms (plant steroids, ecdysteroids, or natural test support) without binding the androgen receptor.</p>
       </div>
 
       {/* IC CTA */}
