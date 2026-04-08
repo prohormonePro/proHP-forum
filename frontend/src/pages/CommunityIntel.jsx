@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import useAuthStore from '../stores/auth';
 import { useSearchParams } from 'react-router-dom';
 
 const API = import.meta.env.VITE_API_URL || '';
 
 function CommunityIntel() {
+  const user = useAuthStore((s) => s.user);
+  const isIC = user?.tier === 'inner_circle' || user?.tier === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
   const [comments, setComments] = useState([]);
   const [stats, setStats] = useState(null);
@@ -72,6 +76,95 @@ function CommunityIntel() {
   ];
 
   const totalPages = Math.ceil(total / LIMIT);
+
+  if (!isIC) {
+    return (
+      <div className="max-w-3xl mx-auto animate-fade-in">
+        <div className="mb-6">
+          <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </button>
+        </div>
+
+        {/* Hero */}
+        <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 mb-6 shadow-lg shadow-[#229DD8]/5">
+          <h1 className="text-2xl font-extrabold text-white mb-2">Community Intel</h1>
+          <p className="text-sm text-slate-400 leading-relaxed">Real user reports on 105+ compounds. Side effects, bloodwork markers, cycle outcomes, and stacking data — sourced from verified cycle logs and YouTube discussions across the ProHP community.</p>
+          {stats && (
+            <div className="grid grid-cols-3 gap-2 mt-5">
+              <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+                <div className="text-lg font-extrabold text-white">{stats.total_comments || 0}</div>
+                <div className="text-[10px] text-slate-500 uppercase tracking-widest">Reports</div>
+              </div>
+              <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+                <div className="text-lg font-extrabold text-white">{compounds.length}</div>
+                <div className="text-[10px] text-slate-500 uppercase tracking-widest">Compounds</div>
+              </div>
+              <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+                <div className="text-lg font-extrabold text-white">{stats.total_likes || 0}</div>
+                <div className="text-[10px] text-slate-500 uppercase tracking-widest">Upvotes</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Compound Pills Preview */}
+        {compounds.length > 0 && (
+          <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6">
+            <h2 className="text-xl font-bold text-white mb-3">Tracked Compounds</h2>
+            <div className="flex flex-wrap gap-2">
+              {compounds.slice(0, 15).map((comp, i) => (
+                <span key={i} className="text-xs px-3 py-1.5 rounded-lg bg-slate-950/50 border border-[#229DD8]/10 text-[#229DD8] font-medium">{comp.compound_name || comp.name || comp}</span>
+              ))}
+              {compounds.length > 15 && (
+                <span className="text-xs px-3 py-1.5 rounded-lg bg-slate-950/50 border border-white/5 text-slate-500">+{compounds.length - 15} more</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Blurred Preview */}
+        <div className="relative mb-6">
+          <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 space-y-3 blur-[6px] select-none pointer-events-none" aria-hidden="true">
+            {[1,2,3,4,5].map(i => (
+              <div key={i} className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-slate-800" />
+                  <div className="h-3 w-24 bg-slate-800 rounded" />
+                  <div className="h-3 w-16 bg-slate-800 rounded ml-auto" />
+                </div>
+                <div className="h-3 w-full bg-slate-800/50 rounded mb-1.5" />
+                <div className="h-3 w-3/4 bg-slate-800/50 rounded mb-1.5" />
+                <div className="h-3 w-1/2 bg-slate-800/50 rounded" />
+                <div className="flex gap-2 mt-3">
+                  <div className="h-5 w-16 bg-slate-800/30 rounded" />
+                  <div className="h-5 w-20 bg-slate-800/30 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-slate-950/90 backdrop-blur-xl rounded-2xl border border-amber-500/20 p-6 sm:p-8 text-center max-w-sm shadow-2xl shadow-black/50">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              </div>
+              <h3 className="text-lg font-extrabold text-white mb-2">Inner Circle Access</h3>
+              <p className="text-sm text-slate-400 mb-5">Unlock {stats?.total_comments || 'hundreds of'} real user reports across {compounds.length || '100+'} compounds. Side effects, bloodwork, outcomes, and stacking data from verified community members.</p>
+              <Link to="/register" className="block w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl py-3 transition-all shadow-lg shadow-amber-500/20">
+                Join Inner Circle | $19/mo
+              </Link>
+              <p className="text-xs text-slate-600 mt-3">Cancel anytime. Instant access.</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-xs text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
