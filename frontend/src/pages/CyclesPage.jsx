@@ -94,7 +94,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
           sortedCycles.map((cycle) => { const sc = STATUS_CONFIG[String(cycle.status || 'active').toLowerCase()] || STATUS_CONFIG.active;
             const Icon = sc.icon;
             return ( <Link to={`/cycles/${cycle.id}`} key={cycle.id}
-                className="block rounded-2xl border border-white/5 bg-slate-900/80 backdrop-blur-md hover:border-[#229DD8]/20 hover:bg-slate-800/60 transition-all cursor-pointer overflow-hidden">
+                className="block rounded-2xl border border-white/5 bg-slate-900/80 backdrop-blur-md hover:border-[#229DD8]/20 hover:bg-slate-800/60 transition-all cursor-pointer overflow-visible">
                 <div className="flex">
                   {/* Main content */}
                   <div className="flex-1 p-5 min-w-0">
