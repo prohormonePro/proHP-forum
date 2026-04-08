@@ -16,6 +16,7 @@ export default function UserProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reputation, setReputation] = useState(null);
   const currentUser = useAuthStore((s) => s.user);
   const isOwner = currentUser?.username === username;
   const [editing, setEditing] = useState(false);
@@ -76,6 +77,14 @@ export default function UserProfile() {
 
         const data = await response.json();
         setProfile(data);
+        // Fetch reputation
+        try {
+          const repRes = await fetch('/api/users/reputation/' + username);
+          if (repRes.ok) {
+            const repData = await repRes.json();
+            setReputation(repData);
+          }
+        } catch (e) { console.error('Rep fetch:', e); }
       } catch (err) {
         console.error('Profile fetch error:', err);
         setError('Failed to load user profile');
@@ -228,6 +237,41 @@ export default function UserProfile() {
           </div>
         )}
       </div>
+
+      {/* Reputation */}
+      {reputation && (
+        <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-white">Reputation</h2>
+            <span className={`text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider ${
+              reputation.rep_tier === 'elite' ? 'bg-amber-500/15 border border-amber-500/30 text-amber-400' :
+              reputation.rep_tier === 'verified' ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' :
+              reputation.rep_tier === 'contributor' ? 'bg-[#229DD8]/15 border border-[#229DD8]/30 text-[#229DD8]' :
+              'bg-slate-800 border border-white/5 text-slate-400'
+            }`}>{reputation.rep_tier}</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+              <div className="text-lg font-extrabold text-white">{reputation.cycle_count}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Cycles</div>
+            </div>
+            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+              <div className="text-lg font-extrabold text-white">{reputation.comment_count}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Comments</div>
+            </div>
+            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+              <div className="text-lg font-extrabold text-[#229DD8]">{reputation.total_likes}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Upvotes</div>
+            </div>
+          </div>
+          {(reputation.computed_age || reputation.computed_years_lifting) && (
+            <div className="flex flex-wrap gap-2 mt-3 justify-center">
+              {reputation.computed_age && <span className="text-xs font-medium text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-white/5">Age: {reputation.computed_age}</span>}
+              {reputation.computed_years_lifting && <span className="text-xs font-medium text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-white/5">{reputation.computed_years_lifting} Yrs Lifting</span>}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Community Intel CTA — compact, full-width below header */}
       <Link

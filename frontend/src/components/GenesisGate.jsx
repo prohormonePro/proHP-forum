@@ -5,7 +5,9 @@ import useAuthStore from '../stores/auth';
 export default function GenesisGate({ onComplete }) {
   const user = useAuthStore((s) => s.user);
   const [age, setAge] = useState('');
+  const [birthday, setBirthday] = useState('');
   const [yearsLifting, setYearsLifting] = useState('');
+  const [liftingSince, setLiftingSince] = useState('');
   const [trtHrt, setTrtHrt] = useState(false);
   const [trtCompound, setTrtCompound] = useState('');
   const [trtDose, setTrtDose] = useState('');
@@ -27,6 +29,8 @@ export default function GenesisGate({ onComplete }) {
         body: JSON.stringify({
           age: parseInt(age),
           years_lifting: yearsLifting ? parseInt(yearsLifting) : null,
+          date_of_birth: birthday || null,
+          lifting_since: liftingSince ? parseInt(liftingSince) : (yearsLifting ? new Date().getFullYear() - parseInt(yearsLifting) : null),
           trt_hrt: trtHrt,
           trt_compound: trtHrt ? trtCompound : null,
           trt_dose: trtHrt ? trtDose : null,
