@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import useAuthStore from '../stores/auth';
 import { useParams, Link } from 'react-router-dom';
 import BackButton from '../components/layout/BackButton';
 import './UserProfile.css';
@@ -15,6 +16,48 @@ export default function UserProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const currentUser = useAuthStore((s) => s.user);
+  const isOwner = currentUser?.username === username;
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ age: '', years_lifting: '', trt_hrt: false, trt_compound: '', trt_dose: '' });
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = () => {
+    setEditForm({
+      age: user?.age || '',
+      years_lifting: user?.years_lifting || '',
+      trt_hrt: user?.trt_hrt || false,
+      trt_compound: user?.trt_compound || '',
+      trt_dose: user?.trt_dose || '',
+    });
+    setEditing(true);
+  };
+
+  const saveProfile = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('prohp_at');
+      const res = await fetch('/api/users/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({
+          age: editForm.age ? parseInt(editForm.age) : null,
+          years_lifting: editForm.years_lifting ? parseInt(editForm.years_lifting) : null,
+          trt_hrt: editForm.trt_hrt,
+          trt_compound: editForm.trt_compound || null,
+          trt_dose: editForm.trt_dose || null,
+        }),
+      });
+      if (res.ok) {
+        setProfile(prev => ({
+          ...prev,
+          user: { ...prev.user, ...editForm, age: editForm.age ? parseInt(editForm.age) : null, years_lifting: editForm.years_lifting ? parseInt(editForm.years_lifting) : null }
+        }));
+        setEditing(false);
+      }
+    } catch (e) { console.error(e); }
+    setSaving(false);
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -96,6 +139,9 @@ export default function UserProfile() {
       <div className="bg-slate-900 rounded-lg p-6 mb-4 text-center">
         <div className="flex items-center justify-center gap-3 mb-2 flex-wrap">
           <h1 className="text-3xl font-bold text-slate-200">{user.username}</h1>
+          {isOwner && !editing && (
+            <button onClick={startEdit} className="text-xs px-2.5 py-1 rounded-lg bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8] hover:bg-[#229DD8]/20 transition-all">Edit Profile</button>
+          )}
           <span className={`tier-badge tier-${user.tier}`}>
             {TIER_NAMES[user.tier] || user.tier}
           </span>
@@ -131,6 +177,56 @@ export default function UserProfile() {
         <p style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '0.35rem' }}>
           We search for proof, above the hype.
         </p>
+
+        {editing && (
+          <div className="mt-4 pt-4 border-t border-white/5 text-left">
+            <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">Age</label>
+                <input type="number" value={editForm.age} onChange={e => setEditForm(p => ({...p, age: e.target.value}))}
+                  className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-2 px-3 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all" />
+              </div>
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">Years Lifting</label>
+                <input type="number" value={editForm.years_lifting} onChange={e => setEditForm(p => ({...p, years_lifting: e.target.value}))}
+                  className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-2 px-3 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all" />
+              </div>
+              <div className="col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={editForm.trt_hrt} onChange={e => setEditForm(p => ({...p, trt_hrt: e.target.checked}))}
+                    className="rounded border-slate-600 bg-slate-800 text-[#229DD8] focus:ring-[#229DD8]" />
+                  <span className="text-sm text-slate-300">On TRT / HRT</span>
+                </label>
+              </div>
+              {editForm.trt_hrt && (
+                <>
+                  <div>
+                    <label className="text-xs text-slate-500 mb-1 block">TRT Compound</label>
+                    <input type="text" value={editForm.trt_compound} onChange={e => setEditForm(p => ({...p, trt_compound: e.target.value}))}
+                      placeholder="Test Cyp" maxLength={40}
+                      className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-2 px-3 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-500 mb-1 block">TRT Dose</label>
+                    <input type="text" value={editForm.trt_dose} onChange={e => setEditForm(p => ({...p, trt_dose: e.target.value}))}
+                      placeholder="200mg/wk" maxLength={30}
+                      className="w-full rounded-lg border border-slate-700/50 bg-slate-950/50 py-2 px-3 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all" />
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <button onClick={saveProfile} disabled={saving}
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-[#229DD8] to-[#1a7fb0] text-white font-semibold text-sm hover:shadow-lg hover:shadow-[#229DD8]/20 transition-all disabled:opacity-50">
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button onClick={() => setEditing(false)}
+                className="px-5 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm hover:text-white transition-all">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Community Intel CTA — compact, full-width below header */}
