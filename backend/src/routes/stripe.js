@@ -118,4 +118,40 @@ router.post('/create-lead-checkout', async (req, res) => {
   }
 });
 
+
+// Consultation checkout
+router.post('/create-consultation-checkout', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user = userResult.rows[0];
+    const isIC = user.tier === 'inner_circle' || user.tier === 'admin';
+    const priceId = isIC
+      ? (process.env.STRIPE_CONSULTATION_IC_PRICE_ID || process.env.STRIPE_CONSULTATION_PRICE_ID)
+      : process.env.STRIPE_CONSULTATION_PRICE_ID;
+
+    if (!priceId) {
+      console.error('No consultation price ID configured');
+      return res.status(500).json({ error: 'Consultation checkout not configured' });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer_email: user.email,
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: 'payment',
+      success_url: process.env.FRONTEND_URL + '/?consultation=success',
+      cancel_url: process.env.FRONTEND_URL + '/consultation',
+      metadata: { user_id: userId, type: 'consultation', tier: isIC ? 'inner_circle' : 'free' },
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('Consultation checkout error:', err);
+    res.status(500).json({ error: 'Failed to create checkout session' });
+  }
+});
+
 module.exports = router;

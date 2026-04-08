@@ -14,9 +14,10 @@ export default function ConsultationPage() {
   async function handleCheckout() {
     setLoading(true);
     try {
+      const token = localStorage.getItem('prohp_at');
       const res = await fetch(API + '/api/stripe/create-consultation-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) },
         body: JSON.stringify({ tier: isIC ? 'inner_circle' : 'free' }),
       });
       const data = await res.json();
