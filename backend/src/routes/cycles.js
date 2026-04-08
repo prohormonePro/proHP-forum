@@ -20,7 +20,7 @@ router.get('/', optionalAuth, async (req, res) => {
        
       comp.product_image_url AS compound_image, comp.company AS compound_company,
       FROM cycle_logs cl
-      LEFT JOIN compounds comp ON (comp.id = cl.compound_id OR (cl.compound_id IS NULL AND comp.slug = LOWER(REPLACE(REPLACE(cl.compound_name, ' ', '-'), 'Hi-Tech ', ''))))
+      LEFT JOIN compounds comp ON (comp.id = cl.compound_id OR (cl.compound_id IS NULL AND comp.slug = LOWER(REPLACE(REPLACE(cl.compound_name, 'Hi-Tech ', ''), ' ', '-'))))
                JOIN users u ON u.id = cl.user_id
                WHERE cl.is_public = true`;
     const params = [];
