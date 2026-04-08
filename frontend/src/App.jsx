@@ -48,7 +48,7 @@ export default function App() {
       <ScrollToTop />
       <div className="flex max-w-7xl mx-auto">
         <Sidebar />
-        <main className="flex-1 pb-20 lg:pb-0 min-w-0 px-4 py-6 lg:px-8">
+        <main className="flex-1 pb-24 lg:pb-0 min-w-0 px-4 py-6 lg:px-8">
           <Routes>
             <Route path="/create-thread" element={<CreateThread />} />
             <Route path="/grep" element={<GrepGate />} />
