@@ -468,8 +468,17 @@ export default function CycleLogDetail() {
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
-            <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
+            <div className="flex items-start gap-4">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
+                <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
+              </div>
+              {cycle.compound_image && (
+                <div className="shrink-0 w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-white/10 bg-slate-950/50 shadow-lg shadow-black/20">
+                  <img src={cycle.compound_image} alt={cycle.compound_name} className="w-full h-full object-contain p-1" onError={(e) => { e.target.style.display = 'none'; }} />
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <span className="text-[#229DD8] font-semibold truncate max-w-[150px] sm:max-w-[200px] inline-block align-bottom">{cycle.username}</span>
               {cycle.is_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
