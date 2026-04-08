@@ -146,7 +146,7 @@ export default function ConsultationPage() {
               <span className="text-slate-400">{v}</span>
             </div>
           ))}
-          <p className="text-slate-600 italic mt-3 text-xs">// Full document: 2-3 pages. Dosing, timing, monitoring, exit strategy.</p>
+          <p className="text-slate-400 italic mt-3 text-xs">// Full document: 2-3 pages. Dosing, timing, monitoring, exit strategy.</p>
         </div>
       </div>
 
@@ -192,7 +192,7 @@ export default function ConsultationPage() {
           </Link>
         )}
 
-        <p className="text-xs text-slate-500 text-center mt-3">Secure checkout powered by Stripe. Scheduling details sent immediately after payment.</p>
+        <p className="text-xs text-slate-400 text-center mt-3">Secure checkout powered by Stripe. Scheduling details sent immediately after payment.</p>
       </div>
 
       {/* === WHY TRAVIS === */}
