@@ -92,7 +92,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <p className="text-[10px] text-slate-600 mt-8 text-center">
+        <p className="text-[10px] text-slate-500 mt-8 text-center">
           Proof over hype. The chain is unbroken.
         </p>
       </div>

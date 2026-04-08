@@ -94,7 +94,7 @@ export default function RegisterPage() {
 
         <p className="text-xs text-slate-500 text-center mt-5 mb-3">Secure checkout powered by Stripe. Cancel anytime.</p>
         <p className="text-xs text-slate-500 text-center">Already a member? <Link to="/login" className="text-[#229DD8] hover:text-white font-medium transition-colors">Log in</Link></p>
-        <p className="text-[10px] text-slate-600 mt-8 text-center">Skepticism without data is fear. Skepticism with data is power.</p>
+        <p className="text-[10px] text-slate-500 mt-8 text-center">Skepticism without data is fear. Skepticism with data is power.</p>
       </div>
     </div>
   );
