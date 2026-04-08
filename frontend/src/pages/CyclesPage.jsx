@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Dumbbell, Activity, CheckCircle, XCircle, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
 import { api } from '../hooks/api';
@@ -23,7 +23,8 @@ function ratingBg(r) { if (r == null) return 'bg-slate-500/10';
   return 'bg-red-500/10';
 }
 
-export default function CyclesPage() { const [showForm, setShowForm] = useState(false);
+export default function CyclesPage() { const [searchParams] = useSearchParams();
+  const [showForm, setShowForm] = useState(searchParams.get('new') === '1');
   const userTier = useAuthStore((x) => x.user?.tier);
   const isInner = userTier === 'inner_circle' || userTier === 'admin';
 

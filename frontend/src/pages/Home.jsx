@@ -74,7 +74,7 @@ export default function Home() {
       {/* Mobile Quick Links (lg has sidebar) */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 lg:hidden scrollbar-hide">
         {isInnerCircle ? (
-          <Link to="/cycles/new" className="shrink-0 flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-amber-500/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:border-amber-500/40 transition-all shadow-[0_2px_12px_rgba(245,158,11,0.08)]">
+          <Link to="/cycles?new=1" className="shrink-0 flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-amber-500/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:border-amber-500/40 transition-all shadow-[0_2px_12px_rgba(245,158,11,0.08)]">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             Log Your Cycle
           </Link>
