@@ -22,6 +22,7 @@ function timeAgo(dateStr) {
 
 export default function Home() {
   const user = useAuthStore((s) => s.user);
+  const isInnerCircle = user?.tier === 'inner_circle' || user?.tier === 'admin';
   const userLevel = TIER_LEVELS[user?.tier || 'free'] ?? 0;
 
   const { data } = useQuery({
