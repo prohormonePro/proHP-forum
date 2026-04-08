@@ -17,9 +17,7 @@ router.get('/', optionalAuth, async (req, res) => {
                       cl.is_featured, cl.created_at,
                       u.username, u.display_name, u.tier AS user_tier, u.is_founding,
              (SELECT count(*)::int FROM posts p2 WHERE p2.thread_id = cl.thread_id) as comment_count
-       
-      comp.product_image_url AS compound_image, comp.company AS compound_company,
-      FROM cycle_logs cl
+               FROM cycle_logs cl
       LEFT JOIN compounds comp ON (comp.id = cl.compound_id OR (cl.compound_id IS NULL AND comp.slug = LOWER(REPLACE(REPLACE(cl.compound_name, 'Hi-Tech ', ''), ' ', '-'))))
                JOIN users u ON u.id = cl.user_id
                WHERE cl.is_public = true`;
