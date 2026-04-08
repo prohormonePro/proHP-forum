@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import useAuthStore from '../stores/auth';
 import { useParams, Link } from 'react-router-dom';
 import BackButton from '../components/layout/BackButton';
-import './UserProfile.css';
+// CSS replaced by Tailwind glassmorphism
 
 const TIER_NAMES = {
   free: 'Free',
@@ -100,7 +100,7 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="profile-container">
+      <div className="max-w-3xl mx-auto animate-fade-in">
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-prohp-500"></div>
         </div>
@@ -110,7 +110,7 @@ export default function UserProfile() {
 
   if (error) {
     return (
-      <div className="profile-container">
+      <div className="max-w-3xl mx-auto animate-fade-in">
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-slate-200 mb-4">{error}</h2>
           <Link
@@ -141,19 +141,21 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="profile-container">
+    <div className="max-w-3xl mx-auto animate-fade-in">
       <BackButton fallback="/" />
 
       {/* Profile Header — username + badge centered */}
-      <div className="bg-slate-900 rounded-lg p-6 mb-4 text-center">
+      <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 mb-4 text-center shadow-lg shadow-[#229DD8]/5">
         <div className="flex items-center justify-center gap-3 mb-2 flex-wrap">
           <h1 className="text-3xl font-bold text-slate-200">{user.username}</h1>
           {isOwner && !editing && (
             <button onClick={startEdit} className="text-xs px-2.5 py-1 rounded-lg bg-[#229DD8]/10 border border-[#229DD8]/20 text-[#229DD8] hover:bg-[#229DD8]/20 transition-all">Edit Profile</button>
           )}
-          <span className={`tier-badge tier-${user.tier}`}>
-            {TIER_NAMES[user.tier] || user.tier}
-          </span>
+          <span className={`text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider ${
+            user.tier === 'admin' ? 'bg-red-500/15 border border-red-500/30 text-red-400' :
+            user.tier === 'inner_circle' ? 'bg-amber-500/15 border border-amber-500/30 text-amber-400' :
+            'bg-slate-800 border border-white/5 text-slate-400'
+          }`}>{TIER_NAMES[user.tier] || user.tier}</span>
         </div>
         {(new Date(user.created_at) < new Date("2026-04-01")) && (
           <span
@@ -240,17 +242,17 @@ export default function UserProfile() {
 
       {/* Reputation */}
       {reputation && (
-        <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-slate-900/60 backdrop-blur-xl rounded-xl border border-white/10 p-5 mb-4 shadow-lg shadow-black/20">
+          <div className="flex items-center gap-3 mb-4">
             <h2 className="text-lg font-bold text-white">Reputation</h2>
-            <span className={`text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider ${
+            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider ${
               reputation.rep_tier === 'elite' ? 'bg-amber-500/15 border border-amber-500/30 text-amber-400' :
               reputation.rep_tier === 'verified' ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' :
               reputation.rep_tier === 'contributor' ? 'bg-[#229DD8]/15 border border-[#229DD8]/30 text-[#229DD8]' :
               'bg-slate-800 border border-white/5 text-slate-400'
             }`}>{reputation.rep_tier}</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 mt-1">
             <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
               <div className="text-lg font-extrabold text-white">{reputation.cycle_count}</div>
               <div className="text-[10px] text-slate-500 uppercase tracking-widest">Cycles</div>
@@ -264,29 +266,18 @@ export default function UserProfile() {
               <div className="text-[10px] text-slate-500 uppercase tracking-widest">Upvotes</div>
             </div>
           </div>
-          {(reputation.computed_age || reputation.computed_years_lifting) && (
-            <div className="flex flex-wrap gap-2 mt-3 justify-center">
-              {reputation.computed_age && <span className="text-xs font-medium text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-white/5">Age: {reputation.computed_age}</span>}
-              {reputation.computed_years_lifting && <span className="text-xs font-medium text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-white/5">{reputation.computed_years_lifting} Yrs Lifting</span>}
-            </div>
-          )}
+
         </div>
       )}
 
       {/* Community Intel CTA — compact, full-width below header */}
-      <Link
-        to="/community-intel"
-        className="prohp-card block mb-6 no-underline"
-        style={{ padding: '0.75rem 1rem', textDecoration: 'none', borderColor: 'rgba(34,157,216,.2)', transition: 'border-color 0.2s' }}
-      >
+      <Link to="/community-intel" className="block mb-4 bg-slate-900/60 backdrop-blur-xl rounded-xl border border-[#229DD8]/15 p-4 hover:border-[#229DD8]/30 transition-all shadow-sm hover:shadow-[#229DD8]/10" style={{ textDecoration: 'none' }}>
         <div className="flex items-center justify-between gap-3">
-          <div style={{ minWidth: 0 }}>
-            <div style={{ color: '#229DD8', fontSize: '0.85rem', fontWeight: 600 }}>Community Intel</div>
-            <div className="text-slate-500 text-xs" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Real user reports &amp; dosage data from 12,500+ YouTube comments
-            </div>
+          <div>
+            <p className="text-sm font-semibold text-[#229DD8]">Community Intel</p>
+            <p className="text-xs text-slate-500">Real user reports and dosage data from 1,034+ data points</p>
           </div>
-          <div style={{ color: '#229DD8', fontSize: '1.1rem', flexShrink: 0 }}>&#8594;</div>
+          <span className="text-[#229DD8] text-lg shrink-0">&#8594;</span>
         </div>
       </Link>
 
@@ -294,11 +285,11 @@ export default function UserProfile() {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Recent Threads */}
         <div className="activity-section">
-          <h2 className="text-xl font-bold text-slate-200 mb-4">Recent Threads</h2>
+          <h2 className="text-lg font-bold text-white mb-3">Recent Threads</h2>
           {recentActivity.threads.length > 0 ? (
             <div className="space-y-3">
               {recentActivity.threads.map((thread) => (
-                <div key={thread.id} className="bg-slate-900 rounded-lg p-4">
+                <div key={thread.id} className="bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/5 p-4">
                   <Link
                     to={`/t/${thread.id}`}
                     className="text-prohp-400 hover:text-prohp-300 font-medium block mb-2"
@@ -318,11 +309,11 @@ export default function UserProfile() {
 
         {/* Recent Posts */}
         <div className="activity-section">
-          <h2 className="text-xl font-bold text-slate-200 mb-4">Recent Posts</h2>
+          <h2 className="text-lg font-bold text-white mb-3">Recent Posts</h2>
           {recentActivity.posts.length > 0 ? (
             <div className="space-y-3">
               {recentActivity.posts.map((post) => (
-                <div key={post.id} className="bg-slate-900 rounded-lg p-4">
+                <div key={post.id} className="bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/5 p-4">
                   <p className="text-slate-300 mb-2">
                     {truncateText(post.body)}
                   </p>
@@ -345,6 +336,7 @@ export default function UserProfile() {
           )}
         </div>
       </div>
+      <p className="text-xs text-slate-600 text-center mt-6 mb-4">Skepticism without data is fear. Skepticism with data is power.</p>
     </div>
   );
 }
