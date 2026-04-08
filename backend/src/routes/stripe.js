@@ -120,15 +120,27 @@ router.post('/create-lead-checkout', async (req, res) => {
 
 
 // Consultation checkout
-router.post('/create-consultation-checkout', authenticate, async (req, res) => {
+router.post('/create-consultation-checkout', async (req, res) => {
   try {
-    const userId = req.user.id;
-    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
-    if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+    // Try to get user from auth token (optional)
+    let user = null;
+    let isIC = false;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [decoded.sub || decoded.id]);
+        if (userResult.rows.length > 0) {
+          user = userResult.rows[0];
+          isIC = user.tier === 'inner_circle' || user.tier === 'admin';
+        }
+      } catch (e) { /* token invalid/expired, proceed as free */ }
     }
-    const user = userResult.rows[0];
-    const isIC = user.tier === 'inner_circle' || user.tier === 'admin';
+    // Also check request body tier hint
+    if (!isIC && req.body && req.body.tier === 'inner_circle') {
+      isIC = false; // Don't trust client claim without valid token
+    }
     const priceId = isIC
       ? (process.env.STRIPE_CONSULTATION_IC_PRICE_ID || process.env.STRIPE_CONSULTATION_PRICE_ID)
       : process.env.STRIPE_CONSULTATION_PRICE_ID;
@@ -139,12 +151,12 @@ router.post('/create-consultation-checkout', authenticate, async (req, res) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      customer_email: user.email,
+      ...(user ? { customer_email: user.email } : {}),
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'payment',
       success_url: process.env.FRONTEND_URL + '/?consultation=success',
       cancel_url: process.env.FRONTEND_URL + '/consultation',
-      metadata: { user_id: userId, type: 'consultation', tier: isIC ? 'inner_circle' : 'free' },
+      metadata: { user_id: user ? user.id : 'anonymous', type: 'consultation', tier: isIC ? 'inner_circle' : 'free' },
     });
 
     res.json({ url: session.url });
