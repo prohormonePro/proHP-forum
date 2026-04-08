@@ -95,8 +95,10 @@ router.get('/:id', optionalAuth, async (req, res) => {
     const { id } = req.params;
 
     const cycleResult = await query(
-      `SELECT cl.*, u.username, u.display_name, u.tier AS user_tier, u.avatar_url, u.is_founding, u.age, u.years_lifting, u.trt_hrt, u.trt_compound, u.trt_dose
+      `SELECT cl.*, u.username, u.display_name, u.tier AS user_tier, u.avatar_url, u.is_founding, u.age, u.years_lifting, u.trt_hrt, u.trt_compound, u.trt_dose,
+       comp.product_image_url AS compound_image, comp.company AS compound_company
        FROM cycle_logs cl JOIN users u ON u.id = cl.user_id
+       LEFT JOIN compounds comp ON (comp.id = cl.compound_id OR (cl.compound_id IS NULL AND comp.slug = LOWER(REPLACE(REPLACE(cl.compound_name, 'Hi-Tech ', ''), ' ', '-'))))
        WHERE cl.id = $1 AND (cl.is_public = true OR cl.user_id = $2)`,
       [id, req.user?.id || '00000000-0000-0000-0000-000000000000']
     );
