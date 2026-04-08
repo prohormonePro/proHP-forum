@@ -81,7 +81,7 @@ router.get('/:username', async (req, res) => {
 // GET /reputation/:username
 router.get('/reputation/:username', async (req, res) => {
   try {
-    const result = await pool.query(
+    const result = await query(
       `SELECT ur.*, 
         CASE WHEN u.date_of_birth IS NOT NULL 
           THEN EXTRACT(YEAR FROM AGE(u.date_of_birth))::int 
