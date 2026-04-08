@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import useAuthStore from './stores/auth';
 import GenesisGate from './components/GenesisGate';
+import MobileNav from './components/layout/MobileNav';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Home from './pages/Home';
@@ -68,6 +69,7 @@ export default function App() {
             <Route path="/consultation" element={<ConsultationPage />} />
             <Route path="/pct" element={<PctGuide />} />
           </Routes>
+          <MobileNav />
         </main>
       </div>
     </div>
