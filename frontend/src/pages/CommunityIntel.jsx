@@ -75,6 +75,7 @@ function CommunityIntel() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="mb-4"><button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>Back</button></div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2" style={{color:'#229DD8'}}>
           Community Intelligence
