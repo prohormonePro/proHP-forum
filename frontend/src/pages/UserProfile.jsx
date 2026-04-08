@@ -253,17 +253,17 @@ export default function UserProfile() {
             }`}>{reputation.rep_tier}</span>
           </div>
           <div className="grid grid-cols-3 gap-2 mt-1">
-            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/8">
               <div className="text-lg font-extrabold text-white">{reputation.cycle_count}</div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Cycles</div>
+              <div className="text-[11px] text-slate-400 uppercase tracking-widest font-medium">Cycles</div>
             </div>
-            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/8">
               <div className="text-lg font-extrabold text-white">{reputation.comment_count}</div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Comments</div>
+              <div className="text-[11px] text-slate-400 uppercase tracking-widest font-medium">Comments</div>
             </div>
-            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/5">
+            <div className="text-center bg-slate-950/50 rounded-lg py-2.5 border border-white/8">
               <div className="text-lg font-extrabold text-[#229DD8]">{reputation.total_likes}</div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Upvotes</div>
+              <div className="text-[11px] text-slate-400 uppercase tracking-widest font-medium">Upvotes</div>
             </div>
           </div>
 
