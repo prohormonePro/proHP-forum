@@ -72,15 +72,15 @@ export default function Home() {
 
       {/* Mobile Quick Links (lg has sidebar) */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 lg:hidden scrollbar-hide">
-        <Link to="/cycles" className="shrink-0 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md border border-amber-500/15 rounded-xl px-4 py-2.5 text-sm font-medium text-amber-400 hover:bg-amber-500/10 transition-all shadow-sm">
+        <Link to="/cycles" className="shrink-0 flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-amber-500/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:border-amber-500/40 transition-all shadow-[0_2px_12px_rgba(245,158,11,0.08)]">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
           Cycle Logs
         </Link>
-        <Link to="/community-intel" className="shrink-0 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md border border-[#229DD8]/15 rounded-xl px-4 py-2.5 text-sm font-medium text-[#229DD8] hover:bg-[#229DD8]/10 transition-all shadow-sm">
+        <Link to="/community-intel" className="shrink-0 flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-[#229DD8]/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-[#229DD8] hover:bg-[#229DD8]/15 hover:border-[#229DD8]/40 transition-all shadow-[0_2px_12px_rgba(34,157,216,0.08)]">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
           Community Intel
         </Link>
-        <Link to="/consultation" className="shrink-0 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md border border-emerald-500/15 rounded-xl px-4 py-2.5 text-sm font-medium text-emerald-400 hover:bg-emerald-500/10 transition-all shadow-sm">
+        <Link to="/consultation" className="shrink-0 flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-emerald-500/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-emerald-400 hover:bg-emerald-500/15 hover:border-emerald-500/40 transition-all shadow-[0_2px_12px_rgba(16,185,129,0.08)]">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
           Consultation
         </Link>
