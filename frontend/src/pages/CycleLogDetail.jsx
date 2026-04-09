@@ -470,27 +470,13 @@ export default function CycleLogDetail() {
                 <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
               </div>
               {cycle.compound_name && (
-                <div className="shrink-0 relative flex justify-center" style={{ width: '160px' }}>
-                  <div className="absolute" style={{ width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} alt={cycle.compound_name} className="relative z-10" style={{ height: '180px', width: 'auto', maxWidth: '160px', objectFit: 'contain', filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.25))' }} onError={(e) => { e.target.closest('.relative.flex').style.display = 'none'; }} />
-                  <div className="absolute z-[5]" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)', width: '70%', height: '6px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
+                <div className="shrink-0 relative flex justify-center items-center" style={{ width: '140px', marginTop: '-8px', paddingBottom: '8px' }}>
+                  <div className="absolute" style={{ width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -55%)', zIndex: 0, pointerEvents: 'none' }} />
+                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '150px', width: 'auto', maxWidth: '130px', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.4))' }} />
+                  <div className="absolute z-[5]" style={{ bottom: '8px', left: '50%', transform: 'translateX(-50%)', width: '70%', height: '8px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="text-[#229DD8] font-semibold truncate max-w-[150px] sm:max-w-[200px] inline-block align-bottom">{cycle.username}</span>
-              {cycle.is_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
-              <span className="w-1 h-1 rounded-full bg-slate-600" />
-              <span className="text-slate-400">{new Date(cycle.created_at).toLocaleDateString()}</span>
-              {threadData?.thread?.view_count > 0 && (<><span className="w-1 h-1 rounded-full bg-slate-600" /><span className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>{threadData.thread.view_count.toLocaleString()} Tracking</span></>)}
-            </div>
-            {(cycle.age || cycle.trt_hrt) && (
-              <div className="flex flex-wrap items-center gap-2 mt-2">
-                {cycle.age && <span className="text-[10px] font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md">{cycle.age} yrs old</span>}
-                {cycle.years_lifting && <span className="text-[10px] font-bold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md">{cycle.years_lifting} yrs lifting</span>}
-                {cycle.trt_hrt && <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">{cycle.trt_compound ? cycle.trt_compound : 'TRT'}{cycle.trt_dose ? ' · ' + cycle.trt_dose : ''}</span>}
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-3 self-start shrink-0">
             {cycle.would_run_again != null && (
