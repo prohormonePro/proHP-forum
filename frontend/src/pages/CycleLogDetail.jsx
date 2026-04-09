@@ -390,7 +390,7 @@ export default function CycleLogDetail() {
   if (error || !data?.cycle) {
     return (
       <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
-        <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
+        <button onClick={() => { if (isPublicView) { window.location.href = "/cycles"; } else { window.history.back(); } }} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
         <div className="prohp-card p-10 text-center border border-white/5">
@@ -436,10 +436,17 @@ export default function CycleLogDetail() {
   return (
     <div className="max-w-3xl mx-auto animate-fade-in px-3 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
       <div className="flex items-center justify-between mb-6">
-        <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition">
+        <button onClick={() => { if (isPublicView) { window.location.href = "/cycles"; } else { window.history.back(); } }} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
         <button onClick={() => setShowHandoffGuide(true)} className="flex items-center gap-2 text-[11px] text-slate-400 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/10 border border-slate-700/30 hover:border-[#229DD8]/20 rounded-lg px-3 py-1.5 transition-all"><Activity className="w-3.5 h-3.5" /><span>AI Handoff</span></button>
+            {showOwnerControls && (
+              <a href={'/cycles/' + cycle.id + '?pub=1'} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-[#229DD8]/5 border border-slate-700/30 hover:border-[#229DD8]/20 rounded-lg px-3 py-1.5 transition-all">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                <span>Public View</span>
+              </a>
+            )}
         {showHandoffGuide && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{zIndex: 99999}} onClick={() => setShowHandoffGuide(false)}>
             <div className="bg-slate-900 border border-[#229DD8]/20 rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -464,25 +471,18 @@ export default function CycleLogDetail() {
 
 
 
-      {/* Owner: View Public Log */}
-      {isOwner && !new URLSearchParams(window.location.search).has('pub') && (
-        <a href={'/cycles/' + cycle.id + '?pub=1'} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all mb-4">
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-          View as Public
-        </a>
-      )}
+
 
       {/* Protocol Header */}
-      <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full">
+      <div className={`bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full ${isPublicView ? "border-cyan-500/20 shadow-[0_0_15px_rgba(34,157,216,0.06)]" : "border-white/10"}`}>
         {/* Hero: Bottle + Title + Rating */}
         <div className="flex flex-col sm:flex-row gap-5 mb-5">
           {/* Bottle - centered on mobile, left on desktop */}
           {cycle.compound_name && (
-            <div className="shrink-0 relative flex justify-center items-center mx-auto sm:mx-0" style={{ width: '200px', minHeight: '220px' }}>
-              <div className="absolute" style={{ width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(14,165,233,0.12) 0%, rgba(14,165,233,0.03) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-              <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '220px', width: 'auto', maxWidth: '190px', objectFit: 'contain', filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.25))' }} />
-              <div className="absolute z-[5]" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)', width: '70%', height: '10px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
+            <div className="shrink-0 relative flex justify-center items-center mx-auto sm:mx-0" style={{ width: '260px', minHeight: '280px' }}>
+              <div className="absolute" style={{ width: '380px', height: '380px', background: 'radial-gradient(circle, rgba(14,165,233,0.12) 0%, rgba(14,165,233,0.03) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+              <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '280px', width: 'auto', maxWidth: '240px', objectFit: 'contain', filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.25))' }} />
+              <div className="absolute z-[5]" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)', width: '60%', height: '12px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
             </div>
           )}
           {/* Title + Meta */}
