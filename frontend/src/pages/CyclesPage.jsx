@@ -24,6 +24,7 @@ function ratingBg(r) { if (r == null) return 'bg-slate-500/10';
 }
 
 export default function CyclesPage() { const [searchParams] = useSearchParams();
+  const hasCycles = (data?.cycles || []).length > 0;
   const [showForm, setShowForm] = useState(searchParams.get('new') === '1');
   const userTier = useAuthStore((x) => x.user?.tier);
   const isInner = userTier === 'inner_circle' || userTier === 'admin';
@@ -67,13 +68,13 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
       </div>
       <p className="text-sm text-slate-400 mb-6">Log your cycle. Share your data. Help the next guy.</p>
 
-      {!showForm && ( <button onClick={() => setShowForm(true)}
+      {!showForm && hasCycles && ( <button onClick={() => setShowForm(true)}
           className="mb-8 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#229DD8] to-[#1b87bc] px-6 py-3 text-sm font-bold text-white hover:from-[#1b87bc] hover:to-[#166e9c] transition-all shadow-lg hover:shadow-[#229DD8]/20">
           + Log Your Cycle
         </button>
       )}
 
-      {showForm && ( <div className="mb-8 animate-fade-in">
+      {(showForm || !hasCycles) && ( <div className="mb-8 animate-fade-in">
           <CycleLogForm onSuccess={() => setShowForm(false)} />
         </div>
       )}
