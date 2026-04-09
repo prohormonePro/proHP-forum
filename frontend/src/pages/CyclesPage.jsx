@@ -34,7 +34,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
   });
 
   if (!isInner) { return (
-      <div className="max-w-3xl mx-auto animate-fade-in pb-24">
+      <div className="max-w-3xl mx-auto animate-fade-in">
         <div className="mb-4"><button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>Back</button></div>
 
                 <div className="flex items-center gap-3 mb-2">
@@ -85,7 +85,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
           <span className="text-xs text-slate-600">{sortedCycles.length} logged</span>
         </div>
       )}
-      <div className="space-y-4">
+      <div className="space-y-4 pb-32">
         {isLoading ? ( Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="rounded-2xl border border-white/5 bg-slate-900/80 p-6 animate-pulse">
               <div className="h-5 bg-slate-800 rounded w-1/2 mb-3" />
