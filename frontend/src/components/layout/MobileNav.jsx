@@ -15,9 +15,13 @@ export default function MobileNav() {
     const handler = () => {
       if (dockRef.current) {
         const vv = window.visualViewport;
-        dockRef.current.style.bottom = (window.innerHeight - vv.height - vv.offsetTop) + 'px';
+        const dockH = dockRef.current.offsetHeight;
+        dockRef.current.style.position = 'fixed';
+        dockRef.current.style.bottom = 'auto';
+        dockRef.current.style.top = (vv.offsetTop + vv.height - dockH) + 'px';
       }
     };
+    handler();
     window.visualViewport.addEventListener('resize', handler);
     window.visualViewport.addEventListener('scroll', handler);
     return () => {
