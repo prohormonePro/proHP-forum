@@ -477,15 +477,11 @@ export default function CycleLogDetail() {
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
           <div className="flex-1 min-w-0">
-            <div className="flex items-start gap-4">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-extrabold text-white mb-1">{cycle.compound_name}</h1>
-                <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
-              </div>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
               {cycle.compound_name && (
-                <div className="shrink-0 relative flex justify-center items-center" style={{ width: '140px', marginTop: '-8px', paddingBottom: '8px' }}>
-                  <div className="absolute" style={{ width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -55%)', zIndex: 0, pointerEvents: 'none' }} />
-                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '150px', width: 'auto', maxWidth: '130px', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.4))' }} />
+                <div className="shrink-0 relative flex justify-center items-center order-first sm:order-last" style={{ width: '180px', marginTop: '-8px', paddingBottom: '8px' }}>
+                  <div className="absolute" style={{ width: '280px', height: '280px', background: 'radial-gradient(circle, rgba(14,165,233,0.12) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -55%)', zIndex: 0, pointerEvents: 'none' }} />
+                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '200px', width: 'auto', maxWidth: '180px', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.4))' }} />
                   <div className="absolute z-[5]" style={{ bottom: '8px', left: '50%', transform: 'translateX(-50%)', width: '70%', height: '8px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
                 </div>
               )}
@@ -498,10 +494,10 @@ export default function CycleLogDetail() {
                 <span className={`text-xs font-bold ${cycle.would_run_again ? 'text-emerald-400' : 'text-red-400'}`}>{cycle.would_run_again ? 'Again' : 'No'}</span>
               </div>
             )}
-            <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl ${cycle.rating != null ? ratingBg(cycle.rating) : 'bg-slate-900/50'} border ${cycle.rating != null ? 'border-white/5' : 'border-amber-500/30'}`}>
+            <div className={`flex flex-col items-center justify-center w-full sm:w-24 h-20 sm:h-24 rounded-xl ${cycle.rating != null ? ratingBg(cycle.rating) : 'bg-slate-900/50 backdrop-blur-md'} border ${cycle.rating != null ? 'border-white/5' : 'border-amber-500/30'}`}>
               {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<div className="flex flex-col items-center animate-pulse">
-                      <span className="text-lg font-bold text-amber-400">—</span>
-                      <span className="text-[8px] uppercase font-bold text-amber-400/60 mt-0.5 text-center leading-tight">Rating<br/>Pending</span>
+                      <span className="text-2xl font-bold text-amber-400">—</span>
+                      <span className="text-[10px] uppercase font-bold text-amber-400/60 mt-0.5 text-center leading-tight">Rating Pending</span>
                     </div>)}
             </div>
           </div>
@@ -615,8 +611,8 @@ export default function CycleLogDetail() {
                 <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-colors text-left">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-sm font-bold text-[#229DD8] shrink-0">Wk {update.week_number}</span>
-                    {update.strength_notes && <span className="text-xs text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.strength_notes}</span>}
-                    {update.side_effects && !update.strength_notes && <span className="text-xs text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
+                    {update.strength_notes && <span className="text-xs text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-md truncate max-w-[160px] sm:max-w-[250px]">{update.strength_notes}</span>}
+                    {update.side_effects && !update.strength_notes && <span className="text-xs text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md truncate max-w-[160px] sm:max-w-[250px]">{update.side_effects}</span>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {update.body_fat_pct && <span className="text-xs font-bold text-amber-400">{update.body_fat_pct}% BF</span>}
