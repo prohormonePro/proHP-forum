@@ -457,9 +457,9 @@ export default function CycleLogDetail() {
             </div>
           </div>
         )}
-        {cycle?.thread_id && (
+        {cycle?.thread_id && isOwner && (
           <Link to={'/t/' + cycle.thread_id} className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all">
-            <MessageSquare className="w-3 h-3" /> View Public Thread
+            <MessageSquare className="w-3 h-3" /> View Discussion Thread
           </Link>
         )}
       </div>
@@ -473,9 +473,9 @@ export default function CycleLogDetail() {
                 <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
                 <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
               </div>
-              {cycle.compound_image && (
+              {cycle.compound_name && (
                 <div className="shrink-0 w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-white/10 bg-slate-950/50 shadow-lg shadow-black/20">
-                  <img src={cycle.compound_image} alt={cycle.compound_name} className="w-full h-full object-contain p-1" onError={(e) => { e.target.style.display = 'none'; }} />
+                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} alt={cycle.compound_name} className="w-full h-full object-contain p-1" onError={(e) => { e.target.style.display = 'none'; }} />
                 </div>
               )}
             </div>
