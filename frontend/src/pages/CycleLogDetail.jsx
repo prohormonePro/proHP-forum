@@ -483,7 +483,7 @@ export default function CycleLogDetail() {
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
               {cycle.username}'s Cycle Log
             </Link>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-1">{cycle.compound_name}</h1>
+            <Link to={'/compounds/' + (cycle.compound_name || '').replace('Hi-Tech ', '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-1 hover:text-[#229DD8] transition-colors inline-block">{cycle.compound_name} <span className="text-[#229DD8]/40 text-lg align-super">↗</span></Link>
             <p className="text-sm sm:text-base text-slate-300 font-medium mb-3">{cycle.title}</p>
             {isPublicView && (
               <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-cyan-400/70 bg-cyan-500/5 border border-cyan-500/20 px-2.5 py-1 rounded-lg mb-3">
@@ -771,7 +771,7 @@ export default function CycleLogDetail() {
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[#229DD8]/20 flex items-center justify-center text-[#229DD8] font-bold text-sm shrink-0">{cycle.username?.charAt(0).toUpperCase()}</div>
-              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><Link to={'/u/' + cycle.username} className="text-[#229DD8] hover:text-white transition-colors">{cycle.username}</Link><span className="text-slate-400">'s </span><Link to={'/compounds/' + (cycle.compound_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-white hover:text-[#229DD8] transition-colors" style={{wordBreak: 'keep-all', overflowWrap: 'normal'}}>{cycle.compound_name} Log</Link></h3>
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><Link to={'/u/' + cycle.username} className="text-[#229DD8] hover:text-white transition-colors">{cycle.username}</Link><span className="text-slate-400">'s </span><span className="text-white font-semibold" style={{wordBreak: 'keep-all', overflowWrap: 'normal'}}>{cycle.compound_name} Log</span></h3>
             </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
           </div>
@@ -989,7 +989,7 @@ export default function CycleLogDetail() {
         const pillClass = "flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium px-3 py-2 sm:px-4 sm:py-2.5 rounded-full border border-white/10 shadow-lg shadow-black/30 hover:bg-slate-800/90 hover:text-white transition-all";
         if (!showHud) return null;
         if (anyWeekOpen && scrollDir === 'down' && !feedbackVisible) return (
-          <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+          <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 lg:bottom-6" style={{zIndex: 9999}}>
             <button onClick={() => { toggleAllWeeks(false); }} className={pillClass}>
               <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Collapse All
             </button>
