@@ -42,7 +42,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <>
+    <div className="min-h-[100dvh] bg-slate-950">
       {user && !user.profile_complete && <GenesisGate onComplete={() => fetchMe()} />}
       <Navbar />
       <ScrollToTop />
@@ -69,9 +70,10 @@ export default function App() {
             <Route path="/consultation" element={<ConsultationPage />} />
             <Route path="/pct" element={<PctGuide />} />
           </Routes>
-          <MobileNav />
         </main>
       </div>
     </div>
+      <MobileNav />
+    </>
   );
 }

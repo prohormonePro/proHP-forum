@@ -85,7 +85,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
           <span className="text-xs text-slate-600">{sortedCycles.length} logged</span>
         </div>
       )}
-      <div className="space-y-4 pb-32">
+      <div className="space-y-4 pb-20">
         {isLoading ? ( Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="rounded-2xl border border-white/5 bg-slate-900/80 p-6 animate-pulse">
               <div className="h-5 bg-slate-800 rounded w-1/2 mb-3" />
