@@ -469,6 +469,15 @@ export default function CycleLogDetail() {
         </a>
       )}
 
+      {/* Owner: View Public Log */}
+      {isOwner && (
+        <a href={'/cycles/' + cycle.id} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all mb-4">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+          View as Public
+        </a>
+      )}
+
       {/* Protocol Header */}
       <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
