@@ -470,13 +470,13 @@ export default function CycleLogDetail() {
           <div className="flex-1 min-w-0">
             <div className="flex items-start gap-4">
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-extrabold text-white mb-1 truncate">{cycle.compound_name}</h1>
+                <h1 className="text-2xl font-extrabold text-white mb-1">{cycle.compound_name}</h1>
                 <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
               </div>
               {cycle.compound_name && (
-                <div className="shrink-0 relative flex justify-center" style={{ width: '100px' }}>
-                  <div className="absolute" style={{ width: '120px', height: '120px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} alt={cycle.compound_name} className="relative z-10" style={{ height: '100px', width: 'auto', maxWidth: '90px', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }} onError={(e) => { e.target.closest('.relative.flex').style.display = 'none'; }} />
+                <div className="shrink-0 relative flex justify-center" style={{ width: '160px' }}>
+                  <div className="absolute" style={{ width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} alt={cycle.compound_name} className="relative z-10" style={{ height: '180px', width: 'auto', maxWidth: '160px', objectFit: 'contain', filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.25))' }} onError={(e) => { e.target.closest('.relative.flex').style.display = 'none'; }} />
                   <div className="absolute z-[5]" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)', width: '70%', height: '6px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
                 </div>
               )}
@@ -818,7 +818,7 @@ export default function CycleLogDetail() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1.5">
-                                <Link to={'/u/' + p.author_username} className="text-sm font-semibold text-[#229DD8] hover:text-white truncate max-w-[140px] sm:max-w-[200px] inline-block align-bottom transition-colors">{p.author_username}</Link>
+                                <Link to={p.author_username ? '/u/' + p.author_username : '#'} className="text-sm font-semibold text-[#229DD8] hover:text-white truncate max-w-[140px] sm:max-w-[200px] inline-block align-bottom transition-colors">{p.author_username}</Link>
                                 {p.author_tier === 'admin' && <span className="text-[8px] font-bold text-[#229DD8] bg-[#229DD8]/10 px-1.5 py-0.5 rounded">ADM</span>}
                                 {p.author_founding && <span className="text-[8px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-1.5 py-0.5 rounded">FM</span>}
                                 <span className="text-[11px] text-slate-500 whitespace-nowrap shrink-0">{timeAgo(p.created_at)}</span>
