@@ -1,5 +1,8 @@
 
-/* §47: No global overflow/position rules. Chrome fix in MobileNav JS. */
+/* §47 FINAL: Chromium Fast Path dock fix — compositor thread, no JS */
+:root {
+  --safe-area-max-inset-bottom: env(safe-area-max-inset-bottom, 36px);
+}
 
 .safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
