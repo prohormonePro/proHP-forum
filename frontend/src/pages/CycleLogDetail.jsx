@@ -475,27 +475,22 @@ export default function CycleLogDetail() {
 
       {/* Protocol Header */}
       <div className={`bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border p-3 sm:p-6 md:p-8 mb-6 overflow-x-hidden max-w-full ${isPublicView ? "border-cyan-500/20 shadow-[0_0_15px_rgba(34,157,216,0.06)]" : "border-white/10"}`}>
-        {/* Hero: Bottle + Title + Rating */}
-        <div className="flex flex-col sm:flex-row gap-5 mb-5">
-          {/* Bottle - centered on mobile, left on desktop */}
-          {cycle.compound_name && (
-            <div className="shrink-0 relative flex justify-center items-center mx-auto sm:mx-0" style={{ width: '260px', minHeight: '280px' }}>
-              <div className="absolute" style={{ width: '380px', height: '380px', background: 'radial-gradient(circle, rgba(14,165,233,0.12) 0%, rgba(14,165,233,0.03) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-              <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '280px', width: 'auto', maxWidth: '240px', objectFit: 'contain', filter: 'drop-shadow(0 12px 28px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.25))' }} />
-              <div className="absolute z-[5]" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)', width: '60%', height: '12px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
-            </div>
-          )}
-          {/* Title + Meta */}
-          <div className="flex-1 min-w-0 text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{cycle.compound_name}</h1>
-            <p className="text-sm text-slate-300 font-medium mb-3">{cycle.title}</p>
+        {/* Hero: CSS Grid — bottle in own column, never pushes text */}
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 sm:gap-6 mb-5">
+          {/* Title + Meta — always first in DOM, renders left on desktop */}
+          <div className="min-w-0 text-center sm:text-left order-2 sm:order-1">
+            <Link to={'/u/' + cycle.username} className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#229DD8]/70 hover:text-[#229DD8] uppercase tracking-wider mb-2 transition-colors">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              {cycle.username}'s Cycle Log
+            </Link>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-1">{cycle.compound_name}</h1>
+            <p className="text-sm sm:text-base text-slate-300 font-medium mb-3">{cycle.title}</p>
             {isPublicView && (
               <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-cyan-400/70 bg-cyan-500/5 border border-cyan-500/20 px-2.5 py-1 rounded-lg mb-3">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 Public View
               </span>
             )}
-            {/* Rating + Would Run Again - inline on desktop, full-width on mobile */}
             <div className="flex items-center justify-center sm:justify-start gap-3 mt-2">
               {cycle.would_run_again != null && (
                 <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl ${cycle.would_run_again ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
@@ -508,6 +503,14 @@ export default function CycleLogDetail() {
               </div>
             </div>
           </div>
+          {/* Bottle — own column on desktop, centered above on mobile */}
+          {cycle.compound_name && (
+            <div className="relative flex justify-center items-center order-1 sm:order-2 mx-auto sm:mx-0" style={{ width: '220px', minHeight: '240px' }}>
+              <div className="absolute" style={{ width: '320px', height: '320px', background: 'radial-gradient(circle, rgba(14,165,233,0.10) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+              <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '240px', width: 'auto', maxWidth: '200px', objectFit: 'contain', filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }} />
+              <div className="absolute z-[5]" style={{ bottom: '0px', left: '50%', transform: 'translateX(-50%)', width: '55%', height: '10px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
+            </div>
+          )}
         </div>
 
         {/* Stats Grid */}
