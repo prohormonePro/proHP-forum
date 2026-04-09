@@ -42,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen max-w-[100vw] bg-slate-950">
+    <div className="min-h-screen bg-slate-950">
       {user && !user.profile_complete && <GenesisGate onComplete={() => fetchMe()} />}
       <Navbar />
       <ScrollToTop />

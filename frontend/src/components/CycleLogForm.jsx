@@ -134,7 +134,7 @@ export default function CycleLogForm({ onSuccess }) {
             </div>
             <div>
               <label htmlFor="start_date" className="block text-sm font-medium text-slate-200 mb-2">Start Date</label>
-              <input type="date" id="start_date" name="start_date" value={formData.start_date} onChange={handleInputChange} className={inputClass + " max-w-full"} />
+              <input type="date" id="start_date" name="start_date" value={formData.start_date} onChange={handleInputChange} className={inputClass + " w-full box-border appearance-none"} />
             </div>
           </div>
         </div>
