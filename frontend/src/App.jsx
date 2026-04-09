@@ -35,7 +35,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen max-w-[100vw] flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-prohp-500 font-bold tracking-wider animate-pulse">PROHP</div>
       </div>
     );
