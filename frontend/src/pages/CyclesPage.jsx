@@ -149,7 +149,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
                     ) : (
                       <div className="flex flex-col items-center">
                       <span className="text-lg font-bold text-amber-400/60">—</span>
-                      <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Pending</span>
+                      <span className="text-[8px] uppercase font-bold text-slate-500 mt-0.5 text-center leading-tight">Rating<br/>Pending</span>
                     </div>
                     )}
                   </div>

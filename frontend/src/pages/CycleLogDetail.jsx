@@ -502,7 +502,7 @@ export default function CycleLogDetail() {
             <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl ${ratingBg(cycle.rating)} border border-white/5`}>
               {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<div className="flex flex-col items-center">
                       <span className="text-lg font-bold text-amber-400/60">—</span>
-                      <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Pending</span>
+                      <span className="text-[8px] uppercase font-bold text-slate-500 mt-0.5 text-center leading-tight">Rating<br/>Pending</span>
                     </div>)}
             </div>
           </div>
@@ -767,7 +767,7 @@ export default function CycleLogDetail() {
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[#229DD8]/20 flex items-center justify-center text-[#229DD8] font-bold text-sm shrink-0">{cycle.username?.charAt(0).toUpperCase()}</div>
-              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><span className="text-[#229DD8]">{cycle.username}</span><span className="text-slate-400">'s </span><Link to={'/compounds/' + (cycle.compound_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-white hover:text-[#229DD8] transition-colors" style={{wordBreak: 'keep-all', overflowWrap: 'normal'}}>{cycle.compound_name} Log</Link></h3>
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug"><span className="text-slate-400">Feedback on </span><Link to={'/u/' + cycle.username} className="text-[#229DD8] hover:text-white transition-colors">{cycle.username}</Link><span className="text-slate-400">'s </span><Link to={'/compounds/' + (cycle.compound_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} className="text-white hover:text-[#229DD8] transition-colors" style={{wordBreak: 'keep-all', overflowWrap: 'normal'}}>{cycle.compound_name} Log</Link></h3>
             </div>
             <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} comment{posts.length !== 1 ? 's' : ''}</span>
           </div>
