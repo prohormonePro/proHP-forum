@@ -485,10 +485,10 @@ export default function CycleLogDetail() {
                 <span className={`text-xs font-bold ${cycle.would_run_again ? 'text-emerald-400' : 'text-red-400'}`}>{cycle.would_run_again ? 'Again' : 'No'}</span>
               </div>
             )}
-            <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl ${ratingBg(cycle.rating)} border border-white/5`}>
-              {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<div className="flex flex-col items-center">
-                      <span className="text-lg font-bold text-amber-400/60">—</span>
-                      <span className="text-[8px] uppercase font-bold text-slate-500 mt-0.5 text-center leading-tight">Rating<br/>Pending</span>
+            <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl ${cycle.rating != null ? ratingBg(cycle.rating) : 'bg-slate-900/50'} border ${cycle.rating != null ? 'border-white/5' : 'border-amber-500/30'}`}>
+              {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<div className="flex flex-col items-center animate-pulse">
+                      <span className="text-lg font-bold text-amber-400">—</span>
+                      <span className="text-[8px] uppercase font-bold text-amber-400/60 mt-0.5 text-center leading-tight">Rating<br/>Pending</span>
                     </div>)}
             </div>
           </div>
@@ -540,7 +540,7 @@ export default function CycleLogDetail() {
                 {/\.(jpg|jpeg|png|gif|webp)$/i.test(media.before) ? <img src={media.before} alt="Before" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80"><svg className="w-8 h-8 text-[#229DD8] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-4.5H18m0 0l3-3m-3 3V3" /></svg><span className="text-[10px] text-[#229DD8] font-medium">View Baseline</span></div>}
               </a>
             ) : (
-              <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
+              <div className="aspect-[3/4] rounded-lg border border border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
                 <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 <span className="text-[10px] text-slate-500 font-medium">Baseline Pending</span>
               </div>
@@ -549,7 +549,7 @@ export default function CycleLogDetail() {
           {/* Mid-Cycle */}
           <div className="relative">
             <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Mid-Cycle</p>
-            <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
+            <div className="aspect-[3/4] rounded-lg border border border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
               <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               <span className="text-[10px] text-slate-500 font-medium">Awaiting</span>
             </div>
@@ -562,7 +562,7 @@ export default function CycleLogDetail() {
                 {/\.(jpg|jpeg|png|gif|webp)$/i.test(media.after) ? <img src={media.after} alt="After" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80"><svg className="w-8 h-8 text-emerald-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-4.5H18m0 0l3-3m-3 3V3" /></svg><span className="text-[10px] text-emerald-400 font-medium">View Results</span></div>}
               </a>
             ) : (
-              <div className="aspect-[3/4] rounded-lg border border-dashed border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
+              <div className="aspect-[3/4] rounded-lg border border border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
                 <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 <span className="text-[10px] text-slate-500 font-medium">Final Pending</span>
               </div>
@@ -602,8 +602,8 @@ export default function CycleLogDetail() {
                 <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-colors text-left">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-sm font-bold text-[#229DD8] shrink-0">Wk {update.week_number}</span>
-                    {update.strength_notes && <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.strength_notes}</span>}
-                    {update.side_effects && !update.strength_notes && <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
+                    {update.strength_notes && <span className="text-xs text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.strength_notes}</span>}
+                    {update.side_effects && !update.strength_notes && <span className="text-xs text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[180px]">{update.side_effects}</span>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {update.body_fat_pct && <span className="text-xs font-bold text-amber-400">{update.body_fat_pct}% BF</span>}
@@ -863,7 +863,7 @@ export default function CycleLogDetail() {
                                 {user && user.id !== p.author_id && !p.is_deleted && (
                                   <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
                                 )}
-                                <button onClick={() => copyLink(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${copiedPost === p.id ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-600 hover:text-slate-300 hover:bg-slate-700/30'}`} style={{transition: 'all 0.15s ease'}}>{copiedPost === p.id ? <><CheckCircle className="w-3 h-3" /><span className="text-[10px] font-medium">Copied!</span></> : <Link2 className="w-3 h-3" />}</button>
+                                <button onClick={() => copyLink(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${copiedPost === p.id ? 'text-emerald-300 bg-emerald-500/15 scale-95' : 'text-slate-600 hover:text-slate-300 hover:bg-slate-700/30'}`} style={{transition: 'all 0.15s ease'}}>{copiedPost === p.id ? <><CheckCircle className="w-3 h-3" /><span className="text-[10px] font-medium">Copied!</span></> : <Link2 className="w-3 h-3" />}</button>
                               </div>
                               {replyTo === p.id && canComment && (
                                 <div className="mt-3 p-3 bg-slate-900/80 rounded-lg border border-[#229DD8]/20">
