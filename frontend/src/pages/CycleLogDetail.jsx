@@ -407,6 +407,8 @@ export default function CycleLogDetail() {
   const weekProgress = computeWeekProgress(cycle);
   const media = parseMediaLinks(cycle.description);
   const isOwner = user?.id === cycle.user_id;
+  const isPublicView = new URLSearchParams(window.location.search).has('pub');
+  const showOwnerControls = isOwner && !isPublicView;
   const existingWeeks = (updates || []).map((u) => u.week_number);
   const latestUpdate = (updates || []).length > 0 ? [...updates].sort((a, b) => b.week_number - a.week_number)[0] : null;
   const latestWeight = latestUpdate?.weight_lbs || null;
@@ -460,18 +462,11 @@ export default function CycleLogDetail() {
 
       </div>
 
-      {/* Owner: View Public Log */}
-      {isOwner && (
-        <a href={'/cycles/' + cycle.id} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all mb-4">
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-          View as Public
-        </a>
-      )}
+
 
       {/* Owner: View Public Log */}
-      {isOwner && (
-        <a href={'/cycles/' + cycle.id} target="_blank" rel="noopener noreferrer"
+      {isOwner && !new URLSearchParams(window.location.search).has('pub') && (
+        <a href={'/cycles/' + cycle.id + '?pub=1'} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all mb-4">
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           View as Public
@@ -638,7 +633,7 @@ export default function CycleLogDetail() {
                 {update.strength_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Strength:</span> {update.strength_notes}</p>}
                 {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Symptoms:</span> {update.side_effects}</p>}
                 {update.mood_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Mood:</span> {update.mood_notes}</p>}
-                {update.general_notes && <p className="text-base text-slate-300 mt-2 whitespace-pre-wrap">{update.general_notes}</p>}
+                {update.general_notes && <div className="mt-2"><span className="text-xs text-slate-500 font-medium">Notes:</span><p className="text-base text-slate-300 mt-1 whitespace-pre-wrap">{update.general_notes}</p></div>}
                 </div>}
               </div>
             ))}
@@ -732,7 +727,7 @@ export default function CycleLogDetail() {
       })()}
 
       {/* Complete Cycle */}
-      {isOwner && cycle.rating == null && (
+      {showOwnerControls && cycle.rating == null && (
         <div className="mb-6">
           {!showCompleteForm ? (
             <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
@@ -752,7 +747,7 @@ export default function CycleLogDetail() {
       )}
 
       {/* Author Update Form */}
-      {isOwner && (
+      {showOwnerControls && (
         <div className="mb-6">
           {!showUpdateForm ? (
             <button onClick={() => setShowUpdateForm(true)}
