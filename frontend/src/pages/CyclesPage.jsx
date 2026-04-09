@@ -147,7 +147,10 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
                         <span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span>
                       </>
                     ) : (
-                      <span className="text-xs text-slate-600 font-medium">N/R</span>
+                      <div className="flex flex-col items-center">
+                      <span className="text-lg font-bold text-amber-400/60">—</span>
+                      <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Pending</span>
+                    </div>
                     )}
                   </div>
                 </div>

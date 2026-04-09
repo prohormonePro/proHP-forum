@@ -500,7 +500,10 @@ export default function CycleLogDetail() {
               </div>
             )}
             <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl ${ratingBg(cycle.rating)} border border-white/5`}>
-              {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<span className="text-xs text-slate-600 font-medium">N/R</span>)}
+              {cycle.rating != null ? (<><span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span><span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span></>) : (<div className="flex flex-col items-center">
+                      <span className="text-lg font-bold text-amber-400/60">—</span>
+                      <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Pending</span>
+                    </div>)}
             </div>
           </div>
         </div>
@@ -725,7 +728,7 @@ export default function CycleLogDetail() {
       })()}
 
       {/* Complete Cycle */}
-      {isOwner && status !== 'completed' && status !== 'abandoned' && (
+      {isOwner && cycle.rating == null && (
         <div className="mb-6">
           {!showCompleteForm ? (
             <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
