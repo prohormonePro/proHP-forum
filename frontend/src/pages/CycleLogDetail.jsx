@@ -479,7 +479,7 @@ export default function CycleLogDetail() {
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 sm:gap-6 mb-5">
           {/* Title + Meta — always first in DOM, renders left on desktop */}
           <div className="min-w-0 text-center sm:text-left order-2 sm:order-1">
-            <Link to={'/u/' + cycle.username} className="flex items-center gap-1.5 text-[10px] font-semibold text-[#229DD8]/70 hover:text-[#229DD8] uppercase tracking-wider mb-3 transition-colors w-full justify-center sm:justify-start">
+            <Link to={'/u/' + cycle.username} className="flex items-center gap-1.5 text-[10px] font-semibold text-[#229DD8]/70 hover:text-[#229DD8] uppercase tracking-wider mb-3 transition-colors w-full justify-center sm:justify-start cursor-pointer relative z-20">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
               {cycle.username}'s Cycle Log
             </Link>
