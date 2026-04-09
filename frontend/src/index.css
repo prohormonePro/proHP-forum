@@ -1,5 +1,17 @@
 
-/* Mobile overflow fix — removed. §47: nothing on any element. */
+/* §47 FINAL: Body as scroll container — fixes Chrome/iOS fixed positioning */
+html {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+body {
+  height: 100%;
+  position: fixed;
+  width: 100%;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
 
 .safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
