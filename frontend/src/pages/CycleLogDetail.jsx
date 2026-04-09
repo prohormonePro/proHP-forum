@@ -745,7 +745,7 @@ export default function CycleLogDetail() {
       )}
 
       {/* Author Update Form */}
-      {isOwner && status === 'active' && (
+      {isOwner && (
         <div className="mb-6">
           {!showUpdateForm ? (
             <button onClick={() => setShowUpdateForm(true)}
