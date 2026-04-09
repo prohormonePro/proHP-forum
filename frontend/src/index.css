@@ -1,8 +1,5 @@
 
-/* Mobile overflow fix — Stage 1049 */
-html, body {
-  overflow-x: hidden;
-}
+/* Mobile overflow fix — removed. §47: nothing on any element. */
 
 .safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
