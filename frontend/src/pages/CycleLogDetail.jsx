@@ -996,7 +996,7 @@ export default function CycleLogDetail() {
           </div>
         );
         if (scrollDir === 'up') return (
-          <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6" style={{zIndex: 9999}}>
+          <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 lg:bottom-6" style={{zIndex: 9999}}>
             <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={pillClass}>
               <ArrowUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Top
             </button>
