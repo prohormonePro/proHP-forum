@@ -78,6 +78,13 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
         </div>
       )}
 
+      {/* Existing Cycle Logs */}
+      {!showForm && sortedCycles.length > 0 && (
+        <div className="flex items-center gap-2 mb-3 mt-2">
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Your Cycle Logs</h2>
+          <span className="text-xs text-slate-600">{sortedCycles.length} logged</span>
+        </div>
+      )}
       <div className="space-y-4">
         {isLoading ? ( Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="rounded-2xl border border-white/5 bg-slate-900/80 p-6 animate-pulse">

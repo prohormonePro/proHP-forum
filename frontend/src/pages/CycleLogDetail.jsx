@@ -457,11 +457,7 @@ export default function CycleLogDetail() {
             </div>
           </div>
         )}
-        {cycle?.thread_id && isOwner && (
-          <Link to={'/t/' + cycle.thread_id} className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/5 px-3 py-1.5 rounded-lg transition-all">
-            <MessageSquare className="w-3 h-3" /> View Discussion Thread
-          </Link>
-        )}
+
       </div>
 
       {/* Protocol Header */}
@@ -729,7 +725,7 @@ export default function CycleLogDetail() {
       })()}
 
       {/* Complete Cycle */}
-      {isOwner && status === 'active' && (
+      {isOwner && status !== 'completed' && status !== 'abandoned' && (
         <div className="mb-6">
           {!showCompleteForm ? (
             <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
