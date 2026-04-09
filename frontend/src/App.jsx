@@ -46,7 +46,7 @@ export default function App() {
       {user && !user.profile_complete && <GenesisGate onComplete={() => fetchMe()} />}
       <Navbar />
       <ScrollToTop />
-      <div className="flex max-w-7xl mx-auto pt-14">
+      <div className="flex max-w-7xl mx-auto">
         <Sidebar />
         <main className="flex-1 pb-24 lg:pb-0 min-w-0 px-4 py-6 lg:px-8">
           <Routes>
