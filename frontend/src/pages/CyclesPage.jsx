@@ -59,7 +59,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
     return rb - ra;
   });
 
-  return ( <div className="max-w-3xl mx-auto animate-fade-in">
+  return ( <div className="max-w-3xl mx-auto animate-fade-in pb-24">
         <div className="mb-4"><button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>Back</button></div>
       <div className="flex items-center gap-3 mb-2">
         <Dumbbell className="w-6 h-6 text-[#229DD8]" />
@@ -141,7 +141,7 @@ export default function CyclesPage() { const [searchParams] = useSearchParams();
                     </div>
                   </div>
                   {/* Rating column */}
-                  <div className={`flex flex-col items-center justify-center w-20 shrink-0 ${ratingBg(cycle.rating)} border-l border-white/5`}>
+                  <div className={`flex flex-col items-center justify-center w-24 shrink-0 ${ratingBg(cycle.rating)} border-l border-white/5`}>
                     {cycle.rating != null ? ( <>
                         <span className={`text-3xl font-black leading-none ${ratingColor(cycle.rating)}`}>{cycle.rating}</span>
                         <span className="text-[9px] uppercase font-bold text-slate-500 mt-1">/10</span>
