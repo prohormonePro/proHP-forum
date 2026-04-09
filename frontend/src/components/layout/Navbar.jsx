@@ -31,7 +31,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-white/[0.04]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-white/[0.04]">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-4">
         <Link to="/" className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm font-extrabold tracking-tight">
