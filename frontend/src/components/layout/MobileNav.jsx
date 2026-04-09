@@ -1,10 +1,30 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import { Home, FlaskConical, Shield, User } from 'lucide-react';
 import useAuthStore from '../../stores/auth';
 
 export default function MobileNav() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
+
+  // Chrome mobile URL bar fix: force dock to visual viewport bottom
+  const dockRef = useRef(null);
+  useEffect(() => {
+    const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
+    if (!isChrome || !window.visualViewport || !dockRef.current) return;
+    const handler = () => {
+      if (dockRef.current) {
+        const vv = window.visualViewport;
+        dockRef.current.style.bottom = (window.innerHeight - vv.height - vv.offsetTop) + 'px';
+      }
+    };
+    window.visualViewport.addEventListener('resize', handler);
+    window.visualViewport.addEventListener('scroll', handler);
+    return () => {
+      window.visualViewport.removeEventListener('resize', handler);
+      window.visualViewport.removeEventListener('scroll', handler);
+    };
+  }, []);
 
   const tabs = [
     { path: '/', icon: Home, label: 'Home', exact: true },
@@ -16,7 +36,7 @@ export default function MobileNav() {
   const isActive = (tab) => tab.exact ? location.pathname === tab.path : location.pathname.startsWith(tab.path);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+    <div ref={dockRef} className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       <nav className="bg-slate-950 mx-3 mb-2 rounded-2xl rounded-2xl border border-white/[0.12] shadow-[0_-4px_30px_rgba(0,0,0,0.5),0_8px_40px_rgba(0,0,0,0.7),0_0_1px_rgba(255,255,255,0.08)]">
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
           {tabs.map((tab) => {
