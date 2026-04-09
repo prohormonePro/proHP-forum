@@ -390,9 +390,9 @@ export default function CycleLogDetail() {
   if (error || !data?.cycle) {
     return (
       <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
-        <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
-          <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
-        </Link>
+        <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6 transition">
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
         <div className="prohp-card p-10 text-center border border-white/5">
           <p className="text-red-400">Cycle log not found or access denied.</p>
         </div>
@@ -434,9 +434,9 @@ export default function CycleLogDetail() {
   return (
     <div className="max-w-3xl mx-auto animate-fade-in px-3 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
       <div className="flex items-center justify-between mb-6">
-        <Link to="/cycles" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition">
-          <ArrowLeft className="w-4 h-4" /> Back to Cycle Logs
-        </Link>
+        <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition">
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
         <button onClick={() => setShowHandoffGuide(true)} className="flex items-center gap-2 text-[11px] text-slate-400 hover:text-[#229DD8] bg-slate-800/50 hover:bg-[#229DD8]/10 border border-slate-700/30 hover:border-[#229DD8]/20 rounded-lg px-3 py-1.5 transition-all"><Activity className="w-3.5 h-3.5" /><span>AI Handoff</span></button>
         {showHandoffGuide && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{zIndex: 99999}} onClick={() => setShowHandoffGuide(false)}>
@@ -474,8 +474,10 @@ export default function CycleLogDetail() {
                 <p className="text-sm text-slate-300 font-medium mb-2">{cycle.title}</p>
               </div>
               {cycle.compound_name && (
-                <div className="shrink-0 w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-white/10 bg-slate-950/50 shadow-lg shadow-black/20">
-                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} alt={cycle.compound_name} className="w-full h-full object-contain p-1" onError={(e) => { e.target.style.display = 'none'; }} />
+                <div className="shrink-0 relative flex justify-center" style={{ width: '100px' }}>
+                  <div className="absolute" style={{ width: '120px', height: '120px', background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+                  <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} alt={cycle.compound_name} className="relative z-10" style={{ height: '100px', width: 'auto', maxWidth: '90px', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }} onError={(e) => { e.target.closest('.relative.flex').style.display = 'none'; }} />
+                  <div className="absolute z-[5]" style={{ bottom: '4px', left: '50%', transform: 'translateX(-50%)', width: '70%', height: '6px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
                 </div>
               )}
             </div>
