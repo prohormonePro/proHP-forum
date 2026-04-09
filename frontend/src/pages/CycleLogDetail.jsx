@@ -505,9 +505,9 @@ export default function CycleLogDetail() {
           </div>
           {/* Bottle — own column on desktop, centered above on mobile */}
           {cycle.compound_name && (
-            <div className="relative flex justify-center items-center order-1 sm:order-2 mx-auto sm:mx-0" style={{ width: '220px', minHeight: '240px' }}>
-              <div className="absolute" style={{ width: '320px', height: '320px', background: 'radial-gradient(circle, rgba(14,165,233,0.10) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
-              <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '240px', width: 'auto', maxWidth: '200px', objectFit: 'contain', filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }} />
+            <div className="relative flex justify-center items-center order-1 sm:order-2 mx-auto sm:mx-0" style={{ width: '300px', minHeight: '350px' }}>
+              <div className="absolute" style={{ width: '420px', height: '420px', background: 'radial-gradient(circle, rgba(14,165,233,0.10) 0%, rgba(14,165,233,0.02) 40%, transparent 70%)', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 0, pointerEvents: 'none' }} />
+              <img src={'/images/compounds/' + cycle.compound_name.replace('Hi-Tech ', '').toLowerCase().replace(/ /g, '-') + '.png'} onError={function(e) { e.target.closest('.relative.flex').style.display = 'none'; }} alt={cycle.compound_name} className="relative z-10" style={{ height: '350px', width: 'auto', maxWidth: '300px', objectFit: 'contain', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 6px 12px rgba(0,0,0,0.35))' }} />
               <div className="absolute z-[5]" style={{ bottom: '0px', left: '50%', transform: 'translateX(-50%)', width: '55%', height: '10px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)', borderRadius: '50%' }} />
             </div>
           )}
