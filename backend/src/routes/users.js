@@ -8,7 +8,7 @@ const router = express.Router();
 // MUST be before /:username to avoid route shadowing
 router.patch('/profile', authenticate, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.sub;
     const { age, years_lifting, trt_hrt, trt_compound, trt_dose } = req.body;
 
     const result = await query(
@@ -74,31 +74,6 @@ router.get('/:username', async (req, res) => {
   } catch (error) {
     console.error('[USER_PROFILE_ERROR]', error);
     res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
-// GET /reputation/:username
-router.get('/reputation/:username', async (req, res) => {
-  try {
-    const result = await query(
-      `SELECT ur.*, 
-        CASE WHEN u.date_of_birth IS NOT NULL 
-          THEN EXTRACT(YEAR FROM AGE(u.date_of_birth))::int 
-          ELSE u.age END as computed_age,
-        CASE WHEN u.lifting_since IS NOT NULL
-          THEN EXTRACT(YEAR FROM CURRENT_DATE)::int - u.lifting_since
-          ELSE u.years_lifting END as computed_years_lifting
-      FROM user_reputation ur
-      JOIN users u ON u.id = ur.id
-      WHERE ur.username = $1`,
-      [req.params.username]
-    );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('Reputation fetch error:', err);
-    res.status(500).json({ error: 'Failed to fetch reputation' });
   }
 });
 
