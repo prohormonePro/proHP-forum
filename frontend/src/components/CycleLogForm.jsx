@@ -98,7 +98,29 @@ export default function CycleLogForm({ onSuccess }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label htmlFor="compound_name" className="block text-sm font-medium text-slate-200 mb-2">Primary Compound *</label>
-              <input type="text" id="compound_name" name="compound_name" value={formData.compound_name} onChange={handleInputChange} placeholder="AC-262" required className={inputClass} />
+              <div className="relative">
+              <input type="text" id="compound_name" name="compound_name" value={formData.compound_name}
+                onChange={(e) => { handleInputChange(e); setCompoundSearch(e.target.value); setShowDropdown(true); }}
+                onFocus={() => { setCompoundSearch(formData.compound_name || ''); setShowDropdown(true); }}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                placeholder="Start typing..." required autoComplete="off" className={inputClass} />
+              {showDropdown && filteredCompounds.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                  {filteredCompounds.map(comp => (
+                    <button key={comp.id} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => {
+                      setFormData(prev => ({...prev, compound_name: comp.name}));
+                      setShowDropdown(false); setCompoundSearch('');
+                    }} className="w-full text-left px-4 py-2.5 text-sm text-slate-200 hover:bg-[#229DD8]/10 hover:text-white transition-colors flex items-center justify-between">
+                      <span>{comp.name}</span>
+                      {comp.company && <span className="text-[10px] text-slate-500">{comp.company}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {formData.compound_name && !showDropdown && compoundSearch.length > 2 && !compoundsList.some(c => c.name === formData.compound_name) && (
+                <p className="text-[11px] text-amber-400/70 mt-1">Compound not listed? Message Travis and he will get it added.</p>
+              )}
+            </div>
             </div>
             <div>
               <label htmlFor="dose" className="block text-sm font-medium text-slate-200 mb-2">Daily Dose</label>
