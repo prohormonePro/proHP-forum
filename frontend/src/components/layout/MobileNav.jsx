@@ -17,7 +17,7 @@ export default function MobileNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden safe-area-pb px-3 pb-4">
-      <nav className="bg-slate-950/40 backdrop-blur-3xl rounded-2xl border border-white/[0.12] shadow-[0_-4px_30px_rgba(0,0,0,0.5),0_8px_40px_rgba(0,0,0,0.7),0_0_1px_rgba(255,255,255,0.08)]">
+      <nav className="bg-slate-950/95 rounded-2xl border border-white/[0.12] shadow-[0_-4px_30px_rgba(0,0,0,0.5),0_8px_40px_rgba(0,0,0,0.7),0_0_1px_rgba(255,255,255,0.08)]">
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
           {tabs.map((tab) => {
             const active = isActive(tab);

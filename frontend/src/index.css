@@ -2,7 +2,6 @@
 /* Mobile overflow fix — Stage 1049 */
 html, body {
   overflow-x: hidden;
-  max-width: 100vw;
 }
 
 .safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
