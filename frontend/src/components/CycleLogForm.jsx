@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { api } from '../hooks/api';
 
 export default function CycleLogForm({ onSuccess }) {
@@ -15,6 +15,16 @@ export default function CycleLogForm({ onSuccess }) {
     after_pic_url: ''
   });
   const [error, setError] = useState('');
+  const [compoundSearch, setCompoundSearch] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { data: compoundsData } = useQuery({
+    queryKey: ['compounds-list'],
+    queryFn: () => api.get('/api/compounds?limit=200'),
+  });
+  const compoundsList = (compoundsData?.compounds || []);
+  const filteredCompounds = compoundSearch.length > 0
+    ? compoundsList.filter(c => c.name.toLowerCase().includes(compoundSearch.toLowerCase())).slice(0, 10)
+    : [];
   const queryClient = useQueryClient();
 
   const createCycleMutation = useMutation({
