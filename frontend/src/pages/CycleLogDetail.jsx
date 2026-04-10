@@ -564,7 +564,7 @@ export default function CycleLogDetail() {
               )}
             </div>
             {lessonBlocks.length > 2 && (
-              <button onClick={() => setFcExpanded(!fcExpanded)} className="text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors mb-5">
+              <button onClick={() => { setFcExpanded(!fcExpanded); if (fcExpanded) setTimeout(() => document.getElementById('final-conclusion')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }} className="text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors mb-5">
                 {fcExpanded ? 'Show less' : `See all ${lessonBlocks.length} lessons`}
               </button>
             )}
