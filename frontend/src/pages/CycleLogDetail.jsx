@@ -225,7 +225,8 @@ export default function CycleLogDetail() {
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { setCommentError('Image must be under 5MB'); return; }
+    const maxSize = file.type.startsWith("video/") ? 15 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) { setCommentError("File must be under " + (file.type.startsWith("video/") ? "15MB" : "5MB")); return; }
     setCommentImage(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -1103,7 +1104,9 @@ export default function CycleLogDetail() {
                                   <div style={{display: 'none'}} className="mt-2">
                                     <div className="rounded-xl overflow-hidden border-2 border-[#229DD8]/20 bg-gradient-to-b from-slate-800/30 to-slate-950/60 shadow-lg shadow-[#229DD8]/5 transform-gpu" style={{backfaceVisibility: 'hidden', willChange: 'transform'}}>
                                       <div className="p-3 transform-gpu">
-                                        {p.image_url.endsWith('.pdf') ? (
+                                        {/\.(mp4|webm|mov)$/i.test(p.image_url) ? (
+                                          <video src={p.image_url} controls playsInline preload="metadata" className="w-full max-h-[400px] rounded-lg bg-black" />
+                                        ) : p.image_url.endsWith('.pdf') ? (
                                           <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-colors text-sm font-medium justify-center p-4">View PDF Document</a>
                                         ) : (
                                           <img src={p.image_url} alt="" className="w-full max-h-[500px] object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity transform-gpu" loading="lazy" style={{backfaceVisibility: 'hidden'}} onClick={() => { const o = document.createElement('div'); o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:99999;cursor:zoom-out;padding:20px'; const i = document.createElement('img'); i.src = p.image_url; i.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain;border-radius:12px'; o.appendChild(i); o.onclick = () => o.remove(); document.body.appendChild(o); }} />
@@ -1111,7 +1114,7 @@ export default function CycleLogDetail() {
                                       </div>
                                       <div className="px-3 pb-2 flex items-center justify-between border-t border-white/5 pt-1.5">
                                         <span className="text-[10px] text-slate-500">Click to expand</span>
-                                        <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#229DD8] hover:text-white transition-colors font-medium">Open original</a>
+                                        <a href={p.image_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#229DD8] hover:text-white transition-colors font-medium">{/\.(mp4|webm|mov)$/i.test(p.image_url) ? "Download video" : p.image_url.endsWith(".pdf") ? "Open PDF" : "Open original"}</a>
                                       </div>
                                     </div>
                                   </div>
@@ -1145,13 +1148,13 @@ export default function CycleLogDetail() {
                                   <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
                                   {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                                   <div className="flex items-center gap-2">
-                                    <button onClick={() => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), parent_id: p.id }).then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
+                                    <button onClick={() => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); (async () => { let imgUrl = null; if (commentImage) { setUploading(true); try { imgUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), parent_id: p.id, ...(imgUrl ? { image_url: imgUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
                                     <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-[#229DD8] transition-colors"><Activity className="w-3 h-3" /> Attach</button>
                                     <button onClick={() => { setReplyTo(null); setCommentImage(null); setImagePreview(null); }} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
                                   </div>
                                   {imagePreview && replyTo === p.id && (
                                     <div className="mt-2 flex items-center gap-2">
-                                      <img src={imagePreview} alt="Preview" className="max-h-20 rounded-lg border border-white/10" />
+                                      {commentImage?.type?.startsWith("video/") ? <video src={imagePreview} className="max-h-20 rounded-lg border border-white/10" muted /> : <img src={imagePreview} alt="Preview" className="max-h-20 rounded-lg border border-white/10" />}
                                       <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
                                     </div>
                                   )}
@@ -1197,7 +1200,7 @@ export default function CycleLogDetail() {
                 <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4,video/webm,video/quicktime" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
             {imagePreview && (
               <div className="mb-3 relative inline-block">
-                <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-white/10" />
+                {commentImage?.type?.startsWith("video/") ? <video src={imagePreview} className="max-h-32 rounded-lg border border-white/10" muted /> : <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-white/10" />}
                 <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">x</button>
               </div>
             )}
@@ -1213,7 +1216,7 @@ export default function CycleLogDetail() {
                 <button onClick={async () => { if (!commentText.trim() || !data?.cycle?.thread_id) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); imgUrl = await uploadImage(commentImage); setUploading(false); } await createPost.mutateAsync({ thread_id: data.cycle.thread_id, body: commentText.trim(), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); } catch(err) { setCommentError(err.message); setUploading(false); } finally { setPosting(false); } }} disabled={!commentText.trim() || posting || uploading} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Comment'}</button>
                 <div className="flex items-center gap-3 w-full mt-1 -mb-1">
                   <button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-2 text-[#229DD8] hover:text-white transition-all px-4 py-2 rounded-lg bg-[#229DD8]/10 hover:bg-[#229DD8]/20 border border-[#229DD8]/20 hover:border-[#229DD8]/40"><Activity className="w-4 h-4" /><span className="text-xs font-medium">Attach</span></button>
-                  <span className="text-xs text-slate-500">Bloodwork, progress pics, supplement labels, PDFs</span>
+                  <span className="text-xs text-slate-500">Bloodwork, progress pics, supplement labels, PDFs, or video</span>
                 </div>
               </div>
             ) : !canComment && user ? (

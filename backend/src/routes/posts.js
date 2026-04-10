@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 15 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
   if (['image/jpeg','image/png','image/gif','image/webp','application/pdf','video/mp4','video/webm','video/quicktime'].includes(file.mimetype)) cb(null, true);
-  else cb(new Error('Only images allowed'), false);
+  else cb(new Error('Use images, PDFs, or video (MP4/WebM)'), false);
 }});
 const { query, getClient } = require('../config/db');
 const { authenticate, requireTier, TIER_LEVELS } = require('../middleware/auth');
