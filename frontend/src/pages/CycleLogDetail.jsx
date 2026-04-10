@@ -1005,7 +1005,7 @@ export default function CycleLogDetail() {
       )}
 
       {/* Author Update Form */}
-      {showOwnerControls && (
+      {showOwnerControls && cycle.status !== 'completed' && (
         <div className="mb-6">
           {!showUpdateForm ? (
             <button onClick={() => setShowUpdateForm(true)}
