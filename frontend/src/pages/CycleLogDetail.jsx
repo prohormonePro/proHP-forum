@@ -806,7 +806,7 @@ export default function CycleLogDetail() {
           <div className="flex items-center gap-3">
             
             {(updates || []).length > 2 && (
-              <button onClick={() => toggleAllWeeks(!Object.values(expandedWeeks).some(v => v))} className="text-xs font-semibold text-slate-500 hover:text-[#229DD8] transition-colors">{Object.values(expandedWeeks).some(v => v) ? 'Collapse All' : 'Expand All'}</button>
+              <button onClick={() => { const shouldCollapse = Object.values(expandedWeeks).some(v => v) || Object.keys(expandedWeeks).length === 0; toggleAllWeeks(!shouldCollapse); if (shouldCollapse) { setTimeout(() => { const el = document.querySelector('[class*="Weekly Updates"]') || document.getElementById('weekly-updates'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50); } }} className="text-xs font-semibold text-slate-500 hover:text-[#229DD8] transition-colors">{Object.values(expandedWeeks).some(v => v) ? 'Collapse All' : 'Expand All'}</button>
             )}
           </div>
         </div>
@@ -831,10 +831,10 @@ export default function CycleLogDetail() {
                   <div className="flex items-center gap-2 shrink-0">
                     {update.body_fat_pct && <span className="text-xs font-bold text-amber-400">{update.body_fat_pct}% BF</span>}
                     {update.weight_lbs && <span className="text-base font-extrabold text-white">{update.weight_lbs} lbs</span>}
-                    <span className="text-xs text-slate-600 ml-1">{(expandedWeeks[idx] ?? (idx === updates.length - 1)) ? '-' : '+'}</span>
+                    <span className="text-xs text-slate-600 ml-1">{(Object.keys(expandedWeeks).length > 0 ? !!expandedWeeks[idx] : idx === updates.length - 1) ? '-' : '+'}</span>
                   </div>
                 </button>
-                {(expandedWeeks[idx] ?? (idx === updates.length - 1)) && <div className="px-5 pb-5">
+                {(Object.keys(expandedWeeks).length > 0 ? !!expandedWeeks[idx] : idx === updates.length - 1) && <div className="px-5 pb-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
                   {update.weight_lbs && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Weight</p><p className="text-base font-bold text-white">{update.weight_lbs} lbs</p></div>)}
                   {update.body_fat_pct && (<div><p className="text-xs uppercase text-slate-500 font-semibold">Body Fat</p><p className="text-base font-bold text-white">{update.body_fat_pct}%</p></div>)}
@@ -1246,7 +1246,7 @@ export default function CycleLogDetail() {
       </div>
       {/* Context-Aware HUD — 2 states: Collapse All / Top */}
       {(() => {
-        const anyWeekOpen = Object.values(expandedWeeks).some(v => v) || (updates && updates.length > 0 && expandedWeeks[updates.length - 1] !== false);
+        const anyWeekOpen = Object.values(expandedWeeks).some(v => v) || (updates && updates.length > 0 && (Object.keys(expandedWeeks).length === 0 || expandedWeeks[updates.length - 1] === true));
         const feedbackVisible = (() => { const el = document.getElementById('feedback-section'); return el ? el.getBoundingClientRect().top < window.innerHeight : false; })();
         const pillClass = "flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-xl text-[11px] sm:text-xs text-slate-300 font-medium px-3 py-2 sm:px-4 sm:py-2.5 rounded-full border border-white/10 shadow-lg shadow-black/30 hover:bg-slate-800/90 hover:text-white transition-all";
         if (!showHud) return null;
