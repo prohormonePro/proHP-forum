@@ -843,7 +843,7 @@ export default function CycleLogDetail() {
                 {update.strength_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Strength:</span> {update.strength_notes}</p>}
                 {update.side_effects && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Symptoms:</span> {update.side_effects}</p>}
                 {update.mood_notes && <p className="text-base text-slate-300 mb-1.5"><span className="text-slate-500 font-medium">Mood:</span> {update.mood_notes}</p>}
-                {update.general_notes && <div className="mt-2"><span className="text-xs text-slate-500 font-medium">Notes:</span><p className="text-base text-slate-300 mt-1 whitespace-pre-wrap">{update.general_notes}</p></div>}
+                {update.general_notes && <div className="mt-3 bg-slate-900/40 border border-slate-700/50 rounded-lg p-3"><p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Notes</p><p className="text-[15px] text-slate-200 leading-relaxed whitespace-pre-wrap">{update.general_notes}</p></div>}
                 </div>}
               </div>
             ))}
@@ -1227,8 +1227,8 @@ export default function CycleLogDetail() {
                   <div className="w-14 h-14 rounded-2xl bg-[#229DD8]/10 flex items-center justify-center mx-auto mb-4">
                     <svg className="w-7 h-7 text-[#229DD8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Unlock the Full Data Archive.</h3>
-                  <p className="text-sm text-slate-400 mb-5 max-w-sm mx-auto">Join the Inner Circle to view attachments, verify bloodwork, and access the complete 101+ Compound Encyclopedia.</p>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">Unlock the Full Data Archive.</h3>
+                  <p className="text-xs sm:text-sm text-slate-400 mb-5 max-w-sm mx-auto">Join the Inner Circle to view attachments, verify bloodwork, and access the complete 101+ Compound Encyclopedia.</p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
                     <div className="flex items-center gap-2 text-xs text-slate-400"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>Full protocols in 5 clicks. Verified side effects in 2.</div>
                     <div className="flex items-center gap-2 text-xs text-slate-400"><span className="w-1.5 h-1.5 rounded-full bg-[#229DD8] shrink-0"></span>Unrestricted 101+ Compound Encyclopedia access.</div>
