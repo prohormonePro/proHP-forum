@@ -787,6 +787,14 @@ export default function CycleLogDetail() {
         {media.bloodwork && (
           <div className="mt-2">
             <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[9px] font-bold text-[#229DD8] bg-[#229DD8]/10 border border-[#229DD8]/20 px-2.5 py-1 rounded-lg hover:bg-[#229DD8]/20 transition-all"><Activity className="w-3 h-3" /> Labs Verified</a>
+      {/* Jump to Final Conclusion - Top of page */}
+      {cycle.final_conclusion && cycle.status === 'completed' && (
+        <button onClick={() => document.getElementById('final-conclusion')?.scrollIntoView({ behavior: 'smooth' })} className="w-full mb-6 py-3 text-sm font-medium text-emerald-400 hover:text-white bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-xl transition-all flex items-center justify-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+          Read Final Conclusion
+        </button>
+      )}
+
           </div>
         )}
       </div>
@@ -928,15 +936,7 @@ export default function CycleLogDetail() {
         );
       })()}
 
-            {/* Scroll to Final Conclusion */}
-      {cycle.final_conclusion && cycle.status === 'completed' && (
-        <button onClick={() => document.getElementById('final-conclusion')?.scrollIntoView({ behavior: 'smooth' })} className="w-full mb-4 py-2.5 text-sm text-emerald-400 hover:text-white bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-xl transition-all flex items-center justify-center gap-2">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
-          Read Final Conclusion
-        </button>
-      )}
-
-{/* Complete Cycle */}
+            {/* Complete Cycle */}
       {showOwnerControls && cycle.rating == null && cycle.status !== 'pct' && (
         <div className="mb-6">
           {!showCompleteForm ? (
@@ -1017,6 +1017,9 @@ export default function CycleLogDetail() {
           )}
         </div>
       )}
+
+      {/* Final Conclusion - ALL users, ALL gates */}
+      {cycle.final_conclusion && renderFinalConclusion(cycle.final_conclusion, cycle.rating, cycle.would_run_again)}
 
       {/* Community Feedback Section */}
       <div id="feedback-section" className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-3 sm:p-6 overflow-x-hidden">
@@ -1220,10 +1223,7 @@ export default function CycleLogDetail() {
               </div>
             ) : !user ? (
               <div className="mt-6">
-                {/* Final Conclusion - Visible to ALL users */}
-      {cycle.final_conclusion && renderFinalConclusion(cycle.final_conclusion, cycle.rating, cycle.would_run_again)}
-
-            <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
+                      <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
                   <div className="w-14 h-14 rounded-2xl bg-[#229DD8]/10 flex items-center justify-center mx-auto mb-4">
                     <svg className="w-7 h-7 text-[#229DD8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
