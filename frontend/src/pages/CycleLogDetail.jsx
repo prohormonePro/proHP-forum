@@ -437,24 +437,43 @@ export default function CycleLogDetail() {
 
   
   // === SOVEREIGN FINAL CONCLUSION RENDERER ===
+  const wikiLink = (text) => {
+    if (!text) return text;
+    const links = [
+      { pattern: /Hi-Tech Sustanon 250/g, url: '/compounds/hi-tech-sustanon-250', done: false },
+      { pattern: /Sustanon 250/g, url: '/compounds/hi-tech-sustanon-250', done: false },
+      { pattern: /Arimistane/g, url: '/compounds/arimistane', done: false },
+      { pattern: /Arimiplex/g, url: '/compounds/arimiplex', done: false },
+      { pattern: /COMT pathway/gi, url: '/compounds/comt', done: false },
+      { pattern: /COMT/g, url: '/compounds/comt', done: false },
+      { pattern: /Hi-Tech Decabolin/g, url: '/compounds/decabolin', done: false },
+      { pattern: /Decabolin/g, url: '/compounds/decabolin', done: false },
+      { pattern: /EpiAndro/g, url: '/compounds/epiandro', done: false },
+      { pattern: /\bPCT\b/g, url: '/pct', done: false },
+    ];
+    let result = text;
+    links.forEach(link => {
+      if (!link.done && link.pattern.test(result)) {
+        link.pattern.lastIndex = 0;
+        result = result.replace(link.pattern, (match) => {
+          if (link.done) return match;
+          link.done = true;
+          return `<a href="${link.url}" class="text-cyan-400 hover:text-cyan-300 underline decoration-cyan-500/30">${match}</a>`;
+        });
+      }
+    });
+    return result;
+  };
+
   const renderFinalConclusion = (text, rating, wouldRunAgain) => {
     if (!text) return null;
-    
-    // Parse structured sections
     const sections = {};
-    const sectionKeys = ['BLOODWORK DELTAS:', 'BODY COMPOSITION:', 'KEY LESSONS:', 'VERDICT:'];
+    const sectionKeys = ['KEY LESSONS:', 'BLOODWORK DELTAS:', 'BODY COMPOSITION:', 'VERDICT:'];
     let remaining = text;
     let preamble = '';
-    
     const firstSection = Math.min(...sectionKeys.map(k => { const i = text.indexOf(k); return i === -1 ? Infinity : i; }));
-    if (firstSection < Infinity) {
-      preamble = text.substring(0, firstSection).trim();
-      remaining = text.substring(firstSection);
-    } else {
-      preamble = text;
-      remaining = '';
-    }
-    
+    if (firstSection < Infinity) { preamble = text.substring(0, firstSection).trim(); remaining = text.substring(firstSection); }
+    else { preamble = text; remaining = ''; }
     sectionKeys.forEach(key => {
       const idx = remaining.indexOf(key);
       if (idx > -1) {
@@ -462,125 +481,131 @@ export default function CycleLogDetail() {
         sections[key] = remaining.substring(idx + key.length, nextIdx === Infinity ? remaining.length : nextIdx).trim();
       }
     });
-    
-    // Parse bloodwork into grid items
+
+    // Parse lessons into sub-sections (bold headers)
+    const lessonBlocks = [];
+    if (sections['KEY LESSONS:']) {
+      const lines = sections['KEY LESSONS:'].split('\n');
+      let current = null;
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        if (trimmed.length < 60 && !trimmed.startsWith('I ') && !trimmed.startsWith('One ') && !trimmed.startsWith('Week') && !trimmed.startsWith('The low') && !trimmed.startsWith('If ') && !trimmed.includes('.') && !trimmed.includes(',')) {
+          if (current) lessonBlocks.push(current);
+          current = { title: trimmed, body: '' };
+        } else if (current) {
+          current.body += (current.body ? '\n' : '') + trimmed;
+        } else {
+          current = { title: '', body: trimmed };
+        }
+      });
+      if (current) lessonBlocks.push(current);
+    }
+
+    // Parse bloodwork
     const bloodMarkers = [];
     if (sections['BLOODWORK DELTAS:']) {
       sections['BLOODWORK DELTAS:'].split('\n').forEach(line => {
-        const match = line.trim().match(/^(.+?):\s*(.+?)\s+to\s+(.+?)(?:\s+(\S+))?$/i);
+        const match = line.trim().match(/^(.+?):\s*(.+?)\s+to\s+(.+?)$/i);
         if (match) {
           const label = match[1].trim();
           const from = match[2].trim();
-          const toVal = (match[3] + (match[4] ? ' ' + match[4] : '')).trim();
+          const toVal = match[3].trim();
           const isStress = /ALT|AST|Estradiol|Creatinine/i.test(label);
           bloodMarkers.push({ label, from, to: toVal, isStress });
         }
       });
     }
-    
-    // Parse body comp
-    const bodyComp = [];
+
+    // Parse body comp into grid items
+    const bodyCompItems = [];
     if (sections['BODY COMPOSITION:']) {
-      sections['BODY COMPOSITION:'].split('\n').forEach(line => {
-        const l = line.trim();
-        if (l && !l.startsWith('Body fat')) bodyComp.push(l);
-        if (l.startsWith('Body fat')) bodyComp.push(l);
+      const bcText = sections['BODY COMPOSITION:'];
+      const patterns = [
+        { match: /Starting weight:\s*(\d+)\s*lbs.*Final weight:\s*(\d+)\s*lbs\s*\(([^)]+)\)/i, render: (m) => ({ label: 'Weight', value: m[3] }) },
+        { match: /Back:\s*([^.]+)/i, render: (m) => ({ label: 'Back', value: m[1].trim() }) },
+        { match: /Waist:\s*([^.]+)/i, render: (m) => ({ label: 'Waist', value: m[1].trim() }) },
+        { match: /Biceps:\s*([^.]+)/i, render: (m) => ({ label: 'Biceps', value: m[1].trim() }) },
+        { match: /Body fat:\s*([^.]+)/i, render: (m) => ({ label: 'Body Fat', value: m[1].trim() }) },
+      ];
+      patterns.forEach(p => {
+        const m = bcText.match(p.match);
+        if (m) bodyCompItems.push(p.render(m));
       });
     }
-    
-    // Parse lessons
-    const lessons = [];
-    if (sections['KEY LESSONS:']) {
-      sections['KEY LESSONS:'].split(/\n(?=\d+\.)/).forEach(l => {
-        const trimmed = l.trim();
-        if (trimmed) {
-          // Hyperlink COMT, PCT, Arimiplex
-          let html = trimmed
-            .replace(/COMT Pathway/gi, '<a href="/compounds/comt" class="text-amber-400 hover:text-amber-300 underline">COMT Pathway</a>')
-            .replace(/COMT/g, '<a href="/compounds/comt" class="text-amber-400 hover:text-amber-300 underline">COMT</a>')
-            .replace(/Arimiplex/g, '<a href="/compounds/arimiplex" class="text-cyan-400 hover:text-cyan-300 underline">Arimiplex</a>')
-            .replace(/\bPCT\b(?!<)/g, '<a href="/pct" class="text-amber-400 hover:text-amber-300 underline">PCT</a>');
-          lessons.push(html);
-        }
-      });
-    }
-    
-    // Parse verdict
+
     const verdict = sections['VERDICT:'] || '';
-    const verdictHtml = verdict
-      .replace(/Arimiplex/g, '<a href="/compounds/arimiplex" class="text-cyan-400 hover:text-cyan-300 underline">Arimiplex</a>')
-      .replace(/\bPCT\b/g, '<a href="/pct" class="text-amber-400 hover:text-amber-300 underline">PCT</a>');
-    
-    const hasStructure = bloodMarkers.length > 0 || lessons.length > 0;
-    const FC_TRUNCATE = 280;
-    const needsTruncate = !hasStructure && text.length > FC_TRUNCATE;
-    
+    const hasStructure = lessonBlocks.length > 0 || bloodMarkers.length > 0;
+    const FC_TRUNCATE = 300;
+
     return (
-      <div className="mb-6 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-emerald-950/20 rounded-xl sm:rounded-2xl border border-emerald-500/25 p-4 sm:p-6 shadow-lg shadow-emerald-500/5">
-        <div className="flex items-center gap-2 mb-4">
+      <div id="final-conclusion" className="mb-6 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-emerald-950/20 rounded-xl sm:rounded-2xl border border-emerald-500/25 p-4 sm:p-6 shadow-lg shadow-emerald-500/5">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <h2 className="text-base sm:text-lg font-bold text-emerald-400">Final Conclusion</h2>
-          {rating && <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">{rating}/10</span>}
+          {rating && <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">{rating}/10</span>}
           {wouldRunAgain !== null && <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${wouldRunAgain ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{wouldRunAgain ? 'Would Run Again' : 'Would Not Repeat'}</span>}
         </div>
-        
-        {/* Preamble */}
-        {preamble && <p className="text-sm text-slate-200 leading-relaxed mb-4">{preamble}</p>}
-        
+
+        {preamble && <p className="text-base text-slate-200 leading-relaxed mb-5" dangerouslySetInnerHTML={{__html: wikiLink(preamble)}} />}
+
         {hasStructure ? (<>
-          {/* Biomarker Delta Grid */}
+          {lessonBlocks.length > 0 && (<>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-3">Key Lessons</p>
+            <div className={`space-y-4 mb-5 ${!fcExpanded && lessonBlocks.length > 2 ? 'max-h-[280px] overflow-hidden relative' : ''}`}>
+              {(fcExpanded ? lessonBlocks : lessonBlocks).map((block, i) => (
+                <div key={i}>
+                  {block.title && <p className="text-sm font-bold text-white mb-1">{block.title}</p>}
+                  <p className="text-[15px] text-slate-200 leading-relaxed" dangerouslySetInnerHTML={{__html: wikiLink(block.body)}} />
+                </div>
+              ))}
+              {!fcExpanded && lessonBlocks.length > 2 && (
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-emerald-950/80 via-emerald-950/60 to-transparent" />
+              )}
+            </div>
+            {lessonBlocks.length > 2 && (
+              <button onClick={() => setFcExpanded(!fcExpanded)} className="text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors mb-5">
+                {fcExpanded ? 'Show less' : `See all ${lessonBlocks.length} lessons`}
+              </button>
+            )}
+          </>)}
+
           {bloodMarkers.length > 0 && (<>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Bloodwork Deltas</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
               {bloodMarkers.map((m, i) => (
-                <div key={i} className="bg-slate-900/40 border border-slate-700/50 rounded-lg p-2.5 flex justify-between items-center">
-                  <span className="text-slate-400 text-[10px] uppercase">{m.label}</span>
-                  <span className={`text-xs font-bold ${m.isStress ? 'text-amber-400' : 'text-cyan-400'}`}>{m.from} ➔ {m.to}</span>
+                <div key={i} className="bg-slate-900/40 border border-slate-700/50 rounded-lg p-2.5">
+                  <p className="text-slate-400 text-[10px] uppercase mb-1">{m.label}</p>
+                  <p className={`text-sm font-bold ${m.isStress ? 'text-amber-400' : 'text-cyan-400'}`}>{m.from} ➔ {m.to}</p>
                 </div>
               ))}
             </div>
           </>)}
-          
-          {/* Body Composition */}
-          {bodyComp.length > 0 && (<>
+
+          {bodyCompItems.length > 0 && (<>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Body Composition</p>
-            <div className="bg-slate-900/30 border border-slate-700/40 rounded-lg p-3 mb-4 space-y-1">
-              {bodyComp.map((line, i) => <p key={i} className="text-sm text-slate-200">{line}</p>)}
-            </div>
-          </>)}
-          
-          {/* Key Lessons */}
-          {lessons.length > 0 && (<>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Key Lessons</p>
-            <div className={`space-y-2 mb-4 ${!fcExpanded && lessons.length > 2 ? 'max-h-[120px] overflow-hidden relative' : ''}`}>
-              {(fcExpanded ? lessons : lessons.slice(0, 5)).map((html, i) => (
-                <p key={i} className="text-sm text-slate-200 leading-relaxed" dangerouslySetInnerHTML={{__html: html}} />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-5">
+              {bodyCompItems.map((item, i) => (
+                <div key={i} className="bg-slate-900/40 border border-slate-700/50 rounded-lg p-2.5">
+                  <p className="text-slate-400 text-[10px] uppercase mb-1">{item.label}</p>
+                  <p className="text-sm font-bold text-white">{item.value}</p>
+                </div>
               ))}
-              {!fcExpanded && lessons.length > 2 && (
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-slate-900/90 to-transparent" />
-              )}
             </div>
-            {lessons.length > 2 && (
-              <button onClick={() => setFcExpanded(!fcExpanded)} className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors mb-4">
-                {fcExpanded ? 'Show less' : `See all ${lessons.length} lessons`}
-              </button>
-            )}
           </>)}
-          
-          {/* Verdict Anchor */}
+
           {verdict && (
             <div className="border-l-2 border-cyan-500 bg-gradient-to-r from-cyan-500/10 to-transparent p-4 rounded-r-xl mt-2">
-              <p className="text-[10px] text-cyan-400 uppercase tracking-widest font-bold mb-1">Verdict</p>
-              <p className="text-sm text-slate-200 leading-relaxed" dangerouslySetInnerHTML={{__html: verdictHtml}} />
+              <p className="text-[10px] text-cyan-400 uppercase tracking-widest font-bold mb-2">Verdict</p>
+              <p className="text-[15px] text-slate-200 leading-relaxed" dangerouslySetInnerHTML={{__html: wikiLink(verdict)}} />
             </div>
           )}
         </>) : (<>
-          {/* Unstructured fallback with truncation */}
-          <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">
-            {needsTruncate && !fcExpanded ? text.substring(0, FC_TRUNCATE) + '...' : text}
+          <p className="text-[15px] text-slate-200 leading-relaxed whitespace-pre-wrap">
+            {text.length > FC_TRUNCATE && !fcExpanded ? text.substring(0, FC_TRUNCATE) + '...' : text}
           </p>
-          {needsTruncate && (
-            <button onClick={() => setFcExpanded(!fcExpanded)} className="mt-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+          {text.length > FC_TRUNCATE && (
+            <button onClick={() => setFcExpanded(!fcExpanded)} className="mt-3 text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
               {fcExpanded ? 'Show less' : 'See more'}
             </button>
           )}
@@ -903,7 +928,15 @@ export default function CycleLogDetail() {
         );
       })()}
 
-      {/* Complete Cycle */}
+            {/* Scroll to Final Conclusion */}
+      {cycle.final_conclusion && cycle.status === 'completed' && (
+        <button onClick={() => document.getElementById('final-conclusion')?.scrollIntoView({ behavior: 'smooth' })} className="w-full mb-4 py-2.5 text-sm text-emerald-400 hover:text-white bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 rounded-xl transition-all flex items-center justify-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+          Read Final Conclusion
+        </button>
+      )}
+
+{/* Complete Cycle */}
       {showOwnerControls && cycle.rating == null && cycle.status !== 'pct' && (
         <div className="mb-6">
           {!showCompleteForm ? (
@@ -1187,19 +1220,7 @@ export default function CycleLogDetail() {
               </div>
             ) : !user ? (
               <div className="mt-6">
-                {/* Final Conclusion — The Thesis */}
-      {cycle.final_conclusion && (
-        <div className="mb-6 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-emerald-950/20 backdrop-blur-md rounded-xl sm:rounded-2xl border border-emerald-500/25 p-4 sm:p-6 shadow-lg shadow-emerald-500/5">
-          <div className="flex items-center gap-2 mb-3">
-            <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <h2 className="text-base sm:text-lg font-bold text-emerald-400">Final Conclusion</h2>
-            {cycle.rating && <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">{cycle.rating}/10</span>}
-          </div>
-          <p className="text-sm sm:text-base text-slate-200 leading-relaxed whitespace-pre-wrap">{cycle.final_conclusion}</p>
-        </div>
-      )}
-
-      {/* Final Conclusion - Visible to ALL users */}
+                {/* Final Conclusion - Visible to ALL users */}
       {cycle.final_conclusion && renderFinalConclusion(cycle.final_conclusion, cycle.rating, cycle.would_run_again)}
 
             <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
