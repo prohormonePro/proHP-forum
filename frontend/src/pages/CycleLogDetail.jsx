@@ -419,6 +419,20 @@ export default function CycleLogDetail() {
 
   const replyToPost = replyTo ? posts.find(p => p.id === replyTo) : null;
   const filteredPosts = commentSearch.trim() ? posts.filter(p => p.body.toLowerCase().includes(commentSearch.toLowerCase()) || p.author_username?.toLowerCase().includes(commentSearch.toLowerCase())) : posts;
+  
+  // PCT section divider helper
+  const renderSectionHeader = (updates, currentIdx) => {
+    const update = updates[currentIdx];
+    const prev = currentIdx > 0 ? updates[currentIdx - 1] : null;
+    if (currentIdx === 0) {
+      return (<div className="mb-4"><h3 className="text-sm font-bold text-[#229DD8] uppercase tracking-wider">Cycle</h3></div>);
+    }
+    if (update.is_pct_week && (!prev || !prev.is_pct_week)) {
+      return (<div className="mt-6 mb-4 pt-4 border-t border-amber-500/20"><h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>Post Cycle Therapy (PCT)</h3><p className="text-xs text-slate-400 mt-1">Recovery phase. <a href="/compounds/comt-pathway-on-cycle-anxiety" className="text-amber-400 hover:text-amber-300 underline">Understanding on-cycle anxiety (COMT)</a> helps explain why PCT recovery matters for your neurochemistry, not just your hormones.</p></div>);
+    }
+    return null;
+  };
+
   const topLevel = filteredPosts
     .filter(p => !p.parent_id)
     .sort((a, b) => {
@@ -621,7 +635,7 @@ export default function CycleLogDetail() {
               <div key={update.id} className="prohp-card border border-white/5 overflow-hidden">
                 <button onClick={() => toggleWeek(idx)} className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-slate-800/30 transition-colors text-left">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm font-bold text-[#229DD8] shrink-0">Wk {update.week_number}</span>
+                    <span className={`text-sm font-bold shrink-0 ${update.is_pct_week ? "text-amber-400" : "text-[#229DD8]"}`}>{update.is_pct_week ? "PCT " : "Wk "}{update.week_number}</span>
                     {update.strength_notes && <span className="text-xs text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-md truncate max-w-[160px] sm:max-w-[250px]">{update.strength_notes}</span>}
                     {update.side_effects && !update.strength_notes && <span className="text-xs text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-md truncate max-w-[160px] sm:max-w-[250px]">{update.side_effects}</span>}
                   </div>
