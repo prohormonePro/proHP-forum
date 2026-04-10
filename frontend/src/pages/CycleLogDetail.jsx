@@ -216,6 +216,8 @@ export default function CycleLogDetail() {
   const [completeFinalConclusion, setCompleteFinalConclusion] = useState('');
   const [completeStep, setCompleteStep] = useState('ask');
   const [commentText, setCommentText] = useState('');
+  const [fcExpanded, setFcExpanded] = useState(false);
+  const [commentsExpanded, setCommentsExpanded] = useState(false);
   const [commentImage, setCommentImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -428,9 +430,163 @@ export default function CycleLogDetail() {
       return (<div className="mb-4"><h3 className="text-sm font-bold text-[#229DD8] uppercase tracking-wider">Cycle</h3></div>);
     }
     if (update.is_pct_week && (!prev || !prev.is_pct_week)) {
-      return (<div className="mt-6 mb-4 pt-4 border-t border-amber-500/20"><h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>Post Cycle Therapy (PCT)</h3><p className="text-xs text-slate-400 mt-1">Recovery phase. <a href="/compounds/comt-pathway-on-cycle-anxiety" className="text-amber-400 hover:text-amber-300 underline">Understanding on-cycle anxiety (COMT)</a> helps explain why PCT recovery matters for your neurochemistry, not just your hormones.</p></div>);
+      return (<div className="mt-6 mb-4 pt-4 border-t border-amber-500/20"><h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>Post Cycle Therapy (PCT)</h3><p className="text-xs text-slate-400 mt-1">Recovery phase. <a href="/compounds/comt" className="text-amber-400 hover:text-amber-300 underline">Understanding on-cycle anxiety (COMT)</a> helps explain why PCT recovery matters for your neurochemistry, not just your hormones.</p></div>);
     }
     return null;
+  };
+
+  
+  // === SOVEREIGN FINAL CONCLUSION RENDERER ===
+  const renderFinalConclusion = (text, rating, wouldRunAgain) => {
+    if (!text) return null;
+    
+    // Parse structured sections
+    const sections = {};
+    const sectionKeys = ['BLOODWORK DELTAS:', 'BODY COMPOSITION:', 'KEY LESSONS:', 'VERDICT:'];
+    let remaining = text;
+    let preamble = '';
+    
+    const firstSection = Math.min(...sectionKeys.map(k => { const i = text.indexOf(k); return i === -1 ? Infinity : i; }));
+    if (firstSection < Infinity) {
+      preamble = text.substring(0, firstSection).trim();
+      remaining = text.substring(firstSection);
+    } else {
+      preamble = text;
+      remaining = '';
+    }
+    
+    sectionKeys.forEach(key => {
+      const idx = remaining.indexOf(key);
+      if (idx > -1) {
+        const nextIdx = Math.min(...sectionKeys.filter(k => k !== key).map(k => { const i = remaining.indexOf(k, idx + key.length); return i === -1 ? Infinity : i; }));
+        sections[key] = remaining.substring(idx + key.length, nextIdx === Infinity ? remaining.length : nextIdx).trim();
+      }
+    });
+    
+    // Parse bloodwork into grid items
+    const bloodMarkers = [];
+    if (sections['BLOODWORK DELTAS:']) {
+      sections['BLOODWORK DELTAS:'].split('\n').forEach(line => {
+        const match = line.trim().match(/^(.+?):\s*(.+?)\s+to\s+(.+?)(?:\s+(\S+))?$/i);
+        if (match) {
+          const label = match[1].trim();
+          const from = match[2].trim();
+          const toVal = (match[3] + (match[4] ? ' ' + match[4] : '')).trim();
+          const isStress = /ALT|AST|Estradiol|Creatinine/i.test(label);
+          bloodMarkers.push({ label, from, to: toVal, isStress });
+        }
+      });
+    }
+    
+    // Parse body comp
+    const bodyComp = [];
+    if (sections['BODY COMPOSITION:']) {
+      sections['BODY COMPOSITION:'].split('\n').forEach(line => {
+        const l = line.trim();
+        if (l && !l.startsWith('Body fat')) bodyComp.push(l);
+        if (l.startsWith('Body fat')) bodyComp.push(l);
+      });
+    }
+    
+    // Parse lessons
+    const lessons = [];
+    if (sections['KEY LESSONS:']) {
+      sections['KEY LESSONS:'].split(/\n(?=\d+\.)/).forEach(l => {
+        const trimmed = l.trim();
+        if (trimmed) {
+          // Hyperlink COMT, PCT, Arimiplex
+          let html = trimmed
+            .replace(/COMT Pathway/gi, '<a href="/compounds/comt" class="text-amber-400 hover:text-amber-300 underline">COMT Pathway</a>')
+            .replace(/COMT/g, '<a href="/compounds/comt" class="text-amber-400 hover:text-amber-300 underline">COMT</a>')
+            .replace(/Arimiplex/g, '<a href="/compounds/arimiplex" class="text-cyan-400 hover:text-cyan-300 underline">Arimiplex</a>')
+            .replace(/\bPCT\b(?!<)/g, '<a href="/pct" class="text-amber-400 hover:text-amber-300 underline">PCT</a>');
+          lessons.push(html);
+        }
+      });
+    }
+    
+    // Parse verdict
+    const verdict = sections['VERDICT:'] || '';
+    const verdictHtml = verdict
+      .replace(/Arimiplex/g, '<a href="/compounds/arimiplex" class="text-cyan-400 hover:text-cyan-300 underline">Arimiplex</a>')
+      .replace(/\bPCT\b/g, '<a href="/pct" class="text-amber-400 hover:text-amber-300 underline">PCT</a>');
+    
+    const hasStructure = bloodMarkers.length > 0 || lessons.length > 0;
+    const FC_TRUNCATE = 280;
+    const needsTruncate = !hasStructure && text.length > FC_TRUNCATE;
+    
+    return (
+      <div className="mb-6 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-emerald-950/20 rounded-xl sm:rounded-2xl border border-emerald-500/25 p-4 sm:p-6 shadow-lg shadow-emerald-500/5">
+        <div className="flex items-center gap-2 mb-4">
+          <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <h2 className="text-base sm:text-lg font-bold text-emerald-400">Final Conclusion</h2>
+          {rating && <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">{rating}/10</span>}
+          {wouldRunAgain !== null && <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${wouldRunAgain ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>{wouldRunAgain ? 'Would Run Again' : 'Would Not Repeat'}</span>}
+        </div>
+        
+        {/* Preamble */}
+        {preamble && <p className="text-sm text-slate-200 leading-relaxed mb-4">{preamble}</p>}
+        
+        {hasStructure ? (<>
+          {/* Biomarker Delta Grid */}
+          {bloodMarkers.length > 0 && (<>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Bloodwork Deltas</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+              {bloodMarkers.map((m, i) => (
+                <div key={i} className="bg-slate-900/40 border border-slate-700/50 rounded-lg p-2.5 flex justify-between items-center">
+                  <span className="text-slate-400 text-[10px] uppercase">{m.label}</span>
+                  <span className={`text-xs font-bold ${m.isStress ? 'text-amber-400' : 'text-cyan-400'}`}>{m.from} ➔ {m.to}</span>
+                </div>
+              ))}
+            </div>
+          </>)}
+          
+          {/* Body Composition */}
+          {bodyComp.length > 0 && (<>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Body Composition</p>
+            <div className="bg-slate-900/30 border border-slate-700/40 rounded-lg p-3 mb-4 space-y-1">
+              {bodyComp.map((line, i) => <p key={i} className="text-sm text-slate-200">{line}</p>)}
+            </div>
+          </>)}
+          
+          {/* Key Lessons */}
+          {lessons.length > 0 && (<>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Key Lessons</p>
+            <div className={`space-y-2 mb-4 ${!fcExpanded && lessons.length > 2 ? 'max-h-[120px] overflow-hidden relative' : ''}`}>
+              {(fcExpanded ? lessons : lessons.slice(0, 5)).map((html, i) => (
+                <p key={i} className="text-sm text-slate-200 leading-relaxed" dangerouslySetInnerHTML={{__html: html}} />
+              ))}
+              {!fcExpanded && lessons.length > 2 && (
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-slate-900/90 to-transparent" />
+              )}
+            </div>
+            {lessons.length > 2 && (
+              <button onClick={() => setFcExpanded(!fcExpanded)} className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors mb-4">
+                {fcExpanded ? 'Show less' : `See all ${lessons.length} lessons`}
+              </button>
+            )}
+          </>)}
+          
+          {/* Verdict Anchor */}
+          {verdict && (
+            <div className="border-l-2 border-cyan-500 bg-gradient-to-r from-cyan-500/10 to-transparent p-4 rounded-r-xl mt-2">
+              <p className="text-[10px] text-cyan-400 uppercase tracking-widest font-bold mb-1">Verdict</p>
+              <p className="text-sm text-slate-200 leading-relaxed" dangerouslySetInnerHTML={{__html: verdictHtml}} />
+            </div>
+          )}
+        </>) : (<>
+          {/* Unstructured fallback with truncation */}
+          <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">
+            {needsTruncate && !fcExpanded ? text.substring(0, FC_TRUNCATE) + '...' : text}
+          </p>
+          {needsTruncate && (
+            <button onClick={() => setFcExpanded(!fcExpanded)} className="mt-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+              {fcExpanded ? 'Show less' : 'See more'}
+            </button>
+          )}
+        </>)}
+      </div>
+    );
   };
 
   const topLevel = filteredPosts
@@ -992,7 +1148,7 @@ export default function CycleLogDetail() {
                       </div>
                     );
                   }
-                  return topLevel.map(p => renderComment(p, 0));
+                  return (commentsExpanded ? topLevel : topLevel.slice(0, 5)).map(p => renderComment(p, 0));
                 })()}
               </div>
             )}
@@ -1009,6 +1165,12 @@ export default function CycleLogDetail() {
                 <button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">x</button>
               </div>
             )}
+              {topLevel.length > 5 && !commentsExpanded && (
+                <button onClick={() => setCommentsExpanded(true)} className="w-full py-3 text-sm text-[#229DD8] hover:text-white bg-[#229DD8]/5 hover:bg-[#229DD8]/10 border border-[#229DD8]/20 rounded-xl transition-all mt-2 mb-4">
+                  See {topLevel.length - 5} more comments
+                </button>
+              )}
+
             <p className="text-xs text-slate-500 mb-2">Your results help the next guy make a better decision.</p>
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Share your thoughts, advice, or questions..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-base placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-vertical mb-3" ref={replyBoxRef} />
                 {commentError && <p className="text-red-400 text-sm mb-2">{commentError}</p>}
@@ -1036,6 +1198,9 @@ export default function CycleLogDetail() {
           <p className="text-sm sm:text-base text-slate-200 leading-relaxed whitespace-pre-wrap">{cycle.final_conclusion}</p>
         </div>
       )}
+
+      {/* Final Conclusion - Visible to ALL users */}
+      {cycle.final_conclusion && renderFinalConclusion(cycle.final_conclusion, cycle.rating, cycle.would_run_again)}
 
             <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
                   <div className="w-14 h-14 rounded-2xl bg-[#229DD8]/10 flex items-center justify-center mx-auto mb-4">
