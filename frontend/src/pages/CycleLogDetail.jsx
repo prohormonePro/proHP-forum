@@ -213,8 +213,8 @@ export default function CycleLogDetail() {
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
   const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
-  const [completePctChecked, setCompletePctChecked] = useState(false);
   const [completeFinalConclusion, setCompleteFinalConclusion] = useState('');
+  const [completeStep, setCompleteStep] = useState('ask');
   const [commentText, setCommentText] = useState('');
   const [commentImage, setCommentImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -737,19 +737,37 @@ export default function CycleLogDetail() {
       {showOwnerControls && cycle.rating == null && cycle.status !== 'pct' && (
         <div className="mb-6">
           {!showCompleteForm ? (
-            <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
+            <button onClick={() => { setShowCompleteForm(true); setCompleteStep('ask'); }} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
           ) : (
             <div className="bg-slate-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-emerald-500/25 p-3 sm:p-6">
-              <h3 className="text-lg font-bold text-white mb-1">Complete Cycle</h3>
-              <p className="text-xs text-slate-500 mb-5">Final verdict. Rate the compound and lock it in.</p>
-              <div className="space-y-4">
-                <div><label className="block text-xs font-medium text-slate-300 mb-1">Rating (1-10)</label><select value={completeRating} onChange={(e) => setCompleteRating(e.target.value)} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all"><option value="">Select rating</option>{[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
-                <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completeWouldRunAgain} onChange={(e) => setCompleteWouldRunAgain(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-[#229DD8] focus:ring-[#229DD8]" /><span className="text-sm text-slate-300">Would run again</span></label>
-                <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completePctChecked} onChange={(e) => setCompletePctChecked(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-amber-500 focus:ring-amber-500" /><span className="text-sm text-slate-300">Taking a PCT?</span></label>
-                <div><label className="block text-xs font-medium text-slate-300 mb-1">Final Conclusion</label><textarea value={completeFinalConclusion} onChange={(e) => setCompleteFinalConclusion(e.target.value)} placeholder="What did you learn? What would you tell someone about to run this compound? This becomes the thesis at the top of your log." rows={4} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none" /></div>
-                {completeCycle.isError && (<div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3"><p className="text-red-400 text-sm">{completeCycle.error?.message || 'Failed'}</p></div>)}
-                <div className="flex gap-3"><button onClick={() => { if (!completeRating) return; completeCycle.mutate({ rating: parseInt(completeRating, 10), would_run_again: completeWouldRunAgain, status: completePctChecked ? 'pct' : 'completed', pct_active: completePctChecked, final_conclusion: completeFinalConclusion || null, pct_start_week: completePctChecked ? (Math.max(...existingWeeks, 0) + 1) : null }); }} disabled={!completeRating || completeCycle.isPending} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">{completeCycle.isPending ? 'Submitting...' : 'Submit & Complete'}</button><button onClick={() => setShowCompleteForm(false)} className="px-4 py-3 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button></div>
-              </div>
+
+              {/* Step 1: PCT Decision */}
+              {completeStep === 'ask' && (<>
+                <h3 className="text-lg font-bold text-white mb-1">Complete Cycle</h3>
+                <p className="text-xs text-slate-500 mb-5">Before we lock this in — are you running a PCT?</p>
+                <div className="flex gap-3">
+                  <button onClick={() => { completeCycle.mutate({ status: 'pct', pct_active: true, pct_start_week: Math.max(...existingWeeks, 0) + 1 }); setShowCompleteForm(false); }} className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">Yes — Start PCT</button>
+                  <button onClick={() => setCompleteStep('finish')} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">No — Finish Now</button>
+                </div>
+                <button onClick={() => setShowCompleteForm(false)} className="mt-3 w-full text-center text-sm text-slate-500 hover:text-white transition-colors">Cancel</button>
+              </>)}
+
+              {/* Step 2: Rating + Final Conclusion (only if No PCT) */}
+              {completeStep === 'finish' && (<>
+                <h3 className="text-lg font-bold text-white mb-1">Final Verdict</h3>
+                <p className="text-xs text-slate-500 mb-5">Rate the compound. Write the thesis. Lock it in.</p>
+                <div className="space-y-4">
+                  <div><label className="block text-xs font-medium text-slate-300 mb-1">Rating (1-10)</label><select value={completeRating} onChange={(e) => setCompleteRating(e.target.value)} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all"><option value="">Select rating</option>{[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+                  <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completeWouldRunAgain} onChange={(e) => setCompleteWouldRunAgain(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-[#229DD8] focus:ring-[#229DD8]" /><span className="text-sm text-slate-300">Would run again</span></label>
+                  <div><label className="block text-xs font-medium text-slate-300 mb-1">Final Conclusion</label><textarea value={completeFinalConclusion} onChange={(e) => setCompleteFinalConclusion(e.target.value)} placeholder="What did you learn? What would you tell someone about to run this compound? This becomes the thesis at the top of your log." rows={4} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none" /></div>
+                  {completeCycle.isError && (<div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3"><p className="text-red-400 text-sm">{completeCycle.error?.message || 'Failed'}</p></div>)}
+                  <div className="flex gap-3">
+                    <button onClick={() => { if (!completeRating) return; completeCycle.mutate({ rating: parseInt(completeRating, 10), would_run_again: completeWouldRunAgain, status: 'completed', final_conclusion: completeFinalConclusion || null }); }} disabled={!completeRating || completeCycle.isPending} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">{completeCycle.isPending ? 'Submitting...' : 'Submit & Complete'}</button>
+                    <button onClick={() => setCompleteStep('ask')} className="px-4 py-3 text-sm text-slate-400 hover:text-white transition-colors">Back</button>
+                  </div>
+                </div>
+              </>)}
+
             </div>
           )}
         </div>
@@ -764,9 +782,22 @@ export default function CycleLogDetail() {
           </div>
           <p className="text-xs text-slate-400 mb-4">Log your PCT weekly. When recovery is complete, mark it done below.</p>
           <WeeklyUpdateForm cycleId={id} existingWeeks={existingWeeks} onSuccess={() => {}} isPctPhase={true} />
-          <button onClick={() => completeCycle.mutate({ status: 'completed', pct_active: false })} className="mt-4 w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">
-            PCT Complete — Mark Cycle Done
-          </button>
+          {completeStep !== 'finish' ? (
+            <button onClick={() => setCompleteStep('finish')} className="mt-4 w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">
+              PCT Complete — Write Final Verdict
+            </button>
+          ) : (
+            <div className="mt-4 bg-slate-900/60 rounded-xl border border-emerald-500/20 p-4 space-y-4">
+              <h4 className="text-sm font-bold text-emerald-400">Final Verdict</h4>
+              <div><label className="block text-xs font-medium text-slate-300 mb-1">Rating (1-10)</label><select value={completeRating} onChange={(e) => setCompleteRating(e.target.value)} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all"><option value="">Select rating</option>{[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
+              <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completeWouldRunAgain} onChange={(e) => setCompleteWouldRunAgain(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-[#229DD8] focus:ring-[#229DD8]" /><span className="text-sm text-slate-300">Would run again</span></label>
+              <div><label className="block text-xs font-medium text-slate-300 mb-1">Final Conclusion</label><textarea value={completeFinalConclusion} onChange={(e) => setCompleteFinalConclusion(e.target.value)} placeholder="The full journey is done — cycle + PCT. What did you learn? This becomes the thesis at the top of your log." rows={4} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none" /></div>
+              <div className="flex gap-3">
+                <button onClick={() => { if (!completeRating) return; completeCycle.mutate({ rating: parseInt(completeRating, 10), would_run_again: completeWouldRunAgain, status: 'completed', pct_active: false, final_conclusion: completeFinalConclusion || null }); }} disabled={!completeRating || completeCycle.isPending} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">{completeCycle.isPending ? 'Submitting...' : 'Complete Cycle'}</button>
+                <button onClick={() => setCompleteStep('ask')} className="px-4 py-3 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
