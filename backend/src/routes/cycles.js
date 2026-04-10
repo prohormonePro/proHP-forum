@@ -13,7 +13,7 @@ router.get('/', optionalAuth, async (req, res) => {
     const offset = (page - 1) * limit;
 
     let sql = `SELECT cl.id, cl.title, cl.compound_name, cl.dose, cl.duration_weeks,
-                      cl.status, cl.rating, cl.would_run_again, cl.start_date, cl.follower_count, cl.update_count,
+                      cl.status, cl.rating, cl.would_run_again, cl.pct_active, cl.final_conclusion, cl.pct_start_week, cl.start_date, cl.follower_count, cl.update_count,
                       cl.is_featured, cl.created_at,
                       u.username, u.display_name, u.tier AS user_tier, u.is_founding,
              (SELECT count(*)::int FROM posts p2 WHERE p2.thread_id = cl.thread_id) as comment_count
@@ -128,7 +128,7 @@ router.post('/:id/updates', authenticate, requireTier('inner_circle'), async (re
       return res.status(403).json({ error: 'You can only update your own cycle logs' });
     }
 
-    const { week_number, weight_lbs, body_fat_pct, strength_notes, side_effects, side_effect_severity, mood_notes, general_notes } = req.body;
+    const { week_number, weight_lbs, body_fat_pct, strength_notes, side_effects, side_effect_severity, mood_notes, general_notes, is_pct_week } = req.body;
 
     if (!week_number || week_number < 1) {
       return res.status(400).json({ error: 'week_number is required (1+)' });
@@ -137,11 +137,11 @@ router.post('/:id/updates', authenticate, requireTier('inner_circle'), async (re
     const result = await query(
       `INSERT INTO cycle_updates (cycle_log_id, user_id, week_number, weight_lbs, body_fat_pct,
        strength_notes, side_effects, side_effect_severity, mood_notes, general_notes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [id, req.user.id, week_number, weight_lbs || null, body_fat_pct || null,
        strength_notes || '', side_effects || '', side_effect_severity || null,
-       mood_notes || '', general_notes || '']
+       mood_notes || '', general_notes || '', is_pct_week || false]
     );
 
     res.status(201).json({ update: result.rows[0] });
@@ -173,8 +173,20 @@ router.patch('/:id', authenticate, requireTier('inner_circle'), async (req, res)
       sets.push('would_run_again = $' + idx++);
       params.push(Boolean(req.body.would_run_again));
     }
+    if (req.body.pct_active !== undefined) {
+      sets.push('pct_active = $' + idx++);
+      params.push(Boolean(req.body.pct_active));
+    }
+    if (req.body.final_conclusion !== undefined) {
+      sets.push('final_conclusion = $' + idx++);
+      params.push(req.body.final_conclusion);
+    }
+    if (req.body.pct_start_week !== undefined) {
+      sets.push('pct_start_week = $' + idx++);
+      params.push(parseInt(req.body.pct_start_week, 10));
+    }
     if (req.body.status !== undefined) {
-      if (!['active', 'completed', 'abandoned'].includes(req.body.status)) return res.status(400).json({ error: 'status must be active, completed, or abandoned' });
+      if (!['active', 'completed', 'abandoned', 'pct'].includes(req.body.status)) return res.status(400).json({ error: 'status must be active, completed, or abandoned' });
       sets.push('status = $' + idx++);
       params.push(req.body.status);
     }

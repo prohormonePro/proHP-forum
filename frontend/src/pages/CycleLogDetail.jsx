@@ -213,6 +213,8 @@ export default function CycleLogDetail() {
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [completeRating, setCompleteRating] = useState('');
   const [completeWouldRunAgain, setCompleteWouldRunAgain] = useState(false);
+  const [completePctChecked, setCompletePctChecked] = useState(false);
+  const [completeFinalConclusion, setCompleteFinalConclusion] = useState('');
   const [commentText, setCommentText] = useState('');
   const [commentImage, setCommentImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -732,7 +734,7 @@ export default function CycleLogDetail() {
       })()}
 
       {/* Complete Cycle */}
-      {showOwnerControls && cycle.rating == null && (
+      {showOwnerControls && cycle.rating == null && cycle.status !== 'pct' && (
         <div className="mb-6">
           {!showCompleteForm ? (
             <button onClick={() => setShowCompleteForm(true)} className="w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">Complete Cycle</button>
@@ -743,11 +745,28 @@ export default function CycleLogDetail() {
               <div className="space-y-4">
                 <div><label className="block text-xs font-medium text-slate-300 mb-1">Rating (1-10)</label><select value={completeRating} onChange={(e) => setCompleteRating(e.target.value)} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all"><option value="">Select rating</option>{[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}</select></div>
                 <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completeWouldRunAgain} onChange={(e) => setCompleteWouldRunAgain(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-[#229DD8] focus:ring-[#229DD8]" /><span className="text-sm text-slate-300">Would run again</span></label>
+                <label className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={completePctChecked} onChange={(e) => setCompletePctChecked(e.target.checked)} className="w-4 h-4 rounded border-slate-600 bg-slate-950 text-amber-500 focus:ring-amber-500" /><span className="text-sm text-slate-300">Taking a PCT?</span></label>
+                <div><label className="block text-xs font-medium text-slate-300 mb-1">Final Conclusion</label><textarea value={completeFinalConclusion} onChange={(e) => setCompleteFinalConclusion(e.target.value)} placeholder="What did you learn? What would you tell someone about to run this compound? This becomes the thesis at the top of your log." rows={4} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-2.5 px-4 text-white text-sm focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none" /></div>
                 {completeCycle.isError && (<div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3"><p className="text-red-400 text-sm">{completeCycle.error?.message || 'Failed'}</p></div>)}
-                <div className="flex gap-3"><button onClick={() => { if (!completeRating) return; completeCycle.mutate({ rating: parseInt(completeRating, 10), would_run_again: completeWouldRunAgain, status: 'completed' }); }} disabled={!completeRating || completeCycle.isPending} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">{completeCycle.isPending ? 'Submitting...' : 'Submit & Complete'}</button><button onClick={() => setShowCompleteForm(false)} className="px-4 py-3 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button></div>
+                <div className="flex gap-3"><button onClick={() => { if (!completeRating) return; completeCycle.mutate({ rating: parseInt(completeRating, 10), would_run_again: completeWouldRunAgain, status: completePctChecked ? 'pct' : 'completed', pct_active: completePctChecked, final_conclusion: completeFinalConclusion || null, pct_start_week: completePctChecked ? (Math.max(...existingWeeks, 0) + 1) : null }); }} disabled={!completeRating || completeCycle.isPending} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl py-3 px-6 transition-all shadow-lg">{completeCycle.isPending ? 'Submitting...' : 'Submit & Complete'}</button><button onClick={() => setShowCompleteForm(false)} className="px-4 py-3 text-sm text-slate-400 hover:text-white transition-colors">Cancel</button></div>
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* PCT Phase */}
+      {showOwnerControls && cycle.status === 'pct' && cycle.pct_active && (
+        <div className="mb-6 bg-gradient-to-br from-amber-950/30 via-slate-900/80 to-amber-950/20 backdrop-blur-md rounded-xl sm:rounded-2xl border border-amber-500/25 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            <h3 className="text-base font-bold text-amber-400">PCT Phase — Recovery in Progress</h3>
+          </div>
+          <p className="text-xs text-slate-400 mb-4">Log your PCT weekly. When recovery is complete, mark it done below.</p>
+          <WeeklyUpdateForm cycleId={id} existingWeeks={existingWeeks} onSuccess={() => {}} isPctPhase={true} />
+          <button onClick={() => completeCycle.mutate({ status: 'completed', pct_active: false })} className="mt-4 w-full border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-400 font-semibold rounded-xl py-3 px-6 transition-all">
+            PCT Complete — Mark Cycle Done
+          </button>
         </div>
       )}
 
@@ -961,7 +980,19 @@ export default function CycleLogDetail() {
               </div>
             ) : !user ? (
               <div className="mt-6">
-                <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
+                {/* Final Conclusion — The Thesis */}
+      {cycle.final_conclusion && (
+        <div className="mb-6 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-emerald-950/20 backdrop-blur-md rounded-xl sm:rounded-2xl border border-emerald-500/25 p-4 sm:p-6 shadow-lg shadow-emerald-500/5">
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <h2 className="text-base sm:text-lg font-bold text-emerald-400">Final Conclusion</h2>
+            {cycle.rating && <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">{cycle.rating}/10</span>}
+          </div>
+          <p className="text-sm sm:text-base text-slate-200 leading-relaxed whitespace-pre-wrap">{cycle.final_conclusion}</p>
+        </div>
+      )}
+
+            <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 text-center shadow-lg shadow-[#229DD8]/5">
                   <div className="w-14 h-14 rounded-2xl bg-[#229DD8]/10 flex items-center justify-center mx-auto mb-4">
                     <svg className="w-7 h-7 text-[#229DD8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
