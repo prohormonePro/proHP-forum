@@ -1165,7 +1165,7 @@ export default function CycleLogDetail() {
                                   <button onClick={() => { setEditingPost(p.id); setEditText(p.body); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded-md transition-all"><Pencil className="w-3 h-3" /></button>
                                 )}
                                 {user && ((user.id === p.author_id && (Date.now() - new Date(p.created_at).getTime()) < 600000) || user.tier === 'admin') && !p.is_deleted && (
-                                  <button onClick={() => { if (confirm('Delete this comment? This cannot be undone.')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all" title="Delete (within 10 min)"><Trash2 className="w-3 h-3" /></button>
+                                  <button onClick={() => { if (confirm('Delete this comment? This cannot be undone.')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all" title={user?.tier === 'admin' ? 'Delete comment' : 'Delete (within 10 min)'}><Trash2 className="w-3 h-3" /></button>
                                 )}
                                 {user && user.id !== p.author_id && !p.is_deleted && (
                                   <button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>
