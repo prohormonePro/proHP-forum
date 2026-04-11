@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUp, ArrowDown, MessageSquare, CheckCircle, ChevronLeft, Award, Eye, Reply, Pencil, Trash2, Flag, Link2, Bookmark } from 'lucide-react';
@@ -141,21 +141,6 @@ export default function ThreadPage() {
   if (error) return (<div className="max-w-3xl mx-auto text-center py-12"><p className="text-red-400 text-sm mb-2">{error.message}</p><Link to="/" className="prohp-btn-ghost text-xs">Back to home</Link></div>);
 
   const { thread, posts, pagination } = data;
-  
-  const sortedPosts = useMemo(() => {
-    if (!posts) return [];
-    const sorted = [...posts];
-    if (sortMode === 'best') {
-      sorted.sort((a, b) => {
-        if (a.is_best_answer && !b.is_best_answer) return -1;
-        if (!a.is_best_answer && b.is_best_answer) return 1;
-        return (b.score || 0) - (a.score || 0);
-      });
-    } else if (sortMode === 'top') {
-      sorted.sort((a, b) => (b.score || 0) - (a.score || 0));
-    }
-    return sorted;
-  }, [posts, sortMode]);
 
   // If this thread belongs to a cycle log, redirect to the Sovereign Dashboard
   if (thread?.cycle_log_id) {
@@ -168,13 +153,9 @@ export default function ThreadPage() {
   const filteredPosts = commentSearch.trim() ? posts.filter(p => p.body.toLowerCase().includes(commentSearch.toLowerCase()) || p.author_username?.toLowerCase().includes(commentSearch.toLowerCase())) : posts;
 
   const topLevel = filteredPosts.filter(p => !p.parent_id).sort((a, b) => {
-    if (sortMode === 'best') {
-      if (a.is_best_answer && !b.is_best_answer) return -1;
-      if (!a.is_best_answer && b.is_best_answer) return 1;
-      return (b.score || 0) - (a.score || 0);
-    }
-    if (sortMode === 'top') return (b.score || 0) - (a.score || 0);
-    return new Date(a.created_at) - new Date(b.created_at);
+    if (sortMode === 'newest') return new Date(b.created_at) - new Date(a.created_at);
+    if (sortMode === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+    return (b.score || 0) - (a.score || 0) || new Date(a.created_at) - new Date(b.created_at);
   });
 
   const repliesByParent = {};
@@ -237,8 +218,8 @@ export default function ThreadPage() {
                     <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
                     {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting || uploading} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{uploading ? '...' : posting ? '...' : 'Reply'}</button>
-                      <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button><button type="button" onClick={() => imageInputRef.current?.click()} className="text-xs text-slate-500 hover:text-[#229DD8] transition-colors flex items-center gap-1 ml-2"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>Attach</button>
+                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
+                      <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
                     </div>
                   </div>
                 )}
@@ -328,7 +309,7 @@ export default function ThreadPage() {
           )}
         </div>
 
-        {canComment && (
+        {canComment && !replyTo && (
           <div className="mt-6 pt-4 border-t border-white/5">
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Drop your experience, ask your question..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-3 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-3" />
             <div className="flex items-center justify-between">
