@@ -196,7 +196,7 @@ export default function ThreadPage() {
                 <div className={`text-sm leading-relaxed mb-2 ${p.is_deleted ? 'text-slate-600 italic' : 'text-slate-300'}`}>
                   {p.is_deleted ? <span>[deleted]</span> : <MarkdownRenderer content={p.body} />}
                 </div>
-                {p.image_url && !p.is_deleted && (<div className="mb-2"><button onClick={(e) => { const img = e.currentTarget.nextElementSibling; img.style.display = img.style.display === 'none' ? 'block' : 'none'; e.currentTarget.textContent = img.style.display === 'none' ? '📎 View attachment' : '📎 Hide attachment'; }} className="text-[10px] text-[#229DD8] hover:text-[#1b87bc] cursor-pointer mb-1.5 font-medium">📎 View attachment</button><img src={p.image_url} alt="" className="max-w-full max-h-96 rounded-lg border border-white/10" loading="lazy" style={{display: 'none'}} /></div>)}
+                {p.image_url && !p.is_deleted && (<div className="mb-2 rounded-lg overflow-hidden border border-white/10">{isVideoFile(p.image_url) ? (<video src={p.image_url} controls playsInline preload="metadata" className="w-full max-h-[400px] bg-black rounded-lg" />) : p.image_url.endsWith('.pdf') ? (<a href={p.image_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#229DD8] hover:text-white text-sm p-3">View PDF</a>) : (<img src={p.image_url} alt="" className="w-full max-h-[400px] object-contain rounded-lg" loading="lazy" />)}</div>)}
                 <div className="flex items-center gap-1 flex-wrap">
                   {user && !p.is_deleted && (
                     <div className="flex items-center gap-0.5 mr-2">
