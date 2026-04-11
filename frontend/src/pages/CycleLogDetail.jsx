@@ -787,8 +787,8 @@ export default function CycleLogDetail() {
                 <div className="aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-white/25 transition-all cursor-pointer shadow-lg" onClick={() => setCycleImageViewer({ url: slot.images[0].image_url, label: slot.label })}>
                   <img src={slot.images[0].image_url} alt={slot.label} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                   {showOwnerControls && (
-                    <div className="absolute bottom-2 right-2 opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                      <button onClick={(e) => { e.stopPropagation(); setCycleImageType(slot.key); cycleImageInputRef.current?.click(); }} className="w-7 h-7 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white hover:bg-[#229DD8]/80 transition-all" title="Replace photo">
+                    <div className="absolute bottom-2 right-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <button onClick={(e) => { e.stopPropagation(); setCycleImageType(slot.key); cycleImageInputRef.current?.click(); }} className="w-9 h-9 rounded-full bg-black/70 border border-white/30 flex items-center justify-center text-white hover:bg-[#229DD8]/80 transition-all" title="Replace photo">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       </button>
                     </div>
@@ -811,7 +811,7 @@ export default function CycleLogDetail() {
           ))}
         </div>
         {uploadingCycleImage && <p className="text-xs text-[#229DD8] text-center mt-2 animate-pulse">Uploading...</p>}
-        <p className="text-[11px] text-slate-500 text-center mt-2 leading-relaxed">Best results: portrait orientation, 3:4 ratio, minimum 600x800px. Natural lighting, same pose each time.</p>
+        {showOwnerControls && <p className="text-[11px] text-slate-500 text-center mt-2 leading-relaxed">Best results: portrait orientation, 3:4 ratio, minimum 600x800px. Natural lighting, same pose each time.</p>}
         <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" ref={cycleImageInputRef} onChange={handleCycleImageUpload} className="hidden" />
         {media.bloodwork && (
           <div className="mt-2">
