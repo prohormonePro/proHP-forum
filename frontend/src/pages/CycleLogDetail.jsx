@@ -1267,7 +1267,7 @@ export default function CycleLogDetail() {
                     <div className="flex items-center gap-2 text-xs text-slate-400"><span className="w-1.5 h-1.5 rounded-full bg-[#229DD8] shrink-0"></span>Unrestricted 101+ Compound Encyclopedia access.</div>
                     <div className="flex items-center gap-2 text-xs text-slate-400"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>Member-only 10-20% vendor discounts. Pays for itself.</div>
                   </div>
-                  <Link to="/login" className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-bold text-sm rounded-xl px-8 py-3 transition-all shadow-lg shadow-[#229DD8]/20 hover:shadow-[#229DD8]/40">
+                  <Link to="/login" state={{ from: window.location.pathname }} className="inline-flex items-center justify-center w-full sm:w-auto bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] text-white font-bold text-sm rounded-xl px-8 py-3 transition-all shadow-lg shadow-[#229DD8]/20 hover:shadow-[#229DD8]/40">
                     Sign In to Join the Discussion
                   </Link>
                   <p className="text-[10px] text-slate-600 mt-4">Not a member? <Link to="/register" className="text-[#229DD8] hover:text-white transition-colors">Join Inner Circle | $19/mo</Link></p>

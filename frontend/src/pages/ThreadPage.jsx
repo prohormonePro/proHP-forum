@@ -297,7 +297,7 @@ export default function ThreadPage() {
         )}
 
         {thread.is_locked && (<div className="mt-4 text-center"><p className="text-xs text-slate-500">This thread is locked. No new replies.</p></div>)}
-        {!user && !thread.is_locked && (<div className="mt-6 pt-4 border-t border-white/5 text-center"><p className="text-sm text-slate-400 mb-3">Log in to join the conversation.</p><Link to="/login" className="prohp-btn-primary text-xs">Log in</Link></div>)}
+        {!user && !thread.is_locked && (<div className="mt-6 pt-4 border-t border-white/5 text-center"><p className="text-sm text-slate-400 mb-3">Log in to join the conversation.</p><Link to="/login" state={{ from: window.location.pathname }} className="prohp-btn-primary text-xs">Log in</Link></div>)}
       </div>
 
       {/* Context-Aware HUD */}
