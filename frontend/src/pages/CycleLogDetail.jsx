@@ -222,6 +222,27 @@ export default function CycleLogDetail() {
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const imageInputRef = useRef(null);
+  const cycleImageInputRef = useRef(null);
+  const [uploadingCycleImage, setUploadingCycleImage] = useState(false);
+  const [cycleImageType, setCycleImageType] = useState('before');
+  
+  const handleCycleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !data?.cycle?.id) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5MB'); return; }
+    setUploadingCycleImage(true);
+    try {
+      const imgUrl = await uploadImage(file);
+      const token = localStorage.getItem('prohp_at');
+      await fetch((import.meta.env.VITE_API_URL || '') + '/api/cycles/' + data.cycle.id + '/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ image_url: imgUrl, image_type: cycleImageType })
+      });
+      queryClient.invalidateQueries({ queryKey: ['cycle', id] });
+    } catch (err) { console.error('Cycle image upload failed:', err); }
+    finally { setUploadingCycleImage(false); if (cycleImageInputRef.current) cycleImageInputRef.current.value = ''; }
+  };
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -301,6 +322,12 @@ export default function CycleLogDetail() {
     queryKey: ['cycle', id],
     queryFn: () => api.get(`/api/cycles/${id}`),
   });
+
+  const cycleImages = data?.images || [];
+  const beforeImages = cycleImages.filter(i => i.image_type === 'before');
+  const midImages = cycleImages.filter(i => i.image_type === 'mid');
+  const afterImages = cycleImages.filter(i => i.image_type === 'after');
+  const bloodworkImages = cycleImages.filter(i => i.image_type === 'bloodwork');
 
   const { data: threadData, isLoading: threadLoading, refetch: refetchThread } = useQuery({
     queryKey: ['thread', data?.cycle?.thread_id],
@@ -748,43 +775,56 @@ export default function CycleLogDetail() {
 
         {/* Progress Photos - Before / Mid-Cycle / After */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {/* Baseline */}
+          {/* Before */}
           <div className="relative group">
             <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Baseline</p>
-            {media.before ? (
-              <a href={media.before} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
-                {/\.(jpg|jpeg|png|gif|webp)$/i.test(media.before) ? <img src={media.before} alt="Before" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80"><svg className="w-8 h-8 text-[#229DD8] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-4.5H18m0 0l3-3m-3 3V3" /></svg><span className="text-[10px] text-[#229DD8] font-medium">View Baseline</span></div>}
+            {beforeImages.length > 0 ? (
+              <a href={beforeImages[0].image_url} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-[#229DD8]/40 transition-all">
+                <img src={beforeImages[0].image_url} alt="Before" className="w-full h-full object-cover" />
+              </a>
+            ) : media.before ? (
+              <a href={media.before} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-[#229DD8]/40 transition-all">
+                <img src={media.before} alt="Before" className="w-full h-full object-cover" />
               </a>
             ) : (
-              <div className="aspect-[3/4] rounded-lg border border border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
-                <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span className="text-[10px] text-slate-500 font-medium">Baseline Pending</span>
+              <div className="aspect-[3/4] rounded-xl border border-dashed border-slate-700/50 flex flex-col items-center justify-center bg-slate-900/30 cursor-pointer hover:border-[#229DD8]/30 hover:bg-[#229DD8]/5 transition-all" onClick={() => { if (showOwnerControls) { setCycleImageType('before'); cycleImageInputRef.current?.click(); } }}>
+                {showOwnerControls ? (<><svg className="w-6 h-6 text-slate-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg><span className="text-[9px] text-slate-600">Add Photo</span></>) : (<span className="text-[10px] text-slate-500 font-medium">Baseline Pending</span>)}
               </div>
             )}
           </div>
           {/* Mid-Cycle */}
           <div className="relative">
             <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Mid-Cycle</p>
-            <div className="aspect-[3/4] rounded-lg border border border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
-              <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              <span className="text-[10px] text-slate-500 font-medium">Awaiting</span>
-            </div>
+            {midImages.length > 0 ? (
+              <a href={midImages[0].image_url} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-[#229DD8]/40 transition-all">
+                <img src={midImages[0].image_url} alt="Mid-Cycle" className="w-full h-full object-cover" />
+              </a>
+            ) : (
+              <div className="aspect-[3/4] rounded-xl border border-dashed border-slate-700/50 flex flex-col items-center justify-center bg-slate-900/30 cursor-pointer hover:border-amber-500/30 hover:bg-amber-500/5 transition-all" onClick={() => { if (showOwnerControls) { setCycleImageType('mid'); cycleImageInputRef.current?.click(); } }}>
+                {showOwnerControls ? (<><svg className="w-6 h-6 text-slate-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg><span className="text-[9px] text-slate-600">Add Photo</span></>) : (<span className="text-[10px] text-slate-500 font-medium">Awaiting</span>)}
+              </div>
+            )}
           </div>
           {/* Post-Cycle */}
           <div className="relative group">
             <p className="text-[11px] uppercase text-slate-400 font-semibold mb-1.5 text-center tracking-wide">Post-Cycle</p>
-            {media.after ? (
-              <a href={media.after} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-lg overflow-hidden border border-white/10 hover:border-[#229DD8]/30 transition-all">
-                {/\.(jpg|jpeg|png|gif|webp)$/i.test(media.after) ? <img src={media.after} alt="After" className="w-full h-full object-cover" /> : <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80"><svg className="w-8 h-8 text-emerald-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-4.5H18m0 0l3-3m-3 3V3" /></svg><span className="text-[10px] text-emerald-400 font-medium">View Results</span></div>}
+            {afterImages.length > 0 ? (
+              <a href={afterImages[0].image_url} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-emerald-500/40 transition-all">
+                <img src={afterImages[0].image_url} alt="After" className="w-full h-full object-cover" />
+              </a>
+            ) : media.after ? (
+              <a href={media.after} target="_blank" rel="noopener noreferrer" className="block aspect-[3/4] rounded-xl overflow-hidden border border-white/10 hover:border-emerald-500/40 transition-all">
+                <img src={media.after} alt="After" className="w-full h-full object-cover" />
               </a>
             ) : (
-              <div className="aspect-[3/4] rounded-lg border border border-white/10 bg-slate-900/50 flex flex-col items-center justify-center">
-                <svg className="w-6 h-6 text-slate-500 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span className="text-[10px] text-slate-500 font-medium">Final Pending</span>
+              <div className="aspect-[3/4] rounded-xl border border-dashed border-slate-700/50 flex flex-col items-center justify-center bg-slate-900/30 cursor-pointer hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all" onClick={() => { if (showOwnerControls) { setCycleImageType('after'); cycleImageInputRef.current?.click(); } }}>
+                {showOwnerControls ? (<><svg className="w-6 h-6 text-slate-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg><span className="text-[9px] text-slate-600">Add Photo</span></>) : (<span className="text-[10px] text-slate-500 font-medium">Final Pending</span>)}
               </div>
             )}
           </div>
         </div>
+        {uploadingCycleImage && <p className="text-xs text-[#229DD8] text-center mt-2 animate-pulse">Uploading...</p>}
+        <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" ref={cycleImageInputRef} onChange={handleCycleImageUpload} className="hidden" />
         {media.bloodwork && (
           <div className="mt-2">
             <a href={media.bloodwork} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[9px] font-bold text-[#229DD8] bg-[#229DD8]/10 border border-[#229DD8]/20 px-2.5 py-1 rounded-lg hover:bg-[#229DD8]/20 transition-all"><Activity className="w-3 h-3" /> Labs Verified</a>

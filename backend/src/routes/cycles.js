@@ -110,7 +110,12 @@ router.get('/:id', optionalAuth, async (req, res) => {
       [id]
     );
 
-    res.json({ cycle: cycleResult.rows[0], updates: updates.rows });
+    const images = await query(
+      'SELECT * FROM cycle_images WHERE cycle_log_id = $1 ORDER BY image_type, sort_order, created_at',
+      [id]
+    );
+
+    res.json({ cycle: cycleResult.rows[0], updates: updates.rows, images: images.rows });
   } catch (err) {
     console.error('[cycles/detail]', err.message);
     res.status(500).json({ error: 'Failed to fetch cycle' });
@@ -200,6 +205,58 @@ router.patch('/:id', authenticate, requireTier('inner_circle'), async (req, res)
   } catch (err) {
     console.error('[cycles/patch]', err.message);
     res.status(500).json({ error: 'Failed to update cycle log' });
+  }
+});
+
+
+// ── GET /api/cycles/:id/images – List cycle images ──
+router.get('/:id/images', async (req, res) => {
+  try {
+    const result = await query(
+      'SELECT * FROM cycle_images WHERE cycle_log_id = $1 ORDER BY image_type, sort_order, created_at',
+      [req.params.id]
+    );
+    res.json({ images: result.rows });
+  } catch (err) {
+    console.error('[cycles/images]', err.message);
+    res.status(500).json({ error: 'Failed to fetch images' });
+  }
+});
+
+// ── POST /api/cycles/:id/images – Upload cycle image ──
+router.post('/:id/images', authenticate, requireTier('inner_circle'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const cycle = await query('SELECT id, user_id FROM cycle_logs WHERE id = $1', [id]);
+    if (!cycle.rows[0]) return res.status(404).json({ error: 'Cycle not found' });
+    if (cycle.rows[0].user_id !== req.user.id) return res.status(403).json({ error: 'Not your cycle' });
+
+    const { image_url, image_type, week_number, caption } = req.body;
+    if (!image_url || !image_type) return res.status(400).json({ error: 'image_url and image_type required' });
+
+    const result = await query(
+      'INSERT INTO cycle_images (cycle_log_id, user_id, image_url, image_type, week_number, caption) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [id, req.user.id, image_url, image_type, week_number || null, caption || null]
+    );
+    res.status(201).json({ image: result.rows[0] });
+  } catch (err) {
+    console.error('[cycles/images/create]', err.message);
+    res.status(500).json({ error: 'Failed to save image' });
+  }
+});
+
+// ── DELETE /api/cycles/:id/images/:imageId – Delete cycle image ──
+router.delete('/:id/images/:imageId', authenticate, async (req, res) => {
+  try {
+    const img = await query('SELECT id, user_id FROM cycle_images WHERE id = $1 AND cycle_log_id = $2', [req.params.imageId, req.params.id]);
+    if (!img.rows[0]) return res.status(404).json({ error: 'Image not found' });
+    if (img.rows[0].user_id !== req.user.id) return res.status(403).json({ error: 'Not your image' });
+
+    await query('DELETE FROM cycle_images WHERE id = $1', [req.params.imageId]);
+    res.json({ deleted: true });
+  } catch (err) {
+    console.error('[cycles/images/delete]', err.message);
+    res.status(500).json({ error: 'Failed to delete image' });
   }
 });
 
