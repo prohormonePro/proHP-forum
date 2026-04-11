@@ -155,7 +155,7 @@ export default function ThreadPage() {
       sorted.sort((a, b) => (b.score || 0) - (a.score || 0));
     }
     return sorted;
-  }, [posts, sortBy]);
+  }, [posts, sortMode]);
 
   // If this thread belongs to a cycle log, redirect to the Sovereign Dashboard
   if (thread?.cycle_log_id) {
@@ -168,12 +168,12 @@ export default function ThreadPage() {
   const filteredPosts = commentSearch.trim() ? posts.filter(p => p.body.toLowerCase().includes(commentSearch.toLowerCase()) || p.author_username?.toLowerCase().includes(commentSearch.toLowerCase())) : posts;
 
   const topLevel = filteredPosts.filter(p => !p.parent_id).sort((a, b) => {
-    if (sortBy === 'best') {
+    if (sortMode === 'best') {
       if (a.is_best_answer && !b.is_best_answer) return -1;
       if (!a.is_best_answer && b.is_best_answer) return 1;
       return (b.score || 0) - (a.score || 0);
     }
-    if (sortBy === 'top') return (b.score || 0) - (a.score || 0);
+    if (sortMode === 'top') return (b.score || 0) - (a.score || 0);
     return new Date(a.created_at) - new Date(b.created_at);
   });
 
