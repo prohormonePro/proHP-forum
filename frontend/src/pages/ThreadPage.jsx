@@ -46,7 +46,7 @@ export default function ThreadPage() {
   const isVideoFile = (url) => url && (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov'));
   const [collapsedThreads, setCollapsedThreads] = useState({});
   const toggleCollapse = (cid) => setCollapsedThreads(prev => ({...prev, [cid]: !prev[cid]}));
-  const [sortMode, setSortMode] = useState('best');
+  const [sortMode, setSortMode] = useState('newest');
   const [commentSearch, setCommentSearch] = useState('');
   const [editingPost, setEditingPost] = useState(null);
   const [editText, setEditText] = useState('');
