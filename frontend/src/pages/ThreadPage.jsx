@@ -153,9 +153,14 @@ export default function ThreadPage() {
   const filteredPosts = commentSearch.trim() ? posts.filter(p => p.body.toLowerCase().includes(commentSearch.toLowerCase()) || p.author_username?.toLowerCase().includes(commentSearch.toLowerCase())) : posts;
 
   const topLevel = filteredPosts.filter(p => !p.parent_id).sort((a, b) => {
+    if (sortMode === 'best') {
+      if (a.is_best_answer && !b.is_best_answer) return -1;
+      if (!a.is_best_answer && b.is_best_answer) return 1;
+      return (b.score || 0) - (a.score || 0);
+    }
     if (sortMode === 'newest') return new Date(b.created_at) - new Date(a.created_at);
     if (sortMode === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
-    return (b.score || 0) - (a.score || 0) || new Date(a.created_at) - new Date(b.created_at);
+    return (b.score || 0) - (a.score || 0);
   });
 
   const repliesByParent = {};
@@ -209,7 +214,7 @@ export default function ThreadPage() {
                   {user && user.id === p.author_id && !p.is_deleted && (<button onClick={() => { setEditingPost(p.id); setEditText(p.body); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded-md transition-all"><Pencil className="w-3 h-3" /></button>)}
                   {user && ((user.id === p.author_id && (Date.now() - new Date(p.created_at).getTime()) < 600000) || user.tier === 'admin') && !p.is_deleted && (<button onClick={() => { if (confirm('Delete this comment? This cannot be undone.')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all" title={user?.tier === 'admin' ? 'Delete comment' : 'Delete (within 10 min)'}><Trash2 className="w-3 h-3" /></button>)}
                   {user && user.id !== p.author_id && !p.is_deleted && (<button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>)}
-                  {user && user.tier === 'admin' && !p.is_deleted && (<button onClick={() => markVerdict.mutate({ postId: p.id })} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${p.is_best_answer ? 'text-emerald-400' : 'text-slate-600 hover:text-emerald-400'}`}><Award className="w-3 h-3" /></button>)}
+                  {(isAdmin || isThreadAuthor) && !p.is_deleted && (<button onClick={() => markVerdict.mutate({ postId: p.id })} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${p.is_best_answer ? 'text-emerald-400' : 'text-slate-600 hover:text-emerald-400'}`}><Award className="w-3 h-3" /></button>)}
                   <button onClick={() => copyLink(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${copiedPost === p.id ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-600 hover:text-slate-300 hover:bg-slate-700/30'}`} style={{transition: 'all 0.15s ease'}}>{copiedPost === p.id ? <><CheckCircle className="w-3 h-3" /><span className="text-[10px] font-medium">Copied!</span></> : <Link2 className="w-3 h-3" />}</button>
                 </div>
                 {replyTo === p.id && canComment && (
@@ -218,8 +223,8 @@ export default function ThreadPage() {
                     <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
                     {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
-                      <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
+                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting || uploading} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{uploading ? '...' : posting ? '...' : 'Reply'}</button>
+                      <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button><button type="button" onClick={() => imageInputRef.current?.click()} className="text-xs text-slate-500 hover:text-[#229DD8] transition-colors flex items-center gap-1 ml-2"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>Attach</button>
                     </div>
                   </div>
                 )}
@@ -309,7 +314,7 @@ export default function ThreadPage() {
           )}
         </div>
 
-        {canComment && !replyTo && (
+        {canComment && (
           <div className="mt-6 pt-4 border-t border-white/5">
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Drop your experience, ask your question..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-3 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-3" />
             <div className="flex items-center justify-between">
