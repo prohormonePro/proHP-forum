@@ -21,6 +21,29 @@ export default function ThreadPage() {
   const [posting, setPosting] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const [commentError, setCommentError] = useState(null);
+  const [commentImage, setCommentImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const imageInputRef = useRef(null);
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = localStorage.getItem('prohp_at');
+    if (!token) throw new Error('Please log in');
+    const res = await fetch((import.meta.env.VITE_API_URL || '') + '/api/posts/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.url;
+  };
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const maxSize = file.type.startsWith('video/') ? 15 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) { setCommentError('File must be under ' + (file.type.startsWith('video/') ? '15MB' : '5MB')); return; }
+    setCommentImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+  const isVideoFile = (url) => url && (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov'));
   const [collapsedThreads, setCollapsedThreads] = useState({});
   const toggleCollapse = (cid) => setCollapsedThreads(prev => ({...prev, [cid]: !prev[cid]}));
   const [sortMode, setSortMode] = useState('best');
@@ -112,7 +135,7 @@ export default function ThreadPage() {
 
   const handleVote = (postId, value) => { if (!user) return; votePost.mutate({ postId, value }); };
   const handleReply = (postId) => { setReplyTo(postId); setTimeout(() => { replyBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); };
-  const postComment = async () => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); try { await createReply.mutateAsync({ thread_id: id, body: commentText.trim(), ...(replyTo ? { parent_id: replyTo } : {}) }); } finally { setPosting(false); } };
+  const postComment = async () => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); try { let imgUrl = null; if (commentImage) { setUploading(true); try { imgUrl = await uploadImage(commentImage); } finally { setUploading(false); } } await createReply.mutateAsync({ thread_id: id, body: commentText.trim(), ...(replyTo ? { parent_id: replyTo } : {}), ...(imgUrl ? { image_url: imgUrl } : {}) }); setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; } finally { setPosting(false); } };
 
   if (isLoading) return (<div className="animate-pulse max-w-3xl mx-auto"><div className="h-4 bg-slate-800 rounded w-24 mb-4" /><div className="h-8 bg-slate-800 rounded w-2/3 mb-4" /><div className="h-32 bg-slate-800 rounded mb-4" /></div>);
   if (error) return (<div className="max-w-3xl mx-auto text-center py-12"><p className="text-red-400 text-sm mb-2">{error.message}</p><Link to="/" className="prohp-btn-ghost text-xs">Back to home</Link></div>);
@@ -184,7 +207,7 @@ export default function ThreadPage() {
                   )}
                   {canComment && !p.is_deleted && (<button onClick={() => handleReply(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-md transition-all ${replyTo === p.id ? 'text-[#229DD8] bg-[#229DD8]/10' : 'text-slate-500 hover:text-[#229DD8] hover:bg-[#229DD8]/5'}`}><Reply className="w-3 h-3" /> Reply</button>)}
                   {user && user.id === p.author_id && !p.is_deleted && (<button onClick={() => { setEditingPost(p.id); setEditText(p.body); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-[#229DD8] hover:bg-[#229DD8]/5 rounded-md transition-all"><Pencil className="w-3 h-3" /></button>)}
-                  {user && ((user.id === p.author_id && (Date.now() - new Date(p.created_at).getTime()) < 600000) || user.tier === 'admin') && !p.is_deleted && (<button onClick={() => { if (confirm('Delete this comment? This cannot be undone.')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all" title="Delete (within 10 min)"><Trash2 className="w-3 h-3" /></button>)}
+                  {user && ((user.id === p.author_id && (Date.now() - new Date(p.created_at).getTime()) < 600000) || user.tier === 'admin') && !p.is_deleted && (<button onClick={() => { if (confirm('Delete this comment? This cannot be undone.')) deletePost.mutate({ postId: p.id }); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-red-400 hover:bg-red-500/5 rounded-md transition-all" title={user?.tier === 'admin' ? 'Delete comment' : 'Delete (within 10 min)'}><Trash2 className="w-3 h-3" /></button>)}
                   {user && user.id !== p.author_id && !p.is_deleted && (<button onClick={() => setReportingPost(p.id)} className="flex items-center gap-1 px-2 py-1 text-[11px] text-slate-600 hover:text-amber-400 hover:bg-amber-500/5 rounded-md transition-all"><Flag className="w-3 h-3" /></button>)}
                   {user && user.tier === 'admin' && !p.is_deleted && (<button onClick={() => markVerdict.mutate({ postId: p.id })} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${p.is_best_answer ? 'text-emerald-400' : 'text-slate-600 hover:text-emerald-400'}`}><Award className="w-3 h-3" /></button>)}
                   <button onClick={() => copyLink(p.id)} className={`flex items-center gap-1 px-2 py-1 text-[11px] rounded-md transition-all ${copiedPost === p.id ? 'text-emerald-400 bg-emerald-500/10 scale-95' : 'text-slate-600 hover:text-slate-300 hover:bg-slate-700/30'}`} style={{transition: 'all 0.15s ease'}}>{copiedPost === p.id ? <><CheckCircle className="w-3 h-3" /><span className="text-[10px] font-medium">Copied!</span></> : <Link2 className="w-3 h-3" />}</button>
@@ -195,7 +218,7 @@ export default function ThreadPage() {
                     <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
                     {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id }).then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
+                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
                       <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
                     </div>
                   </div>
@@ -290,11 +313,14 @@ export default function ThreadPage() {
           <div className="mt-6 pt-4 border-t border-white/5">
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Drop your experience, ask your question..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-3 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-3" />
             <div className="flex items-center justify-between">
-              <p className="text-[10px] text-slate-600">Receipts appreciated. Proof over hype.</p>
-              <button onClick={postComment} disabled={!commentText.trim() || posting} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{posting ? 'Posting...' : 'Post Reply'}</button>
+              <p className="text-[10px] text-slate-600">Proof over hype.</p><button type="button" onClick={() => imageInputRef.current?.click()} className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-[#229DD8] transition-colors px-2 py-1 rounded-md hover:bg-[#229DD8]/5 border border-transparent hover:border-[#229DD8]/20"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>Attach</button>
+              <button onClick={postComment} disabled={!commentText.trim() || posting} className="bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-all">{uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Reply'}</button>
             </div>
           </div>
         )}
+
+                {imagePreview && (<div className="flex items-center gap-3 p-3 mt-3 rounded-lg bg-slate-800/30 border border-white/5">{commentImage?.type?.startsWith('video/') ? <video src={imagePreview} className="max-h-20 rounded-lg border border-white/10" muted /> : <img src={imagePreview} alt="Preview" className="max-h-20 rounded-lg border border-white/10" />}<div className="flex-1"><p className="text-[11px] text-slate-400">{commentImage?.name}</p><p className="text-[9px] text-slate-600">{commentImage ? (commentImage.size / 1024 / 1024).toFixed(1) + ' MB' : ''}</p></div><button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="text-red-400 hover:text-red-300 text-xs font-medium">Remove</button></div>)}
+        <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4,video/webm,video/quicktime" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
 
         {thread.is_locked && (<div className="mt-4 text-center"><p className="text-xs text-slate-500">This thread is locked. No new replies.</p></div>)}
         {!user && !thread.is_locked && (<div className="mt-6 pt-4 border-t border-white/5 text-center"><p className="text-sm text-slate-400 mb-3">Log in to join the conversation.</p><Link to="/login" state={{ from: window.location.pathname }} className="prohp-btn-primary text-xs">Log in</Link></div>)}
