@@ -290,9 +290,9 @@ export default function ThreadPage() {
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[#229DD8]" />
-              <h2 className="text-base font-bold text-white">Replies</h2>
+              <h2 className="text-base font-bold text-white">Comments</h2>
             </div>
-            <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} {posts.length === 1 ? 'reply' : 'replies'}</span>
+            <span className="text-xs text-slate-500 whitespace-nowrap">{posts.length} {posts.length === 1 ? 'comment' : 'comments'}</span>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <input type="text" value={commentSearch} onChange={(e) => setCommentSearch(e.target.value)} placeholder="Search..." className="text-[10px] bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-md px-2 py-1.5 flex-1 min-w-0 sm:max-w-[120px] focus:outline-none focus:border-[#229DD8]/30 placeholder-slate-600" />
@@ -309,7 +309,7 @@ export default function ThreadPage() {
           {posts.length === 0 && (
             <div className="text-center py-8">
               <MessageSquare className="w-6 h-6 text-slate-600 mx-auto mb-2" />
-              <p className="text-xs text-slate-400">No replies yet. Be the first to weigh in.</p>
+              <p className="text-xs text-slate-400">No comments yet. Be the first to share your experience.</p>
             </div>
           )}
         </div>
@@ -327,7 +327,7 @@ export default function ThreadPage() {
                 {imagePreview && (<div className="flex items-center gap-3 p-3 mt-3 rounded-lg bg-slate-800/30 border border-white/5">{commentImage?.type?.startsWith('video/') ? <video src={imagePreview} className="max-h-20 rounded-lg border border-white/10" muted /> : <img src={imagePreview} alt="Preview" className="max-h-20 rounded-lg border border-white/10" />}<div className="flex-1"><p className="text-[11px] text-slate-400">{commentImage?.name}</p><p className="text-[9px] text-slate-600">{commentImage ? (commentImage.size / 1024 / 1024).toFixed(1) + ' MB' : ''}</p></div><button onClick={() => { setCommentImage(null); setImagePreview(null); if (imageInputRef.current) imageInputRef.current.value = ''; }} className="text-red-400 hover:text-red-300 text-xs font-medium">Remove</button></div>)}
         <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4,video/webm,video/quicktime" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
 
-        {thread.is_locked && (<div className="mt-4 text-center"><p className="text-xs text-slate-500">This thread is locked. No new replies.</p></div>)}
+        {thread.is_locked && (<div className="mt-4 text-center"><p className="text-xs text-slate-500">This thread is locked. No new comments.</p></div>)}
         {!user && !thread.is_locked && (<div className="mt-6 pt-4 border-t border-white/5 text-center"><p className="text-sm text-slate-400 mb-3">Log in to join the conversation.</p><Link to="/login" state={{ from: window.location.pathname }} className="prohp-btn-primary text-xs">Log in</Link></div>)}
       </div>
 
