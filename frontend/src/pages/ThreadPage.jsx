@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUp, ArrowDown, MessageSquare, CheckCircle, ChevronLeft, Award, Eye, Reply, Pencil, Trash2, Flag, Link2, Bookmark } from 'lucide-react';
@@ -141,6 +141,21 @@ export default function ThreadPage() {
   if (error) return (<div className="max-w-3xl mx-auto text-center py-12"><p className="text-red-400 text-sm mb-2">{error.message}</p><Link to="/" className="prohp-btn-ghost text-xs">Back to home</Link></div>);
 
   const { thread, posts, pagination } = data;
+  const [sortBy, setSortBy] = useState('newest');
+  const sortedPosts = useMemo(() => {
+    if (!posts) return [];
+    const sorted = [...posts];
+    if (sortBy === 'best') {
+      sorted.sort((a, b) => {
+        if (a.is_best_answer && !b.is_best_answer) return -1;
+        if (!a.is_best_answer && b.is_best_answer) return 1;
+        return (b.score || 0) - (a.score || 0);
+      });
+    } else if (sortBy === 'top') {
+      sorted.sort((a, b) => (b.score || 0) - (a.score || 0));
+    }
+    return sorted;
+  }, [posts, sortBy]);
 
   // If this thread belongs to a cycle log, redirect to the Sovereign Dashboard
   if (thread?.cycle_log_id) {
@@ -218,7 +233,7 @@ export default function ThreadPage() {
                     <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder={`Reply to ${p.author_username}...`} rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 py-2 px-3 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-2" ref={replyBoxRef} />
                     {commentError && <p className="text-red-400 text-xs mb-2">{commentError}</p>}
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{posting ? '...' : 'Reply'}</button>
+                      <button onClick={() => { if (!commentText.trim()) return; setPosting(true); setCommentError(null); (async () => { let iUrl = null; if (commentImage) { setUploading(true); try { iUrl = await uploadImage(commentImage); } finally { setUploading(false); } } return createReply.mutateAsync({ thread_id: id, body: commentText.trim(), parent_id: p.id, ...(iUrl ? { image_url: iUrl } : {}) }); })().then(() => { if (refetchThread) refetchThread(); setCommentText(''); setReplyTo(null); }).finally(() => setPosting(false)); }} disabled={!commentText.trim() || posting || uploading} className="bg-[#229DD8] hover:bg-[#1b87bc] disabled:opacity-50 text-white text-xs font-bold rounded-lg px-4 py-1.5 transition-all">{uploading ? '...' : posting ? '...' : 'Reply'}</button>
                       <button onClick={() => setReplyTo(null)} className="text-xs text-slate-500 hover:text-white transition-colors">Cancel</button>
                     </div>
                   </div>
@@ -309,7 +324,7 @@ export default function ThreadPage() {
           )}
         </div>
 
-        {canComment && !replyTo && (
+        {canComment && (
           <div className="mt-6 pt-4 border-t border-white/5">
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} id="main-comment-box" placeholder="Drop your experience, ask your question..." rows={3} className="w-full rounded-xl border border-slate-700 bg-slate-950/50 py-3 px-4 text-white text-sm placeholder-slate-600 focus:border-[#229DD8] focus:ring-1 focus:ring-[#229DD8] transition-all resize-none mb-3" />
             <div className="flex items-center justify-between">
