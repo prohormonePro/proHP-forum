@@ -1024,6 +1024,8 @@ export default function CycleLogDetail() {
 
       {/* Community Feedback Section */}
       <div id="feedback-section" className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700/50 p-3 sm:p-6 overflow-x-hidden">
+        <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4,video/webm,video/quicktime" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
@@ -1197,7 +1199,7 @@ export default function CycleLogDetail() {
             {/* New Top-Level Comment */}
             {canComment && !replyTo ? (
               <div className="mt-4 pt-4 border-t border-white/5">
-                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4,video/webm,video/quicktime" ref={imageInputRef} onChange={handleImageSelect} className="hidden" />
+                
             {imagePreview && (
               <div className="mb-3 relative inline-block">
                 {commentImage?.type?.startsWith("video/") ? <video src={imagePreview} className="max-h-32 rounded-lg border border-white/10" muted /> : <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-white/10" />}
