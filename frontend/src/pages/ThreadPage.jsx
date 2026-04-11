@@ -141,17 +141,17 @@ export default function ThreadPage() {
   if (error) return (<div className="max-w-3xl mx-auto text-center py-12"><p className="text-red-400 text-sm mb-2">{error.message}</p><Link to="/" className="prohp-btn-ghost text-xs">Back to home</Link></div>);
 
   const { thread, posts, pagination } = data;
-  const [sortBy, setSortBy] = useState('newest');
+  
   const sortedPosts = useMemo(() => {
     if (!posts) return [];
     const sorted = [...posts];
-    if (sortBy === 'best') {
+    if (sortMode === 'best') {
       sorted.sort((a, b) => {
         if (a.is_best_answer && !b.is_best_answer) return -1;
         if (!a.is_best_answer && b.is_best_answer) return 1;
         return (b.score || 0) - (a.score || 0);
       });
-    } else if (sortBy === 'top') {
+    } else if (sortMode === 'top') {
       sorted.sort((a, b) => (b.score || 0) - (a.score || 0));
     }
     return sorted;
