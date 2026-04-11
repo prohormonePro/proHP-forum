@@ -342,6 +342,14 @@ export default function Home() {
       </div>
 
 
+
+      {/* Dev Signal */}
+      <div className="mb-8 py-4 text-center">
+        <Link to="/dev" className="inline-flex items-center gap-2 text-[11px] font-mono text-slate-600 hover:text-cyan-400 transition-colors group">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 group-hover:bg-cyan-400 transition-colors" />
+          Are you a developer? Inspect the architecture.
+        </Link>
+      </div>
     </div>
 
 
