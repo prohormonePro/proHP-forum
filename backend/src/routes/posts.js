@@ -12,6 +12,7 @@ const upload = multer({ storage, limits: { fileSize: 15 * 1024 * 1024 }, fileFil
 const { query, getClient } = require('../config/db');
 const { authenticate, requireTier, TIER_LEVELS } = require('../middleware/auth');
 
+const { sendNotificationEmail } = require("../helpers/emailNotify");
 const router = express.Router();
 
 // ── POST /api/posts — Create a reply ──
@@ -75,6 +76,13 @@ router.post('/', authenticate, async (req, res) => {
               'INSERT INTO notifications (user_id, type, title, body, link) VALUES ($1, $2, $3, $4, $5)',
               [mu.id, 'mention', '@' + req.user.username + ' mentioned you', req.user.username + ' mentioned you in a comment', '/t/' + thread_id + '#comment-' + result.rows[0].id]
             );
+            // Email for @mention
+            try {
+              const _mu_email = await query('SELECT email FROM users WHERE id = $1', [mu.id]);
+              if (_mu_email.rows[0] && _mu_email.rows[0].email) {
+                sendNotificationEmail(_mu_email.rows[0].email, 'You were mentioned on ProHP Forum', 'Someone mentioned you in a discussion on forum.prohormonepro.com. Log in to see what they said.');
+              }
+            } catch (_eErr) { console.error('[email-mention]', _eErr.message); }
           }
         }
       }
@@ -89,6 +97,13 @@ router.post('/', authenticate, async (req, res) => {
             'INSERT INTO notifications (user_id, type, title, body, link) VALUES ($1, $2, $3, $4, $5)',
             [parentPost.rows[0].author_id, 'reply', req.user.username + ' replied to your comment', body.trim().substring(0, 100), '/t/' + thread_id + '#comment-' + result.rows[0].id]
           );
+            // Email for reply
+            try {
+              const _rp_email = await query('SELECT email FROM users WHERE id = $1', [parentPost.rows[0].author_id]);
+              if (_rp_email.rows[0] && _rp_email.rows[0].email) {
+                sendNotificationEmail(_rp_email.rows[0].email, 'New reply on ProHP Forum', 'Someone replied to your post on forum.prohormonepro.com. Log in to check it out.');
+              }
+            } catch (_eErr) { console.error('[email-reply]', _eErr.message); }
         }
       }
     } catch (replyErr) { console.error('[reply-notify]', replyErr.message); }
