@@ -175,7 +175,7 @@ export default function CycleLogDetail() {
   const toggleCollapse = (id) => setCollapsedThreads(prev => ({...prev, [id]: !prev[id]}));
   const [showHud, setShowHud] = useState(false);
   const [commentBoxAbove, setCommentBoxAbove] = useState(false);
-  const [expandedWeeks, setExpandedWeeks] = useState({});
+  const [expandedWeeks, setExpandedWeeks] = useState({0: true});
   const toggleWeek = (i) => setExpandedWeeks(prev => ({...prev, [i]: !prev[i]}));
   const toggleAllWeeks = (open) => { const o = {}; (updates || []).forEach((_, i) => { o[i] = open; }); setExpandedWeeks(o); };
   const [scrollDir, setScrollDir] = useState('down');
