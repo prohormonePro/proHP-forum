@@ -187,10 +187,11 @@ export default function EncyclopediaGate({ onUnlock }) { const [firstName, setFi
           </div>
 
           <input
-            type="hidden"
+            type="text"
             name="bot-field"
             tabIndex={-1}
             aria-hidden="true"
+            autoComplete="off"
             value={honeypotValue}
             onChange={(e) => setHoneypotValue(e.target.value)}
             className="absolute -left-[9999px]"
