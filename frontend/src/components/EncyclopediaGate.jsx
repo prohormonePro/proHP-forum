@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const API = import.meta.env.VITE_API_URL || '';
 
-export default function EncyclopediaGate({ onUnlock }) {
-  const [firstName, setFirstName] = useState('');
+export default function EncyclopediaGate({ onUnlock }) { const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [honeypotValue, setHoneypotValue] = useState('');
@@ -12,40 +11,24 @@ export default function EncyclopediaGate({ onUnlock }) {
   const [utmSource, setUtmSource] = useState('');
   const [utmMedium, setUtmMedium] = useState('');
   const [utmCampaign, setUtmCampaign] = useState('');
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
-  const [videoFailed, setVideoFailed] = useState(false);
-  const videoRef = useRef(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+  useEffect(() => { const params = new URLSearchParams(window.location.search);
     setUtmSource(params.get('utm_source') || '');
     setUtmMedium(params.get('utm_medium') || '');
     setUtmCampaign(params.get('utm_campaign') || '');
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function handleSubmit(e) { e.preventDefault();
     setIsSubmitting(true);
     setError('');
 
-    try {
-      const res = await fetch(`${API}/api/leads`, {
+    try { const res = await fetch(`${API}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          first_name: firstName,
+        body: JSON.stringify({ first_name: firstName,
           last_name: lastName,
-          email,
-          'bot-field': honeypotValue,
+          email, 'bot-field': honeypotValue,
           source: 'Forum Encyclopedia Gate',
           utm_source: utmSource,
           utm_medium: utmMedium,
@@ -53,8 +36,7 @@ export default function EncyclopediaGate({ onUnlock }) {
         }),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+      if (!res.ok) { const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Submission failed.');
       }
 
@@ -66,96 +48,106 @@ export default function EncyclopediaGate({ onUnlock }) {
     }
   }
 
-  const showVideo = !videoFailed;
-  const videoPlaying = showVideo && videoReady;
+  return ( <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: '#0b1120' }}>
 
-  return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#020617]">
-
-      {/* LAYER 1: Always-on premium gradient (never black on any screen size) */}
+      {/* LAYER 1: Deep sovereign radials */}
       <div
         className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(1100px 700px at 50% 25%, rgba(0,198,255,.14), transparent 58%), radial-gradient(900px 520px at 20% 40%, rgba(0,112,243,.16), transparent 60%), linear-gradient(180deg, #020617 0%, #000000 100%)',
+        style={{ background: [
+            'radial-gradient(ellipse 900px 600px at 50% 20%, rgba(34,161,216,0.08), transparent 60%)', 'radial-gradient(ellipse 600px 500px at 20% 60%, rgba(34,161,216,0.05), transparent 55%)',
+            'radial-gradient(ellipse 500px 400px at 80% 70%, rgba(14,165,233,0.04), transparent 50%)',
+          ].join(', '),
         }}
       />
 
-      {/* LAYER 2: Subtle texture so mobile isn't flat */}
+      {/* LAYER 2: Animated pulse ring — slow breathe */}
       <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.08) 0%, transparent 42%)',
-          mixBlendMode: 'overlay',
+        className="absolute rounded-full"
+        style={{ width: '700px',
+          height: '700px',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(34,161,216,0.06) 0%, transparent 70%)',
+          animation: 'sovereignPulse 6s ease-in-out infinite',
+          pointerEvents: 'none',
         }}
       />
 
-      {/* LAYER 3: Desktop video (fades in only when canplay fires) */}
-      {showVideo && (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          ref={videoRef}
-          preload="auto"
-          className={`absolute inset-0 w-full h-full object-cover object-[center_32%] transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
-          style={{ filter: isDesktop ? 'brightness(0.42) contrast(1.18) saturate(0.75) blur(1.5px) hue-rotate(15deg)' : 'brightness(0.85) contrast(1.10) saturate(0.80) blur(0.5px)' }}
-          onCanPlay={() => { setVideoReady(true); if (videoRef.current) videoRef.current.playbackRate = 0.08; }}
-          onError={() => { setVideoFailed(true); setVideoReady(false); }}
-          onStalled={() => setTimeout(() => { if (!videoReady) { setVideoFailed(true); } }, 8000)}
-        >
-          <source src="/videos/Prohormones_slow4x.mp4" type="video/mp4" />
-        </video>
-      )}
-      {/* STAGE_100: Fallback when video fails on desktop */}
-      {videoFailed && (
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at 50% 35%, rgba(30,30,40,1) 0%, rgba(10,10,15,1) 70%)',
-        }} />
-      )}
+      {/* LAYER 3: Subtle grid texture */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2322a1d8' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          pointerEvents: 'none',
+        }}
+      />
 
-      {/* LAYER 4: Cinematic overlays ONLY when video is actually visible */}
-      {videoPlaying && (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/35 to-black/90" />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse at 50% 42%, transparent 40%, rgba(0,0,0,.60) 100%)',
-            }}
-          />
-          {/* LAYER 5: Film grain texture */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-              backgroundSize: '128px 128px',
-            }}
-          />
-          {/* LAYER 6: Corner vignette */}
-          <div className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, rgba(0,0,0,.55) 100%)',
-            }}
-          />
-        </>
-      )}
+      {/* LAYER 4: Top edge glow */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(34,161,216,0.3) 50%, transparent)' }}
+      />
 
-      {/* FORM */}
-      <div className="relative z-10 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 py-12 lg:py-16">
+      {/* Keyframes */}
+      <style>{` @keyframes sovereignPulse {
+          0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+          50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glowShift { 0%, 100% { box-shadow: 0 10px 32px rgba(34,161,216,0.35), 0 0 60px rgba(34,161,216,0.10); }
+          50% { box-shadow: 0 10px 40px rgba(34,161,216,0.50), 0 0 80px rgba(34,161,216,0.18); }
+        }
+      `}</style>
+
+      {/* FORM CARD */}
+      <div
+        className="relative z-10 max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto px-4 py-12 lg:py-16"
+        style={{ animation: 'fadeInUp 0.6s ease-out both' }}
+      >
         <form
           onSubmit={handleSubmit}
-          className="bg-[rgba(15,23,42,0.40)] md:bg-[rgba(15,23,42,0.75)] backdrop-blur-2xl backdrop-brightness-[0.85] md:backdrop-brightness-[0.4] border border-white/[0.08] ring-1 ring-inset ring-white/[0.05] rounded-2xl p-6 sm:p-8 lg:p-10 shadow-[0_24px_80px_rgba(0,0,0,.70)]"
+          className="rounded-2xl p-6 sm:p-8 lg:p-10"
+          style={{ background: 'linear-gradient(135deg, rgba(15,23,42,0.80) 0%, rgba(11,17,32,0.90) 100%)',
+            backdropFilter: 'blur(24px) brightness(0.85)',
+            border: '1px solid rgba(34,161,216,0.12)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.50), inset 0 1px 0 rgba(34,161,216,0.08)',
+          }}
         >
-          <div className="mb-5 text-center">
-            <div className="text-[11px] text-white/60 mb-1 uppercase tracking-[0.18em]" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.9)" }}>I searched{'\u2026'} found nothing.</div>
-            <div className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-3" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>So I built it.</div>
-            <div className="text-sm font-semibold text-white/80 mb-2">
-              Every benefit. Every side effect. For <span className="text-white font-black">EVERY</span> prohormone.
+          {/* Anchor badge */}
+          <div className="flex justify-center mb-5">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase"
+              style={{ background: 'rgba(34,161,216,0.08)',
+                border: '1px solid rgba(34,161,216,0.15)',
+                color: 'rgba(34,161,216,0.7)',
+              }}
+            >
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22a1d8', display: 'inline-block', boxShadow: '0 0 8px rgba(34,161,216,0.6)' }} />
+              E3592DC3
             </div>
-            <div className="text-xs text-white/50 mb-4">
+          </div>
+
+          <div className="mb-6 text-center">
+            <div className="text-[11px] text-slate-500 mb-1.5 uppercase tracking-[0.18em]">
+              I searched{'\u2026'} found nothing.
+            </div>
+            <div
+              className="text-3xl sm:text-4xl font-black tracking-tight text-white mb-3"
+              style={{ textShadow: '0 2px 16px rgba(34,161,216,0.15)' }}
+            >
+              So I built it.
+            </div>
+            <div className="text-sm font-semibold text-slate-300 mb-2">
+              Every benefit. Every side effect. For{' '}
+              <span className="font-black" style={{ color: '#22a1d8' }}>EVERY</span>{' '}
+              prohormone.
+            </div>
+            <div className="text-xs text-slate-500 mb-4">
               106 compounds reviewed {'\u00B7'} 2M+ YouTube views {'\u00B7'} 600+ consultations
             </div>
-            <div className="text-xs text-white/55 italic">
+            <div className="text-xs text-slate-500 italic">
               Confidence comes from clarity. That{'\u2019'}s what this site gives you.
             </div>
           </div>
@@ -169,7 +161,13 @@ export default function EncyclopediaGate({ onUnlock }) {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_4px_rgba(34,157,216,.35)] focus:bg-black/40 outline-none transition-all"
+              className="w-full rounded-xl px-4 py-3 text-white text-sm outline-none transition-all"
+              style={{ background: 'rgba(11,17,32,0.60)',
+                border: '1px solid rgba(34,161,216,0.15)',
+                placeholder: 'rgba(148,163,184,0.45)',
+              }}
+              onFocus={(e) => { e.target.style.borderColor = '#22a1d8'; e.target.style.boxShadow = '0 0 0 4px rgba(34,161,216,0.15)'; }}
+              onBlur={(e) => { e.target.style.borderColor = 'rgba(34,161,216,0.15)'; e.target.style.boxShadow = 'none'; }}
             />
             <input
               type="text"
@@ -179,7 +177,12 @@ export default function EncyclopediaGate({ onUnlock }) {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_4px_rgba(34,157,216,.35)] focus:bg-black/40 outline-none transition-all"
+              className="w-full rounded-xl px-4 py-3 text-white text-sm outline-none transition-all"
+              style={{ background: 'rgba(11,17,32,0.60)',
+                border: '1px solid rgba(34,161,216,0.15)',
+              }}
+              onFocus={(e) => { e.target.style.borderColor = '#22a1d8'; e.target.style.boxShadow = '0 0 0 4px rgba(34,161,216,0.15)'; }}
+              onBlur={(e) => { e.target.style.borderColor = 'rgba(34,161,216,0.15)'; e.target.style.boxShadow = 'none'; }}
             />
           </div>
 
@@ -202,28 +205,42 @@ export default function EncyclopediaGate({ onUnlock }) {
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/45 focus:border-[#229DD8] focus:shadow-[0_0_0_4px_rgba(34,157,216,.35)] focus:bg-black/40 outline-none transition-all mb-5"
+            className="w-full rounded-xl px-4 py-3 text-white text-sm outline-none transition-all mb-5"
+            style={{ background: 'rgba(11,17,32,0.60)',
+              border: '1px solid rgba(34,161,216,0.15)',
+            }}
+            onFocus={(e) => { e.target.style.borderColor = '#22a1d8'; e.target.style.boxShadow = '0 0 0 4px rgba(34,161,216,0.15)'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'rgba(34,161,216,0.15)'; e.target.style.boxShadow = 'none'; }}
           />
 
           <button
             type="submit"
             disabled={isSubmitting}
             className="w-full text-white font-black text-sm py-4 rounded-full transition-all disabled:opacity-50 hover:-translate-y-0.5 active:translate-y-0"
-            style={{ background: "linear-gradient(180deg, #2bb5e8 0%, #229DD8 50%, #1a7eb0 100%)", boxShadow: "0 10px 32px rgba(34,157,216,.40), 0 0 60px rgba(34,157,216,.15)" }}
+            style={{ background: 'linear-gradient(180deg, #2bb5e8 0%, #22a1d8 50%, #1a7eb0 100%)',
+              boxShadow: '0 10px 32px rgba(34,161,216,0.35), 0 0 60px rgba(34,161,216,0.10)',
+              animation: 'glowShift 4s ease-in-out infinite',
+            }}
           >
             {isSubmitting ? 'Securing access\u2026' : 'Enter the ProHormone Encyclopedia \u2192'}
           </button>
 
-          <div className="mt-3 text-[11px] text-white/40 text-center">
+          <div className="mt-3 text-[11px] text-slate-600 text-center">
             No spam. This unlocks access and keeps you looped in.
           </div>
 
-          {error && (
-            <div className="text-red-300 text-xs text-center mt-3" role="status" aria-live="polite">
+          {error && ( <div className="text-red-400 text-xs text-center mt-3 px-3 py-2 rounded-lg" role="status" aria-live="polite" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
               {error}
             </div>
           )}
         </form>
+
+        {/* Bottom anchor line */}
+        <div className="mt-6 flex justify-center">
+          <div className="text-[9px] font-mono tracking-[0.25em] uppercase" style={{ color: 'rgba(34,161,216,0.25)' }}>
+            PROOF OVER HYPE
+          </div>
+        </div>
       </div>
     </div>
   );
