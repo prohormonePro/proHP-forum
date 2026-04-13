@@ -70,8 +70,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login" className="prohp-btn-ghost text-xs">Log in</Link>
+            <div className="ml-auto">
               <Link to="/login" className="prohp-btn-primary text-xs">Log In</Link>
             </div>
           )}
