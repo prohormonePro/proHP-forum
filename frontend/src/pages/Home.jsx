@@ -43,7 +43,7 @@ export default function Home() {
               Welcome back, {user.display_name || user.username}.
             </h1>
             <p className="text-sm text-[var(--text-secondary)] mb-3">
-              105+ compounds reviewed. 2M+ views. Every claim receipted.
+              106 compounds reviewed. 2M+ views. Every claim receipted.
             </p>
             <p className="text-xs text-slate-500 italic">Skepticism without data is fear. Skepticism with data is power.</p>
           </div>
@@ -107,7 +107,7 @@ export default function Home() {
               Compound Encyclopedia
             </div>
             <div className="text-[11px] text-[var(--text-muted)]">
-              105+ compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
+              106 compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
             </div>
           </div>
         </div>
