@@ -2,7 +2,7 @@
 
 **The compound encyclopedia that talks back.**
 
-105 compounds. 1,919 sealed stages. 6 autonomous deploys. One operator.
+106 compounds. 1,919 sealed stages. 6 autonomous deploys. One operator.
 
 Built by [Travis Dillard](https://youtube.com/@ProHormonePro) with 17 years of hormone experience, 600+ coaching clients, and an autonomous AI swarm that deploys code to production without a human touching the terminal.
 
@@ -16,7 +16,7 @@ ProHP Forum is the first compound encyclopedia built on lived experience instead
 
 Every entry was written from video transcripts, personal bloodwork, coaching conversations, and clinical literature. Not scraped. Not generated. Substrate from a man who ran EpiAndro without a test base in 2017, got shut down for six months, and is honest enough to tell you what happened so you do not make the same mistake.
 
-105 compounds. Each one cross-referenced to every related compound through wiki-style hyperlinks. Click Ostarine, read about suppression, click through to Enclomiphene for PCT, discover the COMT pathway, realize the anxiety you felt on RAD-140 was pharmacology not weakness, click through to Magnesium, to P5P, to the mitochondrial stack. Every page feeds every other page. The ouroboros.
+106 compounds. Each one cross-referenced to every related compound through wiki-style hyperlinks. Click Ostarine, read about suppression, click through to Enclomiphene for PCT, discover the COMT pathway, realize the anxiety you felt on RAD-140 was pharmacology not weakness, click through to Magnesium, to P5P, to the mitochondrial stack. Every page feeds every other page. The ouroboros.
 
 The rule is simple: **Proof Over Hype.** If you cannot back it up, do not post it.
 
@@ -283,7 +283,7 @@ Secrets live in `.env` only. Never in payloads, docs, tickets, or commit message
 
 ---
 
-105 compounds. 1,919 stages. 6 autonomous deploys. 17 years of lived experience turned into a living encyclopedia where every page feeds every other page and every hyperlink is a doorway into understanding that did not exist before this week.
+106 compounds. 1,919 stages. 6 autonomous deploys. 17 years of lived experience turned into a living encyclopedia where every page feeds every other page and every hyperlink is a doorway into understanding that did not exist before this week.
 
 Three layers of compound evidence: clinical literature, personal bloodwork, and community data. That is the knowledge stack nobody else has. That is why this encyclopedia talks back.
 

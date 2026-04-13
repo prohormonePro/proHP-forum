@@ -53,7 +53,7 @@ export default function Home() {
               Real compounds. Real logs. No guessing.
             </h1>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              105+ compounds reviewed. 2M+ YouTube views. 600+ consultations.
+              106 compounds reviewed. 2M+ YouTube views. 600+ consultations.
               Every claim receipted, every protocol questioned, every side effect documented.
               No unverified claims. Just the work.
             </p>
@@ -304,7 +304,7 @@ export default function Home() {
       <div className="prohp-card p-5 mb-8">
         <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">About Travis</h3>
         <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-          17 years in the space. 600+ one-on-one clients. 105+ compound profiles written from direct experience.
+          17 years in the space. 600+ one-on-one clients. 106 compound profiles written from direct experience.
           I built ProHormonePro because nobody else would do the work. Real risk discussion. Real receipts.
           No brand deals. No affiliate bias. Just the data and the experience to interpret it.
         </p>

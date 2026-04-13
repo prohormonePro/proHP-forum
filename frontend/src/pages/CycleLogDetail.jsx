@@ -684,7 +684,7 @@ export default function CycleLogDetail() {
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">3.</span><span className="text-xs text-slate-400">Upload the file and ask anything about your cycle</span></div>
                 <div className="flex gap-3 items-start"><span className="text-[#229DD8] font-bold text-sm shrink-0">4.</span><span className="text-xs text-slate-400">Re-upload every 8-10 messages to keep the AI accurate</span></div>
               </div>
-              <p className="text-xs text-slate-500 mb-4">Includes encyclopedia data with verified active/banned status, all 105 compounds with manufacturer info, and guardrails so the AI knows Hi-Tech reformulations from scheduled originals.</p>
+              <p className="text-xs text-slate-500 mb-4">Includes encyclopedia data with verified active/banned status, all 106 compounds with manufacturer info, and guardrails so the AI knows Hi-Tech reformulations from scheduled originals.</p>
               <div className="flex gap-3">
                 <button onClick={() => { downloadCycleJSON(); setShowHandoffGuide(false); }} className="flex-1 bg-gradient-to-r from-[#229DD8] to-[#1b87bc] text-white font-bold text-sm rounded-xl py-2.5 transition-all hover:from-[#1b87bc] hover:to-[#166e9c]">Download Cycle File</button>
                 <button onClick={() => setShowHandoffGuide(false)} className="px-4 text-slate-500 hover:text-white text-sm transition-colors">Close</button>

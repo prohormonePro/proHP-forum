@@ -147,7 +147,7 @@ export default function CompoundsPage() {
           <FlaskConical className="w-5 h-5 text-prohp-400" />
           <h1 className="text-lg font-extrabold tracking-tight">Compound Encyclopedia</h1>
         </div>
-        <p className="text-xs text-slate-500">105 compounds. Every one reviewed. Proof over hype.</p>
+        <p className="text-xs text-slate-500">106 compounds. Every one reviewed. Proof over hype.</p>
       </div>
 
       {/* Control Bar */}

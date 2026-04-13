@@ -153,7 +153,7 @@ export default function EncyclopediaGate({ onUnlock }) {
               Every benefit. Every side effect. For <span className="text-white font-black">EVERY</span> prohormone.
             </div>
             <div className="text-xs text-white/50 mb-4">
-              52+ compounds reviewed {'\u00B7'} 2M+ YouTube views {'\u00B7'} 200+ consultations
+              106 compounds reviewed {'\u00B7'} 2M+ YouTube views {'\u00B7'} 600+ consultations
             </div>
             <div className="text-xs text-white/55 italic">
               Confidence comes from clarity. That{'\u2019'}s what this site gives you.

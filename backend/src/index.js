@@ -18,9 +18,8 @@ process.on('uncaughtException', (err) => {
   console.error('[UNCAUGHT]', err.stack || err);
   process.exit(1);
 });
-process.on('unhandledRejection', (err) => {
-  console.error('[UNHANDLED_REJECTION]', err);
-  process.exit(1);
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[UNHANDLED_REJECTION]', reason);
 });
 
 app.set('trust proxy', 1);
