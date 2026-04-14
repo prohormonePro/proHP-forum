@@ -23,6 +23,7 @@ import ClaimAccountPage from "./pages/ClaimAccountPage";
 import SearchPage from "./pages/SearchPage";
 import CommunityIntel from "./pages/CommunityIntel";
 import ConsultationPage from './pages/ConsultationPage';
+import ConsultationIntake from './pages/ConsultationIntake';
 import DevPage from './pages/DevPage';
 import PctGuide from './pages/PctGuide';
 import ScrollToTopButton from './components/ScrollToTopButton';
@@ -70,6 +71,7 @@ export default function App() {
             <Route path="/dev" element={<DevPage />} />
             <Route path="/community-intel" element={<CommunityIntel />} />
             <Route path="/consultation" element={<ConsultationPage />} />
+              <Route path="/consultation/intake" element={<ConsultationIntake />} />
             <Route path="/pct" element={<PctGuide />} />
           </Routes>
         </main>

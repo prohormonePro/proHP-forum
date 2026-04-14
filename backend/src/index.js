@@ -73,6 +73,7 @@ app.use('/api/threads', require('./routes/threads'));
 app.use('/uploads', express.static(require('path').join(__dirname, '../uploads')));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/consultation-intake', require('./routes/consultationIntake'));
 app.use('/api/compounds', require('./routes/compounds'));
 app.use('/api/cycles', require('./routes/cycles'));
 app.use('/api/stripe', require('./routes/stripe'));
