@@ -8,12 +8,40 @@ function alertTravis(data) {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (!botToken || !chatId) return;
-    const name = data.name || data.selected_slot || 'Unknown';
-    const type = data.type === 'schedule' ? 'SCHEDULE' : 'INTAKE';
-    const slot = data.selected_slot || 'N/A';
-    const goal = data.primary_goal || data.alt_time || '';
-    const msg = 'NEW CONSULTATION ' + type + '\nName: ' + name + '\nSlot: ' + slot + '\nGoal: ' + goal;
-    const postData = JSON.stringify({ chat_id: chatId, text: msg });
+
+    let msg = '';
+    if (data.type === 'schedule') {
+      const slot = data.selected_slot || 'CUSTOM';
+      const alt = data.alt_time || '';
+      const user = data.username || 'anonymous';
+      msg = 'CONSULTATION BOOKED\n'
+        + 'Slot: ' + slot + '\n'
+        + (alt ? 'Preferred time: ' + alt + '\n' : '')
+        + 'User: ' + user;
+    } else {
+      msg = 'NEW CONSULTATION INTAKE\n'
+        + '━━━━━━━━━━━━━━━━━━━━\n'
+        + 'Name: ' + (data.name || '?') + '\n'
+        + 'Age: ' + (data.age || '?') + '\n'
+        + 'Height/Weight/BF: ' + (data.height || '?') + ' / ' + (data.weight || '?') + ' / ' + (data.bodyfat || '?') + '\n'
+        + '━━━━━━━━━━━━━━━━━━━━\n'
+        + 'Training: ' + (data.training_history || 'not provided') + '\n'
+        + 'Diet: ' + (data.diet || 'not provided') + '\n'
+        + 'Current Supps: ' + (data.current_supplements || 'none listed') + '\n'
+        + 'Prior Compounds: ' + (data.prior_compounds || 'none listed') + '\n'
+        + 'TRT: ' + (data.trt_status || '?') + '\n'
+        + 'Bloodwork: ' + (data.bloodwork || 'not provided') + '\n'
+        + '━━━━━━━━━━━━━━━━━━━━\n'
+        + 'Goal: ' + (data.primary_goal || '?') + '\n'
+        + 'Compounds to discuss: ' + (data.compounds_to_discuss || 'not specified') + '\n'
+        + 'Health conditions: ' + (data.health_conditions || 'none reported') + '\n'
+        + '━━━━━━━━━━━━━━━━━━━━\n'
+        + 'THE ONE QUESTION:\n' + (data.the_one_question || 'not provided') + '\n'
+        + '━━━━━━━━━━━━━━━━━━━━\n'
+        + 'E3592DC3';
+    }
+
+    const postData = JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' });
     const req = https.request({
       hostname: 'api.telegram.org',
       path: '/bot' + botToken + '/sendMessage',
