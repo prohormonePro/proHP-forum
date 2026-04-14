@@ -248,8 +248,8 @@ export default function Home() {
               </Link>
             </div>
           )}
-          <p className="text-xs text-[var(--text-secondary)] mt-3 pt-3 border-t border-white/5 text-center sm:text-left">
-            Inner Circle members get full cycle log access, compound deep dives, and community intel.
+          <p className="text-[11px] tracking-wide leading-relaxed text-[var(--text-secondary)] mt-4 pt-3 border-t border-white/[0.04] text-center sm:text-left max-w-sm mx-auto sm:max-w-none sm:mx-0">
+            Inner Circle unlocks full cycle logs, deep dives, and community intel.
           </p>
         </div>
       </div>
