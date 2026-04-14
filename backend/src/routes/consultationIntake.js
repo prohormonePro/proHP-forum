@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');
+const { query } = require('../config/db');
 
 router.post('/', async (req, res) => {
   try {
@@ -8,10 +8,10 @@ router.post('/', async (req, res) => {
     if (!data || typeof data !== 'object') {
       return res.status(400).json({ error: 'Invalid payload.' });
     }
-    await pool.query(
+    await query(
       'CREATE TABLE IF NOT EXISTS consultation_intakes (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), data JSONB NOT NULL, submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW())'
     );
-    await pool.query(
+    await query(
       'INSERT INTO consultation_intakes (data) VALUES ($1)',
       [JSON.stringify(data)]
     );
