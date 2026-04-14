@@ -42,28 +42,41 @@ export default function Home() {
             <h1 className="text-lg font-bold text-[var(--text-primary)] mb-1">
               Welcome back, {user.display_name || user.username}.
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] mb-3">
-              106 compounds reviewed. 2M+ views. Every claim receipted.
+            <p className="text-sm text-slate-300 mb-3 leading-relaxed">
+              <span className="text-slate-100 font-medium">106 compounds reviewed. 1.2M+ YouTube views.</span> Every claim receipted.
             </p>
-            <p className="text-xs text-slate-500 italic">Skepticism without data is fear. Skepticism with data is power.</p>
+            <div className="border-l-2 border-cyan-500/35 pl-4 mb-1">
+              <p className="text-[13px] sm:text-sm text-slate-400 leading-[1.7]">
+                Skepticism without data is fear.
+                <span className="block sm:inline text-slate-300"> Skepticism with data is power.</span>
+              </p>
+            </div>
           </div>
         ) : (
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] mb-2 leading-tight">
               Real compounds. Real logs. No guessing.
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              106 compounds reviewed. 2M+ YouTube views. 600+ consultations.
-              Every claim receipted, every protocol questioned, every side effect documented.
-              No unverified claims. Just the work.
-            </p>
-            <div className="flex items-center gap-3 mt-4">
+            <div className="max-w-3xl mt-1 mb-6 flex flex-col gap-5">
+              <p className="text-[15px] sm:text-[16px] text-slate-300 leading-[1.85]">
+                <span className="text-slate-100 font-medium">106 compounds reviewed. 1.2M+ YouTube views. 600+ consultations.</span>{" "}
+                Every claim receipted, every protocol questioned, every side effect documented.
+                No unverified claims.{" "}
+                <span className="text-white font-semibold">Just the work.</span>
+              </p>
+              <div className="border-l-2 border-cyan-500/35 pl-4">
+                <p className="text-[14px] sm:text-[15px] text-slate-400 leading-[1.7]">
+                  Skepticism without data is fear.
+                  <span className="block sm:inline text-slate-300"> Skepticism with data is power.</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
               <Link to="/r/general" className="prohp-btn-ghost text-sm inline-flex items-center gap-2">
                 <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
                 Browse the Forum
               </Link>
             </div>
-            <p className="text-xs text-slate-500 italic mt-4">Skepticism without data is fear. Skepticism with data is power.</p>
           </div>
         )}
       </div>
@@ -106,7 +119,7 @@ export default function Home() {
             <div className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--prohp-blue)] transition-colors">
               Compound Encyclopedia
             </div>
-            <div className="text-[11px] text-[var(--text-muted)]">
+            <div className="text-xs text-slate-400">
               106 compounds. SARMs, prohormones, peptides, PCT. Risk tiers and mechanism breakdowns.
             </div>
           </div>
@@ -130,11 +143,11 @@ export default function Home() {
                 {/* Header row */}
                 <div className="flex items-start justify-between mb-1.5">
                   <div className="flex items-center gap-2.5">
-                    <h2 className="text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--prohp-blue)] transition-colors">
+                    <h2 className="text-lg font-bold text-white group-hover:text-[var(--prohp-blue)] transition-colors">
                       {room.name}
                     </h2>
                     {locked && (
-                      <span className="tier-badge tier-inner_circle text-[8px] py-0">
+                      <span className="tier-badge tier-inner_circle text-xs py-0">
                         <Lock className="w-2.5 h-2.5 mr-0.5" /> Inner Circle
                       </span>
                     )}
@@ -143,12 +156,12 @@ export default function Home() {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-[var(--text-secondary)] mb-3 leading-relaxed">
+                <p className="text-[15px] text-slate-300 mb-3 leading-relaxed">
                   {room.description}
                 </p>
 
                 {/* Stats row */}
-                <div className="flex items-center gap-4 text-[11px] text-[var(--text-muted)]">
+                <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
                   <span className="flex items-center gap-1">
                     <MessageSquare className="w-3 h-3" />
                     {room.thread_count || 0} {room.thread_count === 1 ? 'thread' : 'threads'}
@@ -211,7 +224,7 @@ export default function Home() {
                 {hasThreads && (
                   <Link
                     to={`/r/${room.slug}`}
-                    className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors ml-auto"
+                    className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors ml-auto"
                   >
                     View all threads
                   </Link>
@@ -225,8 +238,8 @@ export default function Home() {
       {/* ── Cycle Logs + Inner Circle CTA ── */}
       <div className="mb-8">
         <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-5 shadow-lg shadow-amber-500/5">
-          <h2 className="text-base font-bold text-white mb-1.5">Community Cycle Logs</h2>
-          <p className="text-xs text-[var(--text-secondary)] mb-4">
+          <h2 className="text-lg font-bold text-white mb-3">Community Cycle Logs</h2>
+          <p className="text-[15px] text-slate-300 mb-4 leading-relaxed">
             Real protocols. Real bloodwork. Real results. See what the community is running and how they respond.
           </p>
           {user && (user.tier === 'inner_circle' || user.tier === 'admin') ? (
@@ -248,7 +261,7 @@ export default function Home() {
               </Link>
             </div>
           )}
-          <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-white/5 text-center sm:text-left leading-relaxed">
+          <p className="text-sm text-slate-400 font-medium mt-4 pt-4 border-t border-white/10 text-center sm:text-left leading-relaxed">
             Inner Circle unlocks full cycle logs, deep dives, and community intel.
           </p>
         </div>
@@ -257,19 +270,19 @@ export default function Home() {
       <div className="prohp-card p-5 mb-4">
         <div className="flex items-center gap-2 mb-4">
           <Play className="w-3.5 h-3.5 text-red-500" />
-          <span className="text-xs font-bold text-[var(--text-primary)]">YouTube</span>
+          <span className="text-sm font-semibold text-white">YouTube</span>
           <a
             href="https://youtube.com/@prohormonepro"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto flex items-center gap-1 text-[11px] text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors"
+            className="ml-auto flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors"
           >
             Watch <ExternalLink className="w-3 h-3" />
           </a>
         </div>
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="text-center">
-            <div className="stat-value">2M+</div>
+            <div className="stat-value">1.2M+</div>
             <div className="stat-label">Views</div>
           </div>
           <div className="text-center">
@@ -286,10 +299,10 @@ export default function Home() {
           </div>
         </div>
         <div className="border-t border-[var(--border-subtle)] pt-3">
-          <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">
+          <p className="text-[15px] text-slate-300 italic leading-relaxed">
             "Just got my bloodwork back after following your RAD protocol. Numbers are exactly where you said they'd be. Respect."
           </p>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1">- Dylan M., YouTube comment</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">- Dylan M., YouTube comment</p>
         </div>
       </div>
 
@@ -302,8 +315,8 @@ export default function Home() {
       </div>
       {/* ── About Travis ── */}
       <div className="prohp-card p-5 mb-8">
-        <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">About Travis</h3>
-        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+        <h3 className="text-lg font-bold text-white mb-4">About Travis</h3>
+        <p className="text-[15px] sm:text-base text-slate-200 leading-relaxed max-w-2xl">
           17 years in the space. 600+ one-on-one clients. 106 compound profiles written from direct experience.
           I built ProHormonePro because nobody else would do the work. Real risk discussion. Real receipts.
           No brand deals. No affiliate bias. Just the data and the experience to interpret it.
@@ -312,16 +325,16 @@ export default function Home() {
 
       {/* ── Consultation CTA ── */}
       <div className="prohp-card p-5 mb-8">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
+            <h3 className="text-xl font-semibold text-white mb-2">
               1-on-1 consultation - {user && (user.tier === 'inner_circle' || user.tier === 'admin') ? '$400' : '$500'}
             </h3>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-md">
+            <p className="text-[15px] sm:text-base text-slate-300 leading-relaxed max-w-md">
               Your stack, your goals, your questions. Real talk, no script, receipts included.
             </p>
           </div>
-          <div className="flex flex-col gap-2 flex-shrink-0 ml-4">
+          <div className="flex flex-col gap-2 flex-shrink-0 sm:ml-4 mt-4 sm:mt-0 w-full sm:w-auto">
             <Link
               to="/consultation"
               className="prohp-btn-primary text-xs"
@@ -330,7 +343,7 @@ export default function Home() {
             </Link>
             <Link
               to="/r/general"
-              className="text-[10px] text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors text-right"
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--prohp-blue)] transition-colors text-center sm:text-right"
             >
               See what a real session looks like
             </Link>
@@ -340,13 +353,7 @@ export default function Home() {
 
 
 
-      {/* Dev Signal */}
-      <div className="mb-8 py-4 text-center">
-        <Link to="/dev" className="inline-flex items-center gap-2 text-[11px] font-mono text-slate-600 hover:text-cyan-400 transition-colors group">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 group-hover:bg-cyan-400 transition-colors" />
-          Are you a developer? Inspect the architecture.
-        </Link>
-      </div>
+
     </div>
 
 
