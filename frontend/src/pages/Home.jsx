@@ -223,7 +223,7 @@ export default function Home() {
       </div>
 
       {/* ── Cycle Logs + Inner Circle CTA ── */}
-      <div className="max-w-5xl mx-auto px-4 pt-2 pb-6">
+      <div className="mb-8">
         <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-amber-500/15 p-5 shadow-lg shadow-amber-500/5">
           <h2 className="text-base font-bold text-white mb-1.5">Community Cycle Logs</h2>
           <p className="text-xs text-[var(--text-secondary)] mb-4">
