@@ -11,7 +11,8 @@ function alertTravis(data) {
 
     let msg = '';
     if (data.type === 'schedule') {
-      const slot = data.selected_slot || 'CUSTOM';
+      const slotMap = {'wed-12':'Wednesday 12-1pm CST','thu-12':'Thursday 12-1pm CST','fri-12':'Friday 12-1pm CST','sat-14':'Saturday 2-4pm CST'};
+      const slot = slotMap[data.selected_slot] || data.selected_slot || 'CUSTOM';
       const alt = data.alt_time || '';
       const user = data.username || 'anonymous';
       msg = 'CONSULTATION BOOKED\n'
@@ -22,6 +23,8 @@ function alertTravis(data) {
       msg = 'NEW CONSULTATION INTAKE\n'
         + '━━━━━━━━━━━━━━━━━━━━\n'
         + 'Name: ' + (data.name || '?') + '\n'
+        + 'Email: ' + (data.email || 'not provided') + '\n'
+        + 'Phone: ' + (data.phone || 'not provided') + '\n'
         + 'Age: ' + (data.age || '?') + '\n'
         + 'Height/Weight/BF: ' + (data.height || '?') + ' / ' + (data.weight || '?') + ' / ' + (data.bodyfat || '?') + '\n'
         + '━━━━━━━━━━━━━━━━━━━━\n'
