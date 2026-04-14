@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../config/db');
+const https = require('https');
 
-// Telegram alert on new submission
-async function alertTravis(data) {
+function alertTravis(data) {
   try {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -12,13 +12,17 @@ async function alertTravis(data) {
     const type = data.type === 'schedule' ? 'SCHEDULE' : 'INTAKE';
     const slot = data.selected_slot || 'N/A';
     const goal = data.primary_goal || data.alt_time || '';
-    const msg = `NEW CONSULTATION ${type}\nName: ${name}\nSlot: ${slot}\nGoal: ${goal}`;
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-    await fetch(url, {
+    const msg = 'NEW CONSULTATION ' + type + '\nName: ' + name + '\nSlot: ' + slot + '\nGoal: ' + goal;
+    const postData = JSON.stringify({ chat_id: chatId, text: msg });
+    const req = https.request({
+      hostname: 'api.telegram.org',
+      path: '/bot' + botToken + '/sendMessage',
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: msg }),
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(postData) }
     });
+    req.on('error', () => {});
+    req.write(postData);
+    req.end();
   } catch (e) {
     console.error('[consultation-intake] telegram alert failed:', e.message);
   }
@@ -45,7 +49,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Admin GET - view all submissions
 router.get('/', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
