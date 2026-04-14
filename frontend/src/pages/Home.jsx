@@ -248,7 +248,7 @@ export default function Home() {
               </Link>
             </div>
           )}
-          <p className="text-xs text-[var(--text-secondary)] mt-2.5">
+          <p className="text-xs text-[var(--text-secondary)] mt-3 pt-3 border-t border-white/5 text-center sm:text-left">
             Inner Circle members get full cycle log access, compound deep dives, and community intel.
           </p>
         </div>
