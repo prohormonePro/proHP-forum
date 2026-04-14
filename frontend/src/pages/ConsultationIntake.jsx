@@ -62,14 +62,14 @@ export default function ConsultationIntake() { const navigate = useNavigate();
             we can spend consultation time on strategy, not background.
           </p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/consultation/schedule')}
             className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors"
             style={{ background: 'rgba(34,161,216,0.12)',
               border: '1px solid rgba(34,161,216,0.25)',
               color: '#22a1d8',
             }}
           >
-            Back to Forum
+            Book Your Session
           </button>
         </div>
       </div>
