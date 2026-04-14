@@ -9,9 +9,8 @@ DIST_DIR="$APP_DIR/frontend/dist"
 BACKUP_DIR="$APP_DIR/dist_backup_$(date +%Y%m%d_%H%M%S)"
 
 # Cloudflare
-CF_ZONE="35d86a58c5ea26678eff9bc1070b6dd0"
-CF_EMAIL="prohormonepro@gmail.com"
-CF_KEY="cfk_vszAzECrfeA1sggIe2bC7jBuwI9xkor0yKmsIC7B11afef53"
+# S56: read CF creds from .env (never hardcode keys in git-tracked files)
+source /home/travisd/prohp-forum/.env
 
 echo "[1/6] Backing up dist/"
 cp -r "$DIST_DIR" "$BACKUP_DIR" 2>/dev/null || echo "No existing dist to backup"

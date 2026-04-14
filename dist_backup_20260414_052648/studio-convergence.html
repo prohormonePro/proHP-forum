@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Opportunity - Operating Truth</title>
+<style>body{margin:0;padding:0;background:#050810;}</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script type="text/babel">
+import { useState, useEffect } from "react";
+
+const metrics = {
+  original: { signalDensity: 34, transformationProof: 41, productTransferability: 56, voiceFidelity: 22, founderGravity: 38 },
+  sovereign: { signalDensity: 92, transformationProof: 88, productTransferability: 94, voiceFidelity: 96, founderGravity: 91 }
+};
+
+const metricLabels = {
+  signalDensity: "Signal Density",
+  transformationProof: "Transformation Proof",
+  productTransferability: "Product Transferability",
+  voiceFidelity: "Voice Fidelity",
+  founderGravity: "Founder Gravity"
+};
+
+const sections = [
+  {
+    id: "opportunity",
+    label: "The Opportunity",
+    content: {
+      original: `Studio (studio.com) is one of the largest online education companies in the world. Founded in 2017, Studio has raised $64M and was last valued at $1 billion. Investors include: Instagram co-founder Mike Krieger, Airbnb co-founder Joe Gebbia, LinkedIn Chairman Jeff Weiner, Dreamworks co-founder Jeffrey Katzenberg, Floodgate, Greenoaks Capital, Zillow founder Spencer Rascoff, StitchFix founder Katrina Lake, Intuit founder Scott Cook, CAA founder Michael Ovitz, Yelp founder Jeremy Stoppelman, and more. Studio is known for pioneering 10x better products for creators and their audiences. For creators: Studio remains the best way for creators to monetize their knowledge. Studio has the highest average earnings ($330k per year) per creator out of any other platform on the internet. For consumers: Studio's products remain the best way for consumers to learn anything, achieve their goals, and change their lives, with a 10x completion rate / success rate compared to the industry average.`,
+      sovereign: `Studio turns expertise into software.
+
+Not courses. Not communities. Apps.
+
+A creator's methodology gets turned into a personalized coaching engine that users carry in their pocket. It guides decisions, adapts to context, and scales the creator's thinking without requiring the creator's body to be present.
+
+That is why the model works.
+
+Studio is already large enough to matter: $1B valuation, $64M raised, 130+ creators, 1M+ users, 120 countries, profitable.
+
+The real question is not whether Studio is legitimate.
+It is whether the creator's expertise is strong enough to deserve software form.`
+    }
+  },
+  {
+    id: "creator",
+    label: "The Creator",
+    content: {
+      original: `Studio creators are: 1. Trusted experts: Creators who have real expertise, experience, and a trusted track record. They are premium leaders in their field. In many cases, they are the #1 practitioner in their space. Some of these creators have large followings. Some have smaller ones. Studio works with both, as long as you have real expertise to share. 2. Entrepreneurial pioneers: Creators who want to be on the cutting edge. Who want to be pioneers of the newest and best products and experiences. Who want to be co-creators of the future. Who want to launch offerings to their audience that are unlike anyone else's in their space.`,
+      sovereign: `The right creator is not just informative. They are operational.
+
+Their audience does not just watch them. They change because of them.
+
+Their expertise works off-camera. In real decisions. Under pressure. In the dark.
+
+Follower count helps. But it is not the thing.
+
+The thing is this: when someone follows your method, does their life actually move?
+
+If yes, you are not selling content. You are carrying software-grade intelligence in human form.`
+    }
+  },
+  {
+    id: "machine",
+    label: "The Machine",
+    content: {
+      original: `Studio is once again pioneering a brand new, best-in-class way for creators to share and monetize their knowledge. This new product is not taking the form of a course or a community. It's an app. A special kind of AI-powered app that is a 10x improvement on any other offering. Introducing Studio's new Coaching Apps. Imagine the world's most personalized life coach in your pocket. Or, the world's most personalized fitness coach. Or business coach, dating coach, parenting coach, career coach, singing coach, etc. All in the form of a beautiful, powerful, magically personalized app.`,
+      sovereign: `Most creator products decay.
+
+Courses are static. Communities burn out. Both require constant reappearance.
+
+An app does not.
+
+A user enters their goal, context, obstacles, and current state. The creator's frameworks process the input. The app returns a personalized protocol. It adjusts daily. Answers questions in-context. Keeps the creator's thinking alive at the moment it is needed.
+
+That is the leap. Not audience monetization. Method deployment.`
+    }
+  },
+  {
+    id: "economics",
+    label: "The Economics",
+    content: {
+      original: `Apps are one of the most monetizable products, period. The app form factor is notably easier to monetize than courses, communities, and other traditional creator products. Based on our research, 100x more consumers are willing to use an app than other offerings. The few creators who have done it have seen unmatched results: Dr. Becky is earning $22M per year with her Good Inside app. Jeff Nippard is earning $20M per year with his Macrofactor app. Sam Harris is earning $12M per year with his Waking Up app. Kayla Itsines is earning $100M+ per year with her Sweat app.`,
+      sovereign: `This model wins because it compounds.
+
+Courses spike and fade. Communities convert labor into churn. Apps create recurring revenue without requiring recurring presence.
+
+The precedent already exists:
+Dr. Becky - $22M/yr
+Jeff Nippard - $20M/yr
+Sam Harris - $12M/yr
+Kayla Itsines - $100M+/yr
+
+The math is simple:
+250K audience × 2% conversion × $200/yr = $1M ARR.
+
+No story required. Just trust, product, and fit.`
+    }
+  },
+  {
+    id: "invitation",
+    label: "The Invitation",
+    content: {
+      original: `After testing Studio's first Coaching Apps at the end of last year, we identified a few fastest-growing categories. To seize this opportunity, we are now doubling down and bringing on some of the very best creators from these categories as Flagship Creators. These creators will be featured in a global marketing campaign to publicly launch these key categories. We'd like you to be a part of it. To stay organized and work systematically towards the launch, you'll participate in the Flagship Creator Program.`,
+      sovereign: `This is a closed-door cohort. Not an application funnel. An invitation.
+
+You are not just launching an app. Your use case will shape how this category gets built.
+
+April 15: Kickoff.
+4-6 hours over the next few weeks.
+June: Global launch.
+
+You have spent years building trust one video, one post, one comment at a time. This is how you stop trading time for impact and start compounding it.`
+    }
+  }
+];
+
+const voiceSamples = [
+  {
+    context: "YouTube: crashed estrogen on TRT + Ostarine",
+    text: `Hey brother. Solid stack. The crashed estrogen makes sense at 1mg anastrozole weekly on top of 160mg test. Ostarine doesn't aromatize but it does compete for receptor binding which can throw your e2 reading off. A lot of guys on TRT find they need to back off their AI when they add a SARM b/c their effective estrogen drops even though nothing new is converting. Good call adjusting it.\n\nKeep us posted on those labs. Stay swole, Travis.`
+  },
+  {
+    context: "YouTube: panicking about low testosterone at 525",
+    text: `Brother don't panic on that number yet. You pulled blood coming off the flu. That alone can tank total T by 100-200 points temporarily. Infection, inflammation, immune response all suppress the HPG axis. That 525 is a dirty data point not a real reflection of the protocol.\n\nHere's the thing that should actually make you feel good. Your LH went UP. FSH unchanged. After 8 weeks of hi tech dymethazine and Andriol. That should not happen. Your cycling theory is working on the HPTA side.\n\nRetest in 2-3 weeks. Morning draw. Fully healthy. I think you'll see a very different number. Your HPTA is clearly intact. That's the important thing.`
+  },
+  {
+    context: "YouTube: DHT at 81 against 12-65 range",
+    text: `Brother that DHT number is wild. 81 against a 12-65 range. That doesn't appear to be placebo. Looks more like pharmacological proof right there.\n\nDMZ fasted works. Andriol fasted does not. Two compounds, one guy, same protocol, completely different absorption requirements. This is exactly the kind of data nobody else is collecting.\n\nThis is going in the encyclopedia brother. Preciate you being the lab rat.`
+  }
+];
+
+const marketProof = [
+  {
+    type: "ACTION WITHOUT CREATOR PRESENT",
+    quote: "I just used your discount code... I'm loving Andriol. Stacking dymethazine with it soon.",
+    signal: "Running protocols independently based on methodology"
+  },
+  {
+    type: "NOVEL SIGNAL IN A SATURATED SPACE",
+    quote: "I've been researching for nearly 20 years. Never heard this mentioned by anyone before.",
+    signal: "Category-level disruption from a single practitioner"
+  },
+  {
+    type: "TRUST + RESPONSIBILITY LAYER",
+    quote: "You're giving people the tools to do this as safely as possible. That's been missing in the fitness YT community.",
+    signal: "Safety infrastructure where none existed"
+  },
+  {
+    type: "RECURRING BEHAVIORAL LOOP",
+    quote: "I check your updates daily. Doing the stack you recommended... couldn't be happier.",
+    signal: "Daily engagement pattern already established"
+  },
+  {
+    type: "CONSTANT INBOUND DECISION DEMAND",
+    quote: "What would you recommend for my situation... I'm 38, 243lb, suffer from anxiety attacks.",
+    signal: "Personalized protocol requests arriving unprompted"
+  }
+];
+
+function RadarChart({ data, size = 180 }) {
+  const keys = Object.keys(data.sovereign);
+  const n = keys.length;
+  const cx = size / 2, cy = size / 2, r = size * 0.36;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2;
+
+  const getPoint = (value, i) => {
+    const angle = startAngle + i * angleStep;
+    const dist = (value / 100) * r;
+    return { x: cx + dist * Math.cos(angle), y: cy + dist * Math.sin(angle) };
+  };
+
+  const makePath = (vals) => keys.map((k, i) => {
+    const p = getPoint(vals[k], i);
+    return `${i === 0 ? "M" : "L"}${p.x},${p.y}`;
+  }).join(" ") + " Z";
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {[25, 50, 75, 100].map(level => (
+        <polygon key={level}
+          points={keys.map((_, i) => { const p = getPoint(level, i); return `${p.x},${p.y}`; }).join(" ")}
+          fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1"
+        />
+      ))}
+      {keys.map((_, i) => {
+        const p = getPoint(100, i);
+        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />;
+      })}
+      <polygon points={makePath(data.original)} fill="rgba(239,68,68,0.08)" stroke="rgba(239,68,68,0.25)" strokeWidth="1.5" />
+      <polygon points={makePath(data.sovereign)} fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.5)" strokeWidth="1.5" />
+      {keys.map((k, i) => {
+        const p = getPoint(114, i);
+        const lines = metricLabels[k].split(" ");
+        return (
+          <text key={k} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle"
+            fill="#6b7280" fontSize="7.5" fontFamily="ui-monospace, monospace">
+            {lines.map((w, j) => (
+              <tspan key={j} x={p.x} dy={j === 0 ? -(lines.length - 1) * 4.5 : 9}>{w}</tspan>
+            ))}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+export default function SovereignV6() {
+  const [activeSection, setActiveSection] = useState("opportunity");
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [activeVoice, setActiveVoice] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const current = sections.find(s => s.id === activeSection);
+  const totalOriginal = sections.reduce((a, s) => a + s.content.original.split(/\s+/).length, 0);
+  const totalSovereign = sections.reduce((a, s) => a + s.content.sovereign.split(/\s+/).length, 0);
+
+  const mono = "ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace";
+
+  return (
+    <div style={{
+      minHeight: "100vh", background: "#050810", color: "#c8ccd4",
+      fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif",
+      position: "relative"
+    }}>
+      <div style={{
+        position: "fixed", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(ellipse at 25% 0%, rgba(0,160,220,0.04) 0%, transparent 50%), radial-gradient(ellipse at 75% 100%, rgba(0,100,200,0.025) 0%, transparent 50%)"
+      }} />
+
+      <div style={{
+        position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "72px 28px",
+        opacity: mounted ? 1 : 0, transition: "opacity 0.8s ease"
+      }}>
+
+        {/* HEADER */}
+        <header style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 4, color: "rgba(0,200,255,0.3)", marginBottom: 28 }}>
+            TRUTH EXTRACTION
+          </div>
+          <h1 style={{ fontSize: 40, fontWeight: 400, lineHeight: 1.15, margin: 0, color: "#f0f2f5" }}>
+            The Studio Opportunity<br />
+            <span style={{ color: "rgba(0,200,255,0.55)", fontSize: 36 }}>Rendered in Operating Truth</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#6b7280", marginTop: 16, lineHeight: 1.7, maxWidth: 620 }}>
+            This is not a rewrite. It is a truth extraction. I isolated the signal, removed the decision drag,
+            and mapped it to the thing that matters: whether a creator's expertise can become a product that
+            changes people without diluting the voice that made it work.
+          </p>
+          <p style={{ fontSize: 15, color: "#e5e7eb", marginTop: 12, fontWeight: 500 }}>
+            This is the operating model I'll be building with inside Studio.
+          </p>
+        </header>
+
+        {/* BUILD LAWS */}
+        <div style={{
+          background: "rgba(0,200,255,0.025)", border: "1px solid rgba(0,200,255,0.1)",
+          borderRadius: 12, padding: "24px 28px", marginBottom: 24
+        }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(0,200,255,0.45)", marginBottom: 16 }}>
+            BUILD LAWS
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {[
+              "Real transformation must exist before software",
+              "Voice must survive translation into product",
+              "Method must work without the creator present",
+              "Trust must already be earned, not manufactured",
+              "Product must compound without daily labor"
+            ].map((item, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 8,
+                background: "rgba(0,200,255,0.04)", border: "1px solid rgba(0,200,255,0.08)",
+                borderRadius: 6, padding: "6px 14px", fontSize: 12, color: "#94a3b8"
+              }}>
+                <span style={{ color: "#22c55e", fontSize: 13 }}>&#10003;</span>
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* METRICS ROW */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 56 }}>
+          <div style={{
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 12, padding: "24px 20px"
+          }}>
+            <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 2, color: "#4b5563", marginBottom: 12 }}>
+              TRUTH EXTRACTION INDEX
+            </div>
+            <div style={{ fontSize: 42, fontWeight: 300, color: "#00c8ff", fontFamily: mono }}>93%</div>
+            <div style={{ fontSize: 11, color: "#374151", marginTop: 4 }}>decision drag removed</div>
+            <div style={{ marginTop: 12, height: 2, background: "#1a1f2e", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ width: "93%", height: "100%", background: "linear-gradient(90deg, #00c8ff, #0055cc)" }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 9, fontFamily: mono, color: "#2d3748" }}>
+              <span>{totalOriginal}w source</span>
+              <span>{totalSovereign}w signal</span>
+            </div>
+          </div>
+
+          <div style={{
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 12, padding: "24px 20px"
+          }}>
+            <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 2, color: "#4b5563", marginBottom: 12 }}>
+              PRODUCT READINESS
+            </div>
+            <div style={{ fontSize: 42, fontWeight: 300, color: "#22c55e", fontFamily: mono }}>+340%</div>
+            <div style={{ fontSize: 11, color: "#374151", marginTop: 4 }}>actionability gain</div>
+            <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+              {[["Decision-ready", "Yes"], ["Product form", "Clear"], ["Voice integrity", "Preserved"]].map(([label, value], i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontFamily: mono }}>
+                  <span style={{ color: "#4b5563" }}>{label}</span>
+                  <span style={{ color: "#22c55e" }}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 12, padding: "16px 12px", display: "flex", flexDirection: "column", alignItems: "center"
+          }}>
+            <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 2, color: "#4b5563", marginBottom: 4, alignSelf: "flex-start", paddingLeft: 8 }}>
+              5-AXIS SCORECARD
+            </div>
+            <RadarChart data={metrics} size={180} />
+            <div style={{ display: "flex", gap: 16, fontSize: 9, fontFamily: mono, marginTop: 2 }}>
+              <span style={{ color: "rgba(0,200,255,0.5)" }}>&#9632; Operating Truth</span>
+              <span style={{ color: "rgba(239,68,68,0.4)" }}>&#9632; Source Material</span>
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div style={{
+          background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 14, overflow: "hidden", marginBottom: 56
+        }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+            background: "rgba(0,0,0,0.25)", flexWrap: "wrap", gap: 10
+          }}>
+            <div style={{ display: "flex", gap: 3, overflowX: "auto" }}>
+              {sections.map(s => (
+                <button key={s.id} onClick={() => setActiveSection(s.id)} style={{
+                  padding: "6px 12px", whiteSpace: "nowrap",
+                  background: activeSection === s.id ? "rgba(0,200,255,0.1)" : "transparent",
+                  border: activeSection === s.id ? "1px solid rgba(0,200,255,0.2)" : "1px solid transparent",
+                  color: activeSection === s.id ? "#e5e7eb" : "#6b7280",
+                  borderRadius: 6, cursor: "pointer", fontSize: 12, transition: "all 0.2s"
+                }}>{s.label}</button>
+              ))}
+            </div>
+            <div style={{ display: "flex", background: "rgba(0,0,0,0.3)", borderRadius: 6, overflow: "hidden" }}>
+              <button onClick={() => setShowOriginal(false)} style={{
+                padding: "5px 12px", border: "none",
+                background: !showOriginal ? "rgba(0,200,255,0.15)" : "transparent",
+                color: !showOriginal ? "#00c8ff" : "#4b5563",
+                cursor: "pointer", fontSize: 10, fontFamily: mono, letterSpacing: 1
+              }}>OPERATING TRUTH</button>
+              <button onClick={() => setShowOriginal(true)} style={{
+                padding: "5px 12px", border: "none",
+                background: showOriginal ? "rgba(100,100,120,0.15)" : "transparent",
+                color: showOriginal ? "#94a3b8" : "#4b5563",
+                cursor: "pointer", fontSize: 10, fontFamily: mono, letterSpacing: 1
+              }}>SOURCE MATERIAL</button>
+            </div>
+          </div>
+          <div style={{ padding: "36px 36px", minHeight: 240 }}>
+            {current && (
+              <div key={activeSection + String(showOriginal)} style={{
+                lineHeight: 1.9, whiteSpace: "pre-wrap",
+                color: showOriginal ? "#6b7280" : "#d1d5db",
+                fontFamily: showOriginal ? mono : "inherit",
+                fontSize: showOriginal ? 12 : 16,
+                animation: "fadeUp 0.3s ease forwards"
+              }}>
+                {showOriginal ? current.content.original : current.content.sovereign}
+              </div>
+            )}
+          </div>
+          {current && (
+            <div style={{
+              padding: "10px 36px", borderTop: "1px solid rgba(255,255,255,0.03)",
+              display: "flex", gap: 20, fontSize: 10, fontFamily: mono, color: "#2d3748"
+            }}>
+              <span style={{ color: "#6b7280" }}>SOURCE: {current.content.original.split(/\s+/).length}w</span>
+              <span style={{ color: "#00c8ff" }}>TRUTH: {current.content.sovereign.split(/\s+/).length}w</span>
+              <span>EXTRACTED: {Math.round((1 - current.content.sovereign.split(/\s+/).length / current.content.original.split(/\s+/).length) * 100)}%</span>
+            </div>
+          )}
+        </div>
+
+        {/* WHY THIS APP WORKS */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(0,200,255,0.4)", marginBottom: 20 }}>
+            WHY THIS APP WORKS
+          </div>
+          <div style={{
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 12, padding: "32px 28px"
+          }}>
+            <p style={{ fontSize: 16, lineHeight: 1.8, color: "#d1d5db", margin: "0 0 16px" }}>
+              If this didn't already work in real people, I wouldn't build it.
+            </p>
+            <p style={{ fontSize: 16, lineHeight: 1.8, color: "#e5e7eb", margin: "0 0 20px", fontStyle: "italic" }}>
+              This is not a creator inventing a product. This is an existing transformation engine being given software form.
+            </p>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: "#94a3b8", margin: "0 0 24px" }}>
+              The coaching app works because the voice already exists in production.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {[
+                "600+ one-on-one clients",
+                "1.2M+ YouTube views",
+                "17 years of field experience",
+                "Live compound encyclopedia",
+                "Real-time protocol interpretation",
+                "Real replies to real bloodwork",
+                "Pattern recognition under uncertainty",
+                "High-trust voice, zero institutional dependence"
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "8px 12px", fontSize: 13, color: "#94a3b8"
+                }}>
+                  <span style={{ color: "#00c8ff", fontSize: 8 }}>&#9670;</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* VOICE PROOF */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(0,200,255,0.4)", marginBottom: 12 }}>
+            PROOF OF TRANSFERABLE VOICE
+          </div>
+          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 28, lineHeight: 1.7 }}>
+            Most creators sound good on camera and collapse in product. The test is not charisma.
+            The test is whether the voice can read reality, reduce noise, and deliver the next
+            correct action in 3-6 sentences. Below are live production samples.
+          </p>
+          <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
+            {voiceSamples.map((_, i) => (
+              <button key={i} onClick={() => setActiveVoice(i)} style={{
+                padding: "5px 14px",
+                background: activeVoice === i ? "rgba(0,200,255,0.1)" : "transparent",
+                border: activeVoice === i ? "1px solid rgba(0,200,255,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                color: activeVoice === i ? "#d1d5db" : "#4b5563",
+                borderRadius: 6, cursor: "pointer", fontSize: 11
+              }}>Sample {i + 1}</button>
+            ))}
+          </div>
+          <div style={{
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 12, padding: 28
+          }}>
+            <div style={{ fontSize: 10, fontFamily: mono, color: "#4b5563", letterSpacing: 1, marginBottom: 14, textTransform: "uppercase" }}>
+              {voiceSamples[activeVoice].context}
+            </div>
+            <div style={{
+              fontSize: 15, lineHeight: 1.9, color: "#d1d5db", whiteSpace: "pre-wrap",
+              borderLeft: "2px solid rgba(0,200,255,0.15)", paddingLeft: 20
+            }}>
+              {voiceSamples[activeVoice].text}
+            </div>
+          </div>
+        </div>
+
+        {/* WHY THIS VOICE SCALES */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(0,200,255,0.4)", marginBottom: 20 }}>
+            WHY THIS VOICE SCALES
+          </div>
+          <div style={{
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 12, padding: "28px 28px"
+          }}>
+            <p style={{ fontSize: 15, color: "#94a3b8", margin: "0 0 20px", lineHeight: 1.7 }}>
+              This voice works because it does four things fast:
+            </p>
+            {[
+              { action: "Reads the real problem", detail: "underneath the question" },
+              { action: "Removes panic and noise", detail: "before giving direction" },
+              { action: "Identifies the key variable", detail: "that matters next" },
+              { action: "Gives an action", detail: "the user can actually take" }
+            ].map((item, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "baseline", gap: 12,
+                padding: "10px 0", borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.03)" : "none"
+              }}>
+                <span style={{ fontSize: 18, fontFamily: mono, color: "#00c8ff", fontWeight: 300, minWidth: 24 }}>{i + 1}</span>
+                <span style={{ fontSize: 15, color: "#e5e7eb" }}>{item.action}</span>
+                <span style={{ fontSize: 13, color: "#4b5563" }}>{item.detail}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 20, fontSize: 15, color: "#94a3b8", fontStyle: "italic" }}>
+              That is not "content." That is a reasoning engine.
+            </div>
+          </div>
+        </div>
+
+        {/* LIVE MARKET PROOF */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(34,197,94,0.45)", marginBottom: 12 }}>
+            LIVE MARKET PROOF
+          </div>
+          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 24, lineHeight: 1.7 }}>
+            The system is already in use. These are not testimonials. They are evidence
+            of an already-running decision engine operating without the creator present.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {marketProof.map((item, i) => (
+              <div key={i} style={{
+                background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
+                borderRadius: 10, padding: "24px 28px"
+              }}>
+                <div style={{
+                  fontSize: 9, fontFamily: mono, letterSpacing: 2, color: "rgba(34,197,94,0.5)",
+                  marginBottom: 12, textTransform: "uppercase"
+                }}>
+                  {item.type}
+                </div>
+                <div style={{
+                  fontSize: 15, lineHeight: 1.7, color: "#d1d5db", fontStyle: "italic",
+                  borderLeft: "2px solid rgba(34,197,94,0.15)", paddingLeft: 16, marginBottom: 12
+                }}>
+                  "{item.quote}"
+                </div>
+                <div style={{ fontSize: 12, fontFamily: mono, color: "#4b5563" }}>
+                  → {item.signal}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{
+            marginTop: 20, padding: "20px 28px",
+            background: "rgba(34,197,94,0.03)", border: "1px solid rgba(34,197,94,0.08)",
+            borderRadius: 10
+          }}>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: "#e5e7eb", margin: 0, fontStyle: "italic" }}>
+              This is not engagement. This is live protocol execution.
+              The product already exists. Studio is the infrastructure layer.
+            </p>
+          </div>
+        </div>
+
+        {/* INTERNAL CONTRAST */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(200,160,0,0.35)", marginBottom: 12 }}>
+            INTERNAL CONTRAST: RAW THOUGHT vs OPERATING TRUTH
+          </div>
+          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 24, lineHeight: 1.7 }}>
+            Everyone has noise. The difference is whether you can detect it, compress it, and preserve
+            only the part that moves reality forward. The mechanism is the asset.
+          </p>
+          <div style={{
+            background: "rgba(239,68,68,0.02)", border: "1px solid rgba(239,68,68,0.07)",
+            borderRadius: 10, padding: 28, marginBottom: 12
+          }}>
+            <div style={{ fontSize: 13, lineHeight: 1.8, color: "#6b7280", fontFamily: mono, fontStyle: "italic" }}>
+              "So I was thinking about this. We don't want to have the, people are going to have to go in
+              and update this manually, get this away. But we also want to be sure that anytime anybody
+              hosts anything that their age and whether they're on TRT... Um, is always included. Always...
+              Yeah. Um, There you go... I don't really know I guess. What else? What's missing?"
+            </div>
+            <div style={{ marginTop: 12, fontSize: 10, fontFamily: mono, color: "rgba(239,68,68,0.5)", letterSpacing: 1 }}>
+              ↑ RAW THOUGHT // BEFORE EXTRACTION
+            </div>
+          </div>
+          <div style={{
+            background: "rgba(0,200,255,0.02)", border: "1px solid rgba(0,200,255,0.07)",
+            borderRadius: 10, padding: 28
+          }}>
+            <div style={{ fontSize: 15, lineHeight: 1.8, color: "#d1d5db" }}>
+              User profiles display age at time of each post (calculated from birthday, entered once).
+              TRT status and dosing are editable anytime. Years lifting auto-increments from date entered.
+              All three visible on cycle logs. Profile page only otherwise.
+            </div>
+            <div style={{ marginTop: 12, fontSize: 10, fontFamily: mono, color: "rgba(0,200,255,0.5)", letterSpacing: 1 }}>
+              ↑ OPERATING TRUTH // AFTER EXTRACTION. SAME INFORMATION. FOUR SENTENCES.
+            </div>
+          </div>
+        </div>
+
+        {/* MESSAGE TO CRAIG */}
+        <div style={{
+          padding: "44px 36px",
+          background: "linear-gradient(180deg, rgba(0,200,255,0.02) 0%, rgba(0,0,0,0) 100%)",
+          border: "1px solid rgba(0,200,255,0.08)", borderRadius: 14,
+          position: "relative", marginBottom: 56
+        }}>
+          <div style={{
+            position: "absolute", top: -1, left: 36, right: 36, height: 1,
+            background: "linear-gradient(90deg, transparent, rgba(0,200,255,0.25), transparent)"
+          }} />
+          <div style={{ fontSize: 10, fontFamily: mono, letterSpacing: 3, color: "rgba(0,200,255,0.35)", marginBottom: 28 }}>
+            TRANSMISSION // CRAIG MAUGHAN // STUDIO.COM
+          </div>
+          <div style={{ fontSize: 16, lineHeight: 2, color: "#d1d5db" }}>
+            <p style={{ margin: "0 0 22px" }}>Craig,</p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              I read the full Flagship Creator material, then rebuilt it through the same system I use
+              to structure products, compress decision-noise, and deploy operating truth into software.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              What came through clearly is that Studio has a real opportunity here. The core idea is strong.
+              But the clearest signal inside the pitch is still buried under too much reassurance, too many examples,
+              and too much language designed for creators who still need to be convinced.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              The creators you most want do not need more convincing. They need the signal.
+              You said I have total control over the content, and that the product should match the way I communicate.
+              That only works if the voice stays intact.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>So I extracted it.</p>
+
+            <p style={{ margin: "0 0 22px" }}>Same facts. Higher resolution. Clearer path.</p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              I also included live production samples of my coaching voice in the wild: real replies to real people,
+              dealing with real compounds, bloodwork, side effects, and decision-points. That matters because the real
+              product is not "content." It is whether a creator's way of thinking can survive translation into software
+              and still move someone's life. Mine can.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              I have spent 17 years in the prohormone, SARM, peptide, TRT, and performance space.
+              I have worked with 600+ one-on-one clients, built a live compound research encyclopedia,
+              and produced 1.2M+ YouTube views by doing the same thing over and over: reduce noise,
+              identify the variable that matters, and tell someone the next correct thing.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>That is already app-shaped.</p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              I also build software outside this category. ProHP VSO is a separate platform I built
+              for VA-accredited Veterans Service Officers, currently in production review with the VA Lighthouse API.
+              I think about product as operating infrastructure, not content packaging.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              I am not approaching this as a creator looking for a platform. I am approaching it as someone
+              whose methodology already operates like software, and whose next logical form is a product
+              that scales without requiring constant physical presence.
+            </p>
+
+            <p style={{ margin: "0 0 22px" }}>
+              I'm building this the same way I built everything else: no noise, no drift, no separation
+              between what's said and what actually works.
+            </p>
+
+            <p style={{ margin: "0 0 28px" }}>Looking forward to Wednesday.</p>
+
+            <div style={{
+              borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: 20,
+              display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16
+            }}>
+              <div>
+                <div style={{ fontSize: 17, color: "#f0f2f5", fontWeight: 500, marginBottom: 3 }}>Travis Dillard</div>
+                <div style={{ fontSize: 12, fontFamily: mono, color: "#4b5563" }}>Founder, ProHP LLC</div>
+                <div style={{ fontSize: 12, fontFamily: mono, color: "#4b5563" }}>forum.prohormonepro.com</div>
+              </div>
+              <div style={{ fontSize: 9, fontFamily: mono, letterSpacing: 2, color: "rgba(0,200,255,0.25)", textAlign: "right" }}>
+                PROOF OVER HYPE<br />E3592DC3
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div style={{ textAlign: "center", fontFamily: mono, fontSize: 9, color: "#151a24", letterSpacing: 3, paddingBottom: 40 }}>
+          TRUTH EXTRACTION ENGINE · E3592DC3
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        * { box-sizing: border-box; }
+        button:hover { opacity: 0.85; }
+      `}} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(SovereignV6));
+</script>
+</body>
+</html>
