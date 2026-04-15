@@ -125,6 +125,32 @@ function CommunityIntel() {
     return html.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
   };
 
+  const formatComment = (html) => {
+    if (!html) return null;
+    let text = html.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+    const lines = text.split('\n').filter(l => l.trim());
+    const elements = [];
+    const headerPattern = /^(side effects?|blood\s*work|muscular|strength|benefits?|dosing|dosage|cycle|pct|diet|training|sleep|mood|libido|results?|week\s*\d+|day\s*\d+)\s*[:;-]/i;
+    const bulletPattern = /^\s*[-*]\s+/;
+    let key = 0;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (headerPattern.test(trimmed)) {
+        const colonIdx = trimmed.search(/[:;-]/);
+        const header = trimmed.slice(0, colonIdx).trim();
+        const rest = trimmed.slice(colonIdx + 1).trim();
+        elements.push(<div key={key++} className="text-white font-semibold text-sm mt-3 mb-1">{header}</div>);
+        if (rest) elements.push(<div key={key++} className="text-slate-300 text-sm leading-relaxed">{rest}</div>);
+      } else if (bulletPattern.test(trimmed)) {
+        const content = trimmed.replace(bulletPattern, '');
+        elements.push(<div key={key++} className="flex items-start gap-2 ml-2"><span className="text-[#229DD8] mt-1.5 text-[8px]">&#9670;</span><span className="text-slate-300 text-sm leading-relaxed">{content}</span></div>);
+      } else {
+        elements.push(<div key={key++} className="text-slate-300 text-sm leading-relaxed mb-1">{trimmed}</div>);
+      }
+    }
+    return elements;
+  };
+
   // === FREE GATE ===
   if (!isIC) {
     return (
@@ -319,7 +345,20 @@ function CommunityIntel() {
             <div key={c.id} className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 hover:border-[#229DD8]/20 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">{stripHtml(c.comment_text)}</div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-slate-400 text-xs">{c.author_name}{c.published_at ? " " + new Date(c.published_at).toLocaleDateString() : ""}</span>
+                    {c.signal_type && c.signal_type !== "general" && (
+                      <span className={" px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold " + (
+                        c.signal_type === "cycle_log" ? "bg-[#229DD8]/15 text-[#229DD8] border border-[#229DD8]/20"
+                        : c.signal_type === "side_effect" ? "bg-amber-500/15 text-amber-400 border border-amber-500/20"
+                        : c.signal_type === "benefit" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
+                        : c.signal_type === "travis_reply" ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/20"
+                        : c.signal_type === "question" ? "bg-slate-500/15 text-slate-400 border border-slate-500/20"
+                        : "bg-slate-800/50 text-slate-500"
+                      )}>{c.signal_type.replace("_", " ")}</span>
+                    )}
+                  </div>
+                  <div className="text-sm text-slate-300 leading-relaxed" style={{lineHeight: "1.65"}}>{c.signal_type === "cycle_log" ? formatComment(c.comment_text) : stripHtml(c.comment_text)}</div>
                   <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
                     <span className="font-medium text-slate-400">{c.author_name}</span>
                     {c.signal_type && c.signal_type !== 'general' && (
