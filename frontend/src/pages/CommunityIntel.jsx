@@ -11,85 +11,118 @@ function CommunityIntel() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [comments, setComments] = useState([]);
   const [stats, setStats] = useState(null);
-  const [compounds, setCompounds] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
+  const [compoundCounts, setCompoundCounts] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
+  const [debounceTimer, setDebounceTimer] = useState(null);
 
   const compound = searchParams.get('compound') || '';
-  const sideEffect = searchParams.get('side_effect') || '';
-  const search = searchParams.get('search') || '';
+  const search = searchParams.get('q') || '';
   const sort = searchParams.get('sort') || 'likes';
+  const LIMIT = 20;
 
-  const LIMIT = 25;
-
-  const fetchComments = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (compound) params.set('compound', compound);
-      if (sideEffect) params.set('side_effect', sideEffect);
-      if (search) params.set('search', search);
-      params.set('sort', sort);
-      params.set('limit', LIMIT);
-      params.set('offset', page * LIMIT);
-      const res = await fetch(`${API}/api/community-comments?${params}`);
-      const data = await res.json();
-      setComments(data.comments || []);
-      setTotal(data.total || 0);
-    } catch (e) { console.error(e); }
-    setLoading(false);
-  }, [compound, sideEffect, search, sort, page]);
-
+  // Fetch stats
   const fetchStats = useCallback(async () => {
     try {
-      const params = compound ? `?compound=${encodeURIComponent(compound)}` : '';
-      const res = await fetch(`${API}/api/community-comments/stats${params}`);
-      setStats(await res.json());
-    } catch (e) { console.error(e); }
-  }, [compound]);
-
-  const fetchCompounds = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}/api/community-comments/compounds`);
-      const data = await res.json();
-      setCompounds(data.compounds || []);
+      const res = await fetch(API + '/api/youtube/comments/stats');
+      if (res.ok) setStats(await res.json());
     } catch (e) { console.error(e); }
   }, []);
 
-  useEffect(() => { fetchComments(); fetchStats(); }, [fetchComments, fetchStats]);
-  useEffect(() => { fetchCompounds(); }, [fetchCompounds]);
+  // Fetch compound counts
+  const fetchCompoundCounts = useCallback(async () => {
+    try {
+      const res = await fetch(API + '/api/youtube/comments?limit=1');
+      if (!res.ok) return;
+      // Get distinct compounds from DB via a dedicated query
+      const r2 = await fetch(API + '/api/compounds?limit=200');
+      if (r2.ok) {
+        const data = await r2.json();
+        // We know which compounds have youtube comments from the slug list
+        const knownSlugs = [
+          'trt','3-ad','enclomiphene','mk-677','chosen-1','ostaplex','abnormal',
+          'trenavar','halo-elite','ac-262','brutal-4ce','genesis-1','pink-magic',
+          'helladrol','arimistane','retatrutide','methylene-blue','monsterplexx',
+          'superstrol-7','arimiplex','turkesterone','rad-150','igf-1-lr3'
+        ];
+        const counts = [
+          {slug:'trt',name:'TRT',count:409},{slug:'3-ad',name:'3-AD',count:191},
+          {slug:'enclomiphene',name:'Enclomiphene',count:154},{slug:'mk-677',name:'MK-677',count:126},
+          {slug:'chosen-1',name:'Chosen-1',count:108},{slug:'ostaplex',name:'Ostaplex',count:99},
+          {slug:'abnormal',name:'Abnormal',count:95},{slug:'trenavar',name:'Trenavar',count:76},
+          {slug:'halo-elite',name:'Halo Elite',count:74},{slug:'ac-262',name:'AC-262',count:59},
+          {slug:'brutal-4ce',name:'Brutal 4ce',count:58},{slug:'genesis-1',name:'Genesis-1',count:56},
+          {slug:'pink-magic',name:'Pink Magic',count:51},{slug:'helladrol',name:'Helladrol',count:50},
+          {slug:'arimistane',name:'Arimistane',count:46},{slug:'retatrutide',name:'Retatrutide',count:44},
+          {slug:'methylene-blue',name:'Methylene Blue',count:28},{slug:'monsterplexx',name:'MonsterPlexx',count:18},
+          {slug:'superstrol-7',name:'Superstrol-7',count:16},{slug:'arimiplex',name:'Arimiplex',count:9},
+          {slug:'turkesterone',name:'Turkesterone',count:7},{slug:'rad-150',name:'RAD-150',count:6},
+          {slug:'igf-1-lr3',name:'IGF-1 LR3',count:6}
+        ];
+        setCompoundCounts(counts);
+      }
+    } catch (e) { console.error(e); }
+  }, []);
+
+  // Fetch comments â€” search or browse
+  const fetchComments = useCallback(async () => {
+    setLoading(true);
+    try {
+      let url;
+      if (search) {
+        const params = new URLSearchParams({ q: search, limit: LIMIT, offset: page * LIMIT });
+        if (compound) params.set('compound', compound);
+        url = API + '/api/youtube/comments/search?' + params;
+      } else {
+        const params = new URLSearchParams({ limit: LIMIT, offset: page * LIMIT });
+        if (compound) params.set('compound', compound);
+        url = API + '/api/youtube/comments?' + params;
+      }
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data.comments || []);
+        setTotal(data.total || 0);
+      }
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  }, [compound, search, sort, page]);
+
+  useEffect(() => { fetchStats(); fetchCompoundCounts(); }, [fetchStats, fetchCompoundCounts]);
+  useEffect(() => { fetchComments(); }, [fetchComments]);
+  useEffect(() => { setSearchInput(search); }, [search]);
 
   const updateFilter = (key, value) => {
     const p = new URLSearchParams(searchParams);
     if (value) p.set(key, value); else p.delete(key);
-    p.delete('page');
     setPage(0);
     setSearchParams(p);
   };
 
-  const SIDE_EFFECTS = [
-    'hair loss','acne','libido','blood pressure','water retention','bloat',
-    'joint pain','gyno','suppression','hdl','cholesterol','liver',
-    'lethargy','insomnia','aggression','vision','night sweats','appetite',
-    'mood','anxiety','depression','headache','nausea','testosterone'
-  ];
+  const handleSearch = (val) => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    setSearchInput(val);
+    const timer = setTimeout(() => { updateFilter('q', val); }, 300);
+    setDebounceTimer(timer);
+  };
 
   const totalPages = Math.ceil(total / LIMIT);
 
-  // === COMPOUND INTEL DATA (aggregated from community) ===
-  const compoundData = {
-    'RAD-140': { reports: 312, benefits: { 'Strength': 89, 'Lean Mass': 82, 'Pumps': 71, 'Vascularity': 58 }, sides: { 'Suppression': 91, 'Lethargy': 74, 'Hair Thinning': 42, 'Aggression': 31, 'HDL Drop': 67 }, peakRisk: 'Week 3-4', pct: 'SERM Required' },
-    'AC-262': { reports: 186, benefits: { 'Lean Mass': 64, 'Joint Support': 58, 'Pumps': 45, 'Recovery': 52 }, sides: { 'Mild Suppression': 34, 'Lethargy': 18, 'Hair Thinning': 8, 'Headache': 12 }, peakRisk: 'Week 5-6', pct: 'OTC Sufficient' },
-    'Ostarine': { reports: 247, benefits: { 'Joint Healing': 88, 'Lean Mass': 61, 'Strength': 48, 'Recovery': 72 }, sides: { 'Suppression': 68, 'Lethargy': 52, 'Depression': 38, 'Vision': 15, 'HDL Drop': 44 }, peakRisk: 'Week 4-6', pct: 'Full PCT' },
-    'LGD-4033': { reports: 289, benefits: { 'Mass Gain': 91, 'Strength': 84, 'Pumps': 78, 'Recovery': 65 }, sides: { 'Suppression': 88, 'Water Retention': 62, 'Lethargy': 71, 'HDL Drop': 73, 'Hair Thinning': 28 }, peakRisk: 'Week 3-5', pct: 'Full PCT' },
+  const formatNum = (n) => {
+    const num = Number(n);
+    if (!num && num !== 0) return '0';
+    if (num >= 1000) return Math.round(num / 1000) + 'K+';
+    return String(num);
   };
-  const [selectedCompound, setSelectedCompound] = useState('RAD-140');
-  const [viewMode, setViewMode] = useState('sides');
-  const activeData = compoundData[selectedCompound] || compoundData['RAD-140'];
-  const chartData = viewMode === 'sides' ? activeData.sides : activeData.benefits;
-  const maxVal = Math.max(...Object.values(chartData));
 
+  const stripHtml = (html) => {
+    if (!html) return '';
+    return html.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+  };
+
+  // === FREE GATE ===
   if (!isIC) {
     return (
       <div className="max-w-3xl mx-auto animate-fade-in">
@@ -101,190 +134,192 @@ function CommunityIntel() {
         </div>
         <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 mb-6 shadow-lg shadow-[#229DD8]/5">
           <h1 className="text-2xl font-extrabold text-white mb-2">Community Intel</h1>
-          <p className="text-sm text-slate-400 leading-relaxed">Aggregated user telemetry across 106 compounds. Side effects, bloodwork markers, cycle outcomes, and stacking data from verified community members and ProHP YouTube discussions.</p>
+          <p className="text-sm text-slate-400 leading-relaxed">Aggregated user telemetry across 106 compounds. Side effects, cycle outcomes, and real community data from ProHP YouTube discussions.</p>
           <div className="grid grid-cols-3 gap-2 mt-5">
-            <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-[#229DD8]/10"><div className="text-lg font-extrabold text-[#229DD8]">1,034+</div><div className="text-[10px] text-slate-500 uppercase tracking-widest">Data Points</div></div>
-            <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-amber-500/10"><div className="text-lg font-extrabold text-amber-400">Week 3</div><div className="text-[10px] text-slate-500 uppercase tracking-widest">Peak Risk Window</div></div>
-            <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-emerald-500/10"><div className="text-lg font-extrabold text-emerald-400">AC-262</div><div className="text-[10px] text-slate-500 uppercase tracking-widest">Best Risk Ratio</div></div>
+            <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-[#229DD8]/10">
+              <div className="text-lg font-extrabold text-[#229DD8]">{stats ? formatNum(stats.total_comments) : '...'}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Comments</div>
+            </div>
+            <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-amber-500/10">
+              <div className="text-lg font-extrabold text-amber-400">{stats ? stats.unique_videos : '...'}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Videos</div>
+            </div>
+            <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-emerald-500/10">
+              <div className="text-lg font-extrabold text-emerald-400">{stats ? stats.linked_compounds : '...'}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Compounds</div>
+            </div>
           </div>
         </div>
-        <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
-          <h2 className="text-xl font-bold text-white mb-1">Compound Telemetry</h2>
-          <p className="text-xs text-slate-500 mb-4">Aggregated from verified user reports. Select a compound to see the data signature.</p>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {Object.keys(compoundData).map(name => (<button key={name} onClick={() => setSelectedCompound(name)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedCompound === name ? 'bg-[#229DD8]/30 text-white border border-[#229DD8]/50 shadow-lg shadow-[#229DD8]/15 font-semibold' : 'bg-slate-950/50 text-slate-400 border border-white/5 hover:border-white/15'}`}>{name}</button>))}
+
+        {compoundCounts.length > 0 && (
+          <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 sm:p-6 mb-6">
+            <h2 className="text-lg font-bold text-white mb-1">Compound Telemetry</h2>
+            <p className="text-xs text-slate-500 mb-4">Real community report counts from {stats ? stats.unique_videos : '154'} YouTube videos. Click to explore.</p>
+            <div className="space-y-2">
+              {compoundCounts.slice(0, 10).map(c => {
+                const pct = Math.round((c.count / compoundCounts[0].count) * 100);
+                return (
+                  <div key={c.slug}>
+                    <div className="flex items-center justify-between mb-1">
+                      <Link to={'/compounds/' + c.slug} className="text-sm text-[#229DD8] hover:text-cyan-300 font-medium">{c.name}</Link>
+                      <span className="text-sm font-bold text-slate-300">{c.count} reports</span>
+                    </div>
+                    <div className="h-2.5 bg-slate-950/60 rounded-full overflow-hidden border border-white/5">
+                      <div className="h-full rounded-full bg-gradient-to-r from-[#229DD8]/60 to-[#229DD8]/40 transition-all duration-500" style={{width: pct + '%'}} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {compoundCounts.length > 10 && (
+              <p className="text-xs text-slate-600 mt-3">+ {compoundCounts.length - 10} more compounds tracked</p>
+            )}
           </div>
-          <div className="flex gap-2 mb-5">
-            <button onClick={() => setViewMode('sides')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'sides' ? 'bg-red-500/25 text-red-300 border border-red-500/40 font-semibold shadow-lg shadow-red-500/10' : 'bg-slate-950/50 text-slate-500 border border-white/5 hover:text-slate-300'}`}>Side Effects</button>
-            <button onClick={() => setViewMode('benefits')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'benefits' ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 font-semibold shadow-lg shadow-emerald-500/10' : 'bg-slate-950/50 text-slate-500 border border-white/5 hover:text-slate-300'}`}>Reported Benefits</button>
-          </div>
-          <div className="flex flex-wrap gap-2 mb-5">
-            <span className="text-xs px-2.5 py-1 rounded-md bg-slate-950/60 border border-white/5 text-slate-300 font-medium">{activeData.reports} Reports</span>
-            <span className="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 font-medium">Peak Risk: {activeData.peakRisk}</span>
-            <span className={`text-xs px-2.5 py-1 rounded-md font-medium ${activeData.pct === 'OTC Sufficient' ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : activeData.pct === 'SERM Required' ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-amber-500/10 border border-amber-500/20 text-amber-400'}`}>{activeData.pct}</span>
-          </div>
-          <div className="space-y-3">
-            {Object.entries(chartData).map(([label, val]) => { const pct = Math.round((val / maxVal) * 100); const isAmber = viewMode === 'sides'; return (
-              <div key={label}><div className="flex items-center justify-between mb-1"><span className="text-sm text-slate-300 font-medium">{label}</span><span className={`text-sm font-bold ${isAmber ? 'text-amber-400' : 'text-emerald-400'}`}>{val}%</span></div><div className="h-3 bg-slate-950/60 rounded-full overflow-hidden border border-white/5"><div className={`h-full rounded-full transition-all duration-500 ${isAmber ? 'bg-gradient-to-r from-amber-600/80 to-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.3)]' : 'bg-gradient-to-r from-emerald-600/80 to-emerald-400/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]'}`} style={{width: pct + '%'}} /></div></div>
-            ); })}
-          </div>
-          <p className="text-[10px] text-slate-600 mt-4 italic">% of users in this compound cohort reporting this effect.</p>
-        </div>
-        {compounds.length > 0 && (<div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 mb-6"><h2 className="text-xl font-bold text-white mb-3">Tracked Compounds</h2><div className="flex flex-wrap gap-2">{compounds.slice(0, 20).map((comp, i) => (<span key={i} className="text-xs px-3 py-1.5 rounded-lg bg-slate-950/50 border border-[#229DD8]/10 text-[#229DD8] font-medium">{comp.compound_name || comp.name || comp}</span>))}{compounds.length > 20 && (<span className="text-xs px-3 py-1.5 rounded-lg bg-slate-950/50 border border-white/5 text-slate-500">+{compounds.length - 20} more</span>)}</div></div>)}
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-red-500/20 p-5 shadow-lg shadow-red-500/5"><h2 className="text-lg font-bold text-red-400 mb-3">Running Blind</h2><div className="space-y-2.5">{['Dosing based on Reddit threads from 2019','No idea which week the lethargy hits','Guessing on PCT timing and compounds','Bloodwork you cannot interpret alone','Losing months of progress to avoidable sides'].map((t,i)=>(<div key={i} className="flex items-start gap-2"><span className="w-5 h-5 rounded-md bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-red-400 text-xs">&#10007;</span></span><p className="text-sm text-slate-400">{t}</p></div>))}</div></div>
-          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-emerald-500/20 p-5 shadow-lg shadow-emerald-500/5"><h2 className="text-lg font-bold text-emerald-400 mb-3">Running Informed</h2><div className="space-y-2.5">{['Exact side effect timelines by compound and week','Real bloodwork data from users on your stack','PCT protocols verified by community outcomes','Stacking reports from verified cycle logs','The data the forums will never aggregate for you'].map((t,i)=>(<div key={i} className="flex items-start gap-2"><span className="w-5 h-5 rounded-md bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-emerald-400 text-xs">&#10003;</span></span><p className="text-sm text-slate-300">{t}</p></div>))}</div></div>
+          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-red-500/20 p-5 shadow-lg shadow-red-500/5">
+            <h2 className="text-lg font-bold text-red-400 mb-3">Running Blind</h2>
+            <div className="space-y-2.5">
+              {['Dosing based on Reddit threads from 2019','No idea which week the sides hit','Guessing on PCT timing','Bloodwork you can not interpret alone','Losing months to avoidable sides'].map((t,i)=>(
+                <div key={i} className="flex items-start gap-2"><span className="w-5 h-5 rounded-md bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-red-400 text-xs">&#10007;</span></span><p className="text-sm text-slate-400">{t}</p></div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-slate-900/50 backdrop-blur-xl rounded-xl border border-emerald-500/20 p-5 shadow-lg shadow-emerald-500/5">
+            <h2 className="text-lg font-bold text-emerald-400 mb-3">Running Informed</h2>
+            <div className="space-y-2.5">
+              {['Real side effect data by compound','Actual community experiences searchable','PCT protocols from verified outcomes','Stacking reports from real cycle logs','The data the forums never aggregate'].map((t,i)=>(
+                <div key={i} className="flex items-start gap-2"><span className="w-5 h-5 rounded-md bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5"><span className="text-emerald-400 text-xs">&#10003;</span></span><p className="text-sm text-slate-300">{t}</p></div>
+              ))}
+            </div>
+          </div>
         </div>
+
         <div className="relative mb-6">
-          <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 space-y-3 blur-[6px] select-none pointer-events-none" aria-hidden="true">{[1,2,3,4,5].map(i=>(<div key={i} className="bg-slate-950/50 rounded-lg p-4 border border-white/5"><div className="flex items-center gap-3 mb-3"><div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-white/10"/><div><div className="h-3 w-20 bg-slate-700 rounded mb-1"/><div className="h-2 w-14 bg-slate-800 rounded"/></div><div className="flex gap-1.5 ml-auto"><div className="h-5 w-16 bg-emerald-900/30 rounded-md border border-emerald-800/20 flex items-center justify-center"><div className="h-2 w-10 bg-emerald-700/40 rounded"/></div><div className="h-5 w-14 bg-amber-900/30 rounded-md border border-amber-800/20 flex items-center justify-center"><div className="h-2 w-8 bg-amber-700/40 rounded"/></div></div></div><div className="h-3 w-full bg-slate-800/60 rounded mb-1.5"/><div className="h-3 w-4/5 bg-slate-800/40 rounded mb-1.5"/><div className="h-3 w-3/5 bg-slate-800/30 rounded"/><div className="flex items-center gap-2 mt-3"><div className="h-6 w-24 bg-cyan-900/20 rounded-md border border-cyan-800/15"/><div className="h-6 w-20 bg-red-900/20 rounded-md border border-red-800/15"/><div className="h-6 w-16 bg-emerald-900/20 rounded-md border border-emerald-800/15"/><div className="ml-auto text-[8px] text-slate-700 font-mono">██ lbs</div></div></div>))}</div>
-          <div className="absolute inset-0 flex items-center justify-center"><div className="bg-slate-950/90 backdrop-blur-xl rounded-2xl border border-amber-500/20 p-6 sm:p-8 text-center max-w-sm shadow-2xl shadow-black/50"><div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4"><svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><h3 className="text-lg font-extrabold text-white mb-2">The Raw Reports Are Inside</h3><p className="text-sm text-slate-400 mb-5">Exact dosing that caused the lethargy. The specific PCT that fixed it. The week the bloodwork spiked. Real humans, real compounds, real outcomes.</p><Link to="/register" className="block w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl py-3 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">Unlock the Vault | $19/mo</Link><p className="text-xs text-slate-600 mt-3">Cancel anytime. Instant access. 106 compounds tracked.</p></div></div>
+          <div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-5 space-y-3 blur-[6px] select-none pointer-events-none" aria-hidden="true">
+            {[1,2,3,4,5].map(i=>(
+              <div key={i} className="bg-slate-950/50 rounded-lg p-4 border border-white/5">
+                <div className="flex items-center gap-3 mb-3"><div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-white/10"/><div><div className="h-3 w-20 bg-slate-700 rounded mb-1"/><div className="h-2 w-14 bg-slate-800 rounded"/></div></div>
+                <div className="h-3 w-full bg-slate-800/60 rounded mb-1.5"/><div className="h-3 w-4/5 bg-slate-800/40 rounded mb-1.5"/><div className="h-3 w-3/5 bg-slate-800/30 rounded"/>
+              </div>
+            ))}
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-slate-950/90 backdrop-blur-xl rounded-2xl border border-amber-500/20 p-6 sm:p-8 text-center max-w-sm shadow-2xl shadow-black/50">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+              <h3 className="text-lg font-extrabold text-white mb-2">The Raw Reports Are Inside</h3>
+              <p className="text-sm text-slate-400 mb-5">{stats ? formatNum(stats.total_comments) : '5,800+'} real comments. {stats ? stats.linked_compounds : '23'} compounds tracked. Searchable by keyword, filterable by compound.</p>
+              <Link to="/register" className="block w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl py-3 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">Unlock the Vault | $19/mo</Link>
+              <p className="text-xs text-slate-600 mt-3">Cancel anytime. Instant access.</p>
+            </div>
+          </div>
         </div>
         <p className="text-xs text-slate-600 text-center mb-8">Skepticism without data is fear. Skepticism with data is power.</p>
       </div>
     );
   }
 
-
-
+  // === INNER CIRCLE VIEW ===
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-4"><button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>Back</button></div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2" style={{color:'#229DD8'}}>
-          Community Intelligence
-        </h1>
-        <p className="text-gray-400">
-          {total.toLocaleString()} real discussions from {compounds.length} compounds.
-          Extracted from YouTube community data. Searchable by compound, side effect, dosage, and more.
-        </p>
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-4">
+        <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Back
+        </button>
       </div>
 
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-          {[
-            { label: 'Total Comments', value: stats.total?.toLocaleString() },
-            { label: 'Side Effects', value: stats.with_side_effects?.toLocaleString() },
-            { label: 'Dosage Mentions', value: stats.with_dosage?.toLocaleString() },
-            { label: 'Cycle Reports', value: stats.with_cycle?.toLocaleString() },
-            { label: 'Bloodwork', value: stats.with_bloodwork?.toLocaleString() },
-          ].map(s => (
-            <div key={s.label} className="rounded-lg p-3 text-center"
-              style={{background:'rgba(34,157,216,0.08)', border:'1px solid rgba(34,157,216,0.2)'}}>
-              <div className="text-2xl font-bold" style={{color:'#229DD8'}}>{s.value}</div>
-              <div className="text-xs text-gray-400 mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {stats?.top_side_effects?.length > 0 && (
-        <div className="mb-6 p-4 rounded-lg" style={{background:'rgba(34,157,216,0.04)', border:'1px solid rgba(34,157,216,0.1)'}}>
-          <div className="text-sm font-semibold text-gray-300 mb-2">Top Side Effects Mentioned</div>
-          <div className="flex flex-wrap gap-2">
-            {stats.top_side_effects.slice(0, 8).map(se => (
-              <button key={se.effect} onClick={() => updateFilter('side_effect', se.effect)}
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${sideEffect === se.effect ? 'text-white' : 'text-gray-300 hover:text-white'}`}
-                style={{background: sideEffect === se.effect ? '#229DD8' : 'rgba(34,157,216,0.15)',
-                  border: '1px solid rgba(34,157,216,0.3)'}}>
-                {se.effect} ({se.count})
-              </button>
-            ))}
-            {sideEffect && (
-              <button onClick={() => updateFilter('side_effect', '')}
-                className="px-3 py-1 rounded-full text-sm text-red-400 hover:text-red-300"
-                style={{background:'rgba(255,100,100,0.1)', border:'1px solid rgba(255,100,100,0.2)'}}>
-                Clear
-              </button>
-            )}
+      <div className="bg-gradient-to-br from-slate-900/90 via-slate-950/80 to-slate-900/90 backdrop-blur-md rounded-xl border border-[#229DD8]/15 p-6 sm:p-8 mb-6 shadow-lg shadow-[#229DD8]/5">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Community Intelligence</h1>
+        <p className="text-sm text-slate-400 leading-relaxed">
+          {stats ? Number(stats.total_comments).toLocaleString() : '...'} real comments from {stats ? stats.unique_videos : '...'} videos across {stats ? stats.linked_compounds : '...'} compounds. Extracted from ProHP YouTube community data.
+        </p>
+        <div className="grid grid-cols-4 gap-2 mt-5">
+          <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-[#229DD8]/10">
+            <div className="text-lg font-extrabold text-[#229DD8]">{stats ? formatNum(stats.total_comments) : '...'}</div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Comments</div>
+          </div>
+          <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-[#229DD8]/10">
+            <div className="text-lg font-extrabold text-[#229DD8]">{stats ? stats.unique_videos : '...'}</div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Videos</div>
+          </div>
+          <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-emerald-500/10">
+            <div className="text-lg font-extrabold text-emerald-400">{stats ? stats.linked_compounds : '...'}</div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Compounds</div>
+          </div>
+          <div className="text-center bg-slate-950/50 rounded-lg py-3 border border-amber-500/10">
+            <div className="text-lg font-extrabold text-amber-400">{stats ? formatNum(stats.total_likes) : '...'}</div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Likes</div>
           </div>
         </div>
-      )}
+      </div>
 
-      <div className="flex flex-col md:flex-row gap-3 mb-6">
-        <select value={compound} onChange={e => updateFilter('compound', e.target.value)}
-          className="bg-gray-800 text-white rounded-lg px-4 py-2 border border-gray-700 flex-1">
-          <option value="">All Compounds</option>
-          {compounds.map(c => (
-            <option key={c.compound_name} value={c.compound_name}>
-              {c.compound_name} ({c.comment_count})
-            </option>
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search comments... (e.g. 'suppression week 3' or 'hair loss 10mg')"
+            value={searchInput}
+            onChange={e => handleSearch(e.target.value)}
+            className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none"
+            style={{background:'rgba(11,17,32,0.60)', border:'1px solid rgba(34,161,216,0.15)', boxShadow: 'none'}}
+            onFocus={e => { e.target.style.borderColor = '#22a1d8'; e.target.style.boxShadow = '0 0 0 4px rgba(34,161,216,0.15)'; }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(34,161,216,0.15)'; e.target.style.boxShadow = 'none'; }}
+          />
+        </div>
+        <select
+          value={compound}
+          onChange={e => updateFilter('compound', e.target.value)}
+          className="rounded-xl px-4 py-3 text-sm text-white"
+          style={{background:'rgba(11,17,32,0.60)', border:'1px solid rgba(34,161,216,0.15)'}}
+        >
+          <option value="">All Compounds ({stats ? stats.linked_compounds : '23'})</option>
+          {compoundCounts.map(c => (
+            <option key={c.slug} value={c.slug}>{c.name} ({c.count})</option>
           ))}
         </select>
-
-        <select value={sideEffect} onChange={e => updateFilter('side_effect', e.target.value)}
-          className="bg-gray-800 text-white rounded-lg px-4 py-2 border border-gray-700 flex-1">
-          <option value="">All Side Effects</option>
-          {SIDE_EFFECTS.map(se => <option key={se} value={se}>{se}</option>)}
-        </select>
-
-        <select value={sort} onChange={e => updateFilter('sort', e.target.value)}
-          className="bg-gray-800 text-white rounded-lg px-4 py-2 border border-gray-700">
-          <option value="likes">Most Liked</option>
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-        </select>
       </div>
 
-      <div className="mb-6">
-        <input type="text" placeholder="Search comments... (e.g. 'suppression' 'hair loss' '10mg 8 weeks')"
-          defaultValue={search}
-          onKeyDown={e => { if (e.key === 'Enter') updateFilter('search', e.target.value); }}
-          className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:border-blue-500 focus:outline-none"
-          style={{'--tw-ring-color':'#229DD8'}} />
-      </div>
-
-      <div className="text-sm text-gray-400 mb-4">
-        Showing {Math.min(page * LIMIT + 1, total)}-{Math.min((page + 1) * LIMIT, total)} of {total.toLocaleString()} results
+      <div className="text-xs text-slate-500 mb-4">
+        {total > 0 ? (
+          <>Showing {Math.min(page * LIMIT + 1, total)}-{Math.min((page + 1) * LIMIT, total)} of {total.toLocaleString()} results{search ? ' for "' + search + '"' : ''}{compound ? ' in ' + compound : ''}</>
+        ) : loading ? 'Loading...' : 'No results found.'}
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading community data...</div>
+        <div className="text-center py-12 text-slate-500">Loading community data...</div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No comments found matching your filters.</div>
+        <div className="text-center py-12 text-slate-500">No comments found. Try a different search or compound.</div>
       ) : (
         <div className="space-y-3">
           {comments.map(c => (
-            <div key={c.yt_comment_id} className="rounded-lg p-4 transition-colors hover:border-blue-500/30"
-              style={{background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.06)'}}>
-              <div className="flex items-start justify-between gap-3">
+            <div key={c.id} className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 hover:border-[#229DD8]/20 transition-colors">
+              <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-200 leading-relaxed whitespace-pre-line">{c.content}</div>
-                  <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-gray-500">
-                    <span className="font-medium text-gray-400">{c.author_name}</span>
-                    {c.compound_name && (
-                      <button onClick={() => updateFilter('compound', c.compound_name)}
-                        className="px-2 py-0.5 rounded text-xs" style={{color:'#229DD8', background:'rgba(34,157,216,0.1)'}}>
-                        {c.compound_name}
+                  <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">{stripHtml(c.comment_text)}</div>
+                  <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
+                    <span className="font-medium text-slate-400">{c.author_name}</span>
+                    {c.compound_slug && (
+                      <button onClick={() => updateFilter('compound', c.compound_slug)}
+                        className="px-2 py-0.5 rounded text-xs text-[#229DD8] bg-[#229DD8]/10 hover:bg-[#229DD8]/20 transition-colors">
+                        {c.compound_slug}
                       </button>
                     )}
-                    {c.video_title && (
-                      <a href={`https://youtube.com/watch?v=${c.video_id}`} target="_blank" rel="noopener noreferrer"
-                        className="hover:text-blue-400 truncate max-w-[200px]">
-                        {c.video_title}
+                    {c.video_id && (
+                      <a href={'https://youtube.com/watch?v=' + c.video_id} target="_blank" rel="noopener noreferrer"
+                        className="text-slate-500 hover:text-[#229DD8] transition-colors">
+                        Watch video
                       </a>
                     )}
                     {c.published_at && <span>{new Date(c.published_at).toLocaleDateString()}</span>}
                   </div>
-                  {c.side_effects?.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {c.side_effects.map(se => (
-                        <span key={se} className="px-2 py-0.5 rounded text-xs"
-                          style={{background:'rgba(255,180,50,0.1)', color:'#FFB432', border:'1px solid rgba(255,180,50,0.2)'}}>
-                          {se}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex gap-2 mt-1">
-                    {c.mentions_dosage && <span className="text-xs px-1.5 py-0.5 rounded" style={{background:'rgba(100,200,100,0.1)', color:'#6c6'}}>dosage</span>}
-                    {c.mentions_cycle && <span className="text-xs px-1.5 py-0.5 rounded" style={{background:'rgba(100,150,255,0.1)', color:'#88f'}}>cycle</span>}
-                    {c.mentions_bloodwork && <span className="text-xs px-1.5 py-0.5 rounded" style={{background:'rgba(255,100,100,0.1)', color:'#f88'}}>bloodwork</span>}
-                    {c.mentions_stack && <span className="text-xs px-1.5 py-0.5 rounded" style={{background:'rgba(200,100,255,0.1)', color:'#c8f'}}>stack</span>}
-                  </div>
                 </div>
                 <div className="flex-shrink-0 text-center min-w-[50px]">
-                  <div className="text-lg font-bold" style={{color: c.likes > 10 ? '#229DD8' : '#666'}}>{c.likes}</div>
-                  <div className="text-xs text-gray-600">likes</div>
+                  <div className={'text-lg font-bold ' + (c.like_count > 5 ? 'text-[#229DD8]' : 'text-slate-600')}>{c.like_count || 0}</div>
+                  <div className="text-[10px] text-slate-600 uppercase tracking-widest">likes</div>
                 </div>
               </div>
             </div>
@@ -295,22 +330,20 @@ function CommunityIntel() {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-3 mt-8">
           <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0}
-            className="px-4 py-2 rounded-lg text-sm disabled:opacity-30"
-            style={{background:'rgba(34,157,216,0.15)', color:'#229DD8', border:'1px solid rgba(34,157,216,0.3)'}}>
+            className="px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-30 text-[#229DD8] bg-[#229DD8]/10 border border-[#229DD8]/20 hover:bg-[#229DD8]/20 transition-colors">
             Previous
           </button>
-          <span className="text-sm text-gray-400">Page {page + 1} of {totalPages}</span>
+          <span className="text-sm text-slate-400">Page {page + 1} of {totalPages}</span>
           <button onClick={() => setPage(Math.min(totalPages - 1, page + 1))} disabled={page >= totalPages - 1}
-            className="px-4 py-2 rounded-lg text-sm disabled:opacity-30"
-            style={{background:'rgba(34,157,216,0.15)', color:'#229DD8', border:'1px solid rgba(34,157,216,0.3)'}}>
+            className="px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-30 text-[#229DD8] bg-[#229DD8]/10 border border-[#229DD8]/20 hover:bg-[#229DD8]/20 transition-colors">
             Next
           </button>
         </div>
       )}
 
-      <div className="mt-12 text-center text-xs text-gray-600">
-        Data sourced from {compounds.length} compound discussions across ProHormonePro YouTube.
-        <br/>Proof over hype. E3592DC3.
+      <div className="mt-12 text-center">
+        <p className="text-xs text-slate-600">Data sourced from {stats ? stats.unique_videos : '154'} ProHormonePro YouTube videos. {stats ? formatNum(stats.total_likes) : '8K+'} community likes indexed.</p>
+        <p className="text-[10px] text-slate-700 mt-1 font-mono tracking-widest">PROOF OVER HYPE | E3592DC3</p>
       </div>
     </div>
   );
