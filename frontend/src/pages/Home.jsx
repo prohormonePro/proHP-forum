@@ -7,6 +7,14 @@ import useAuthStore from '../stores/auth';
 
 const TIER_LEVELS = { free: 0, inner_circle: 1, admin: 2 };
 
+function formatCount(n) {
+  const num = Number(n);
+  if (!num && num !== 0) return null;
+  if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M+';
+  if (num >= 1000) return Math.round(num / 1000) + 'K+';
+  return String(num);
+}
+
 function timeAgo(dateStr) {
   if (!dateStr) return '';
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -31,6 +39,17 @@ export default function Home() {
   });
 
   const rooms = data?.rooms || [];
+
+  const { data: ytData } = useQuery({
+    queryKey: ['youtube-stats'],
+    queryFn: () => api.get('/api/youtube/stats'),
+    staleTime: 3600000,
+    retry: 1,
+  });
+  const ytLive = ytData?.live === true;
+  const ytViews = formatCount(ytData?.viewCount) || '1.2M+';
+  const ytSubs = formatCount(ytData?.subscriberCount) || '14K+';
+  const ytVideos = formatCount(ytData?.videoCount) || '300+';
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in">
@@ -271,6 +290,12 @@ export default function Home() {
         <div className="flex items-center gap-2 mb-4">
           <Play className="w-3.5 h-3.5 text-red-500" />
           <span className="text-sm font-semibold text-white">YouTube</span>
+          {ytLive && (
+            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+              <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
+              LIVE
+            </span>
+          )}
           <a
             href="https://youtube.com/@prohormonepro"
             target="_blank"
@@ -282,15 +307,15 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="text-center">
-            <div className="stat-value">1.2M+</div>
+            <div className="stat-value">{ytViews}</div>
             <div className="stat-label">Views</div>
           </div>
           <div className="text-center">
-            <div className="stat-value">14K+</div>
+            <div className="stat-value">{ytSubs}</div>
             <div className="stat-label">Subscribers</div>
           </div>
           <div className="text-center">
-            <div className="stat-value">300+</div>
+            <div className="stat-value">{ytVideos}</div>
             <div className="stat-label">Uploads</div>
           </div>
           <div className="text-center">
