@@ -12,13 +12,13 @@ router.get('/search', async (req, res) => {
     const params = [q.trim()];
     let idx = 2;
     let where = "to_tsvector('english', comment_text) @@ plainto_tsquery('english', $1)";
-    where += " AND signal_type NOT IN ('noise', 'admin_update')";
+    where += " AND signal_type NOT IN ('noise', 'admin_update') AND (is_reply = false OR is_reply IS NULL)";
     if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
     if (filter && filter !== 'all') { where += ' AND signal_type = $' + idx; params.push(filter); idx++; }
     const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
     params.push(safeLimit, safeOffset);
     const result = await query(
-      'SELECT id, video_id, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, ' +
+      'SELECT id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count, ' +
       "ts_rank(to_tsvector('english', comment_text), plainto_tsquery('english', $1)) AS relevance " +
       'FROM youtube_comments WHERE ' + where + ' ORDER BY relevance DESC, like_count DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
     res.json({ comments: result.rows, total: parseInt(countR.rows[0].count), query: q.trim() });
@@ -32,13 +32,13 @@ router.get('/', async (req, res) => {
     const safeOffset = parseInt(offset) || 0;
     const params = [];
     let idx = 1;
-    let where = "signal_type NOT IN ('noise', 'admin_update')";
+    let where = "signal_type NOT IN ('noise', 'admin_update') AND (is_reply = false OR is_reply IS NULL)";
     if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
     if (filter && filter !== 'all') { where += ' AND signal_type = $' + idx; params.push(filter); idx++; }
     const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
     params.push(safeLimit, safeOffset);
     const result = await query(
-      'SELECT id, video_id, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score ' +
+      'SELECT id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count ' +
       'FROM youtube_comments WHERE ' + where + ' ORDER BY like_count DESC, published_at DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
     res.json({ comments: result.rows, total: parseInt(countR.rows[0].count), limit: safeLimit, offset: safeOffset });
   } catch (err) { console.error('[yt/comments]', err.message); res.status(500).json({ error: 'Failed' }); }

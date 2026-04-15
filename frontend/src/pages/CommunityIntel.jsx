@@ -345,6 +345,13 @@ function CommunityIntel() {
             <div key={c.id} className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 hover:border-[#229DD8]/20 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
+                  {c.video_title && (
+                    <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
+                      {c.compound_slug && <span className="text-[#229DD8] font-semibold">{c.compound_slug}</span>}
+                      {c.compound_slug && c.video_title && <span className="text-slate-700">|</span>}
+                      <a href={"https://youtube.com/watch?v=" + c.video_id} target="_blank" rel="noopener noreferrer" className="hover:text-[#229DD8] truncate">{c.video_title}</a>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-slate-400 text-xs">{c.author_name}{c.published_at ? " " + new Date(c.published_at).toLocaleDateString() : ""}</span>
                     {c.signal_type && c.signal_type !== "general" && (
@@ -388,6 +395,7 @@ function CommunityIntel() {
                 </div>
                 <div className="flex-shrink-0 text-center min-w-[50px]">
                   <div className={'text-lg font-bold ' + (c.like_count > 5 ? 'text-[#229DD8]' : 'text-slate-600')}>{c.like_count || 0}</div>
+                  {c.reply_count > 0 && <div className="text-[10px] text-slate-500 mt-1">{c.reply_count} replies</div>}
                   <div className="text-[10px] text-slate-600 uppercase tracking-widest">likes</div>
                 </div>
               </div>
