@@ -18,6 +18,16 @@ function CommunityIntel() {
   const [searchInput, setSearchInput] = useState('');
   const [filter, setFilter] = useState('all');
   const [debounceTimer, setDebounceTimer] = useState(null);
+  const [expandedReplies, setExpandedReplies] = useState({});
+  const [repliesData, setRepliesData] = useState({});
+  const fetchReplies = async (commentId) => {
+    if (expandedReplies[commentId]) { setExpandedReplies(prev => ({...prev, [commentId]: false})); return; }
+    try {
+      const res = await fetch(API + "/api/youtube/comments/replies/" + commentId);
+      if (res.ok) { const data = await res.json(); setRepliesData(prev => ({...prev, [commentId]: data.replies})); }
+    } catch(e) { console.error(e); }
+    setExpandedReplies(prev => ({...prev, [commentId]: true}));
+  };
 
   const compound = searchParams.get('compound') || '';
   const search = searchParams.get('q') || '';
@@ -395,10 +405,25 @@ function CommunityIntel() {
                 </div>
                 <div className="flex-shrink-0 text-center min-w-[50px]">
                   <div className={'text-lg font-bold ' + (c.like_count > 5 ? 'text-[#229DD8]' : 'text-slate-600')}>{c.like_count || 0}</div>
-                  {c.reply_count > 0 && <div className="text-[10px] text-slate-500 mt-1">{c.reply_count} replies</div>}
+                  {c.reply_count > 0 && <button onClick={() => fetchReplies(c.id)} className="text-[10px] text-[#229DD8] mt-1 hover:text-cyan-300 cursor-pointer">{expandedReplies[c.id] ? "Hide" : c.reply_count + " replies"}</button>}
                   <div className="text-[10px] text-slate-600 uppercase tracking-widest">likes</div>
                 </div>
               </div>
+            </div>
+              {expandedReplies[c.id] && repliesData[c.id] && (
+                <div className="mt-2 ml-4 border-l-2 border-[#229DD8]/30 pl-3 space-y-2">
+                  {repliesData[c.id].map(r => (
+                    <div key={r.id} className="bg-slate-950/40 rounded-lg p-3 border border-white/5">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={"text-xs font-semibold " + (r.author_name && r.author_name.toLowerCase().includes("prohormonepro") ? "text-[#229DD8]" : "text-slate-400")}>{r.author_name}</span>
+                        {r.published_at && <span className="text-[10px] text-slate-600">{new Date(r.published_at).toLocaleDateString()}</span>}
+                        {r.like_count > 0 && <span className="text-[10px] text-slate-500">{r.like_count} likes</span>}
+                      </div>
+                      <div className="text-sm text-slate-300 leading-relaxed">{stripHtml(r.comment_text)}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -3,6 +3,18 @@ const router = express.Router();
 const { query } = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
+const BASE_FIELDS = 'id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count';
+
+router.get('/replies/:parentId', async (req, res) => {
+  try {
+    const result = await query(
+      'SELECT ' + BASE_FIELDS + ' FROM youtube_comments WHERE parent_comment_id = $1 ORDER BY like_count DESC, published_at ASC',
+      [req.params.parentId]
+    );
+    res.json({ replies: result.rows });
+  } catch (err) { console.error('[yt/replies]', err.message); res.status(500).json({ error: 'Failed' }); }
+});
+
 router.get('/search', async (req, res) => {
   try {
     const { q, limit = 20, offset = 0, compound, filter } = req.query;
@@ -15,11 +27,11 @@ router.get('/search', async (req, res) => {
     where += " AND signal_type NOT IN ('noise', 'admin_update')";
     if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
     if (filter && filter !== 'all') { where += ' AND signal_type = $' + idx; params.push(filter); idx++; }
-    else { where += ' AND (is_reply = false OR is_reply IS NULL)'; }  // only exclude replies when no specific filter
+    else { where += ' AND (is_reply = false OR is_reply IS NULL)'; }
     const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
     params.push(safeLimit, safeOffset);
     const result = await query(
-      'SELECT id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count, ' +
+      'SELECT ' + BASE_FIELDS + ', ' +
       "ts_rank(to_tsvector('english', comment_text), plainto_tsquery('english', $1)) AS relevance " +
       'FROM youtube_comments WHERE ' + where + ' ORDER BY relevance DESC, like_count DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
     res.json({ comments: result.rows, total: parseInt(countR.rows[0].count), query: q.trim() });
@@ -33,15 +45,38 @@ router.get('/', async (req, res) => {
     const safeOffset = parseInt(offset) || 0;
     const params = [];
     let idx = 1;
+
+    if (filter === 'travis_reply') {
+      let where = "c.signal_type = 'travis_reply' AND c.parent_comment_id IS NOT NULL";
+      if (compound) { where += ' AND c.compound_slug = $' + idx; params.push(compound); idx++; }
+      const countR = await query('SELECT count(*) FROM youtube_comments c WHERE ' + where, params);
+      params.push(safeLimit, safeOffset);
+      const result = await query(
+        'SELECT c.id, c.video_id, c.video_title, c.author_name, c.comment_text, c.like_count, c.published_at, c.compound_slug, c.signal_type, c.parent_comment_id, ' +
+        'p.author_name AS parent_author, p.comment_text AS parent_text, p.like_count AS parent_likes, p.published_at AS parent_date, p.signal_type AS parent_signal ' +
+        'FROM youtube_comments c LEFT JOIN youtube_comments p ON c.parent_comment_id = p.comment_id ' +
+        'WHERE ' + where + ' ORDER BY c.like_count DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
+      return res.json({ comments: result.rows, total: parseInt(countR.rows[0].count), limit: safeLimit, offset: safeOffset, threaded: true });
+    }
+
+    if (filter === 'question') {
+      let where = "signal_type = 'question' AND reply_count > 0";
+      if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
+      const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
+      params.push(safeLimit, safeOffset);
+      const result = await query(
+        'SELECT ' + BASE_FIELDS + ' FROM youtube_comments WHERE ' + where + ' ORDER BY like_count DESC, published_at DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
+      return res.json({ comments: result.rows, total: parseInt(countR.rows[0].count), limit: safeLimit, offset: safeOffset });
+    }
+
     let where = "signal_type NOT IN ('noise', 'admin_update')";
     if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
     if (filter && filter !== 'all') { where += ' AND signal_type = $' + idx; params.push(filter); idx++; }
-    else { where += ' AND (is_reply = false OR is_reply IS NULL)'; }  // only exclude replies when no specific filter
+    else { where += ' AND (is_reply = false OR is_reply IS NULL)'; }
     const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
     params.push(safeLimit, safeOffset);
     const result = await query(
-      'SELECT id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count ' +
-      'FROM youtube_comments WHERE ' + where + ' ORDER BY like_count DESC, published_at DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
+      'SELECT ' + BASE_FIELDS + ' FROM youtube_comments WHERE ' + where + ' ORDER BY like_count DESC, published_at DESC LIMIT $' + idx + ' OFFSET $' + (idx+1), params);
     res.json({ comments: result.rows, total: parseInt(countR.rows[0].count), limit: safeLimit, offset: safeOffset });
   } catch (err) { console.error('[yt/comments]', err.message); res.status(500).json({ error: 'Failed' }); }
 });
@@ -55,8 +90,8 @@ router.get('/stats', async (req, res) => {
       "count(*) FILTER (WHERE signal_type = 'cycle_log') AS cycle_logs, " +
       "count(*) FILTER (WHERE signal_type = 'side_effect') AS side_effects, " +
       "count(*) FILTER (WHERE signal_type = 'benefit') AS benefits, " +
-      "count(*) FILTER (WHERE signal_type = 'question') AS questions, " +
-      "count(*) FILTER (WHERE signal_type = 'travis_reply') AS travis_replies, " +
+      "count(*) FILTER (WHERE signal_type = 'question' AND reply_count > 0) AS questions, " +
+      "count(*) FILTER (WHERE signal_type = 'travis_reply' AND parent_comment_id IS NOT NULL) AS travis_replies, " +
       "count(*) FILTER (WHERE signal_type = 'noise') AS noise, " +
       "count(*) FILTER (WHERE signal_type = 'admin_update') AS admin_updates " +
       "FROM youtube_comments");
