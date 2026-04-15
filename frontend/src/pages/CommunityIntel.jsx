@@ -16,6 +16,7 @@ function CommunityIntel() {
   const [page, setPage] = useState(0);
   const [compoundCounts, setCompoundCounts] = useState([]);
   const [searchInput, setSearchInput] = useState('');
+  const [filter, setFilter] = useState('all');
   const [debounceTimer, setDebounceTimer] = useState(null);
 
   const compound = searchParams.get('compound') || '';
@@ -74,10 +75,12 @@ function CommunityIntel() {
       if (search) {
         const params = new URLSearchParams({ q: search, limit: LIMIT, offset: page * LIMIT });
         if (compound) params.set('compound', compound);
+        if (filter !== 'all') params.set('filter', filter);
         url = API + '/api/youtube/comments/search?' + params;
       } else {
         const params = new URLSearchParams({ limit: LIMIT, offset: page * LIMIT });
         if (compound) params.set('compound', compound);
+        if (filter !== 'all') params.set('filter', filter);
         url = API + '/api/youtube/comments?' + params;
       }
       const res = await fetch(url);
@@ -88,7 +91,7 @@ function CommunityIntel() {
       }
     } catch (e) { console.error(e); }
     setLoading(false);
-  }, [compound, search, sort, page]);
+  }, [compound, search, sort, page, filter]);
 
   useEffect(() => { fetchStats(); fetchCompoundCounts(); }, [fetchStats, fetchCompoundCounts]);
   useEffect(() => { fetchComments(); }, [fetchComments]);
@@ -257,6 +260,23 @@ function CommunityIntel() {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 mb-4">
+        {[
+          {key:'all',label:'All Intel'},
+          {key:'cycle_log',label:'Cycle Logs'},
+          {key:'side_effect',label:'Side Effects'},
+          {key:'benefit',label:'Benefits'},
+          {key:'question',label:'Q&A'},
+          {key:'travis_reply',label:"Travis's Replies"},
+        ].map(f => (
+          <button key={f.key} onClick={() => { setFilter(f.key); setPage(0); }}
+            className={' px-3 py-1.5 rounded-lg text-sm font-medium transition-all ' + (filter === f.key
+              ? 'bg-[#229DD8]/30 text-white border border-[#229DD8]/50 shadow-lg shadow-[#229DD8]/15 font-semibold'
+              : 'bg-slate-950/50 text-slate-400 border border-white/5 hover:border-white/15')}>
+            {f.label}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="flex-1">
           <input
@@ -302,6 +322,16 @@ function CommunityIntel() {
                   <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">{stripHtml(c.comment_text)}</div>
                   <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
                     <span className="font-medium text-slate-400">{c.author_name}</span>
+                    {c.signal_type && c.signal_type !== 'general' && (
+                      <span className={' px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold ' + (
+                        c.signal_type === 'cycle_log' ? 'bg-[#229DD8]/15 text-[#229DD8] border border-[#229DD8]/20'
+                        : c.signal_type === 'side_effect' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
+                        : c.signal_type === 'benefit' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                        : c.signal_type === 'travis_reply' ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/20'
+                        : c.signal_type === 'question' ? 'bg-slate-500/15 text-slate-400 border border-slate-500/20'
+                        : 'bg-slate-800/50 text-slate-500'
+                      )}>{c.signal_type.replace('_', ' ')}</span>
+                    )}
                     {c.compound_slug && (
                       <button onClick={() => updateFilter('compound', c.compound_slug)}
                         className="px-2 py-0.5 rounded text-xs text-[#229DD8] bg-[#229DD8]/10 hover:bg-[#229DD8]/20 transition-colors">
