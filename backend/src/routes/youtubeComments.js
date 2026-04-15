@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../config/db');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 
 // GET /api/youtube/comments/search?q=term&limit=20&offset=0
-router.get('/comments/search', async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const { q, limit = 20, offset = 0, compound } = req.query;
     if (!q || q.trim().length < 2) {
@@ -54,7 +54,7 @@ router.get('/comments/search', async (req, res) => {
 });
 
 // GET /api/youtube/comments?compound=slug&limit=10
-router.get('/comments', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { compound, video_id, limit = 10, offset = 0 } = req.query;
     const safeLimit = Math.min(parseInt(limit) || 10, 50);
@@ -104,7 +104,7 @@ router.get('/comments', async (req, res) => {
 
 // POST /api/youtube/comments/import — admin only
 // Body: { videoId, compoundSlug? }
-router.post('/comments/import', authenticateToken, async (req, res) => {
+router.post('/import', authenticate, async (req, res) => {
   try {
     if (req.user.tier !== 'admin') {
       return res.status(403).json({ error: 'Admin only' });
@@ -174,7 +174,7 @@ router.post('/comments/import', authenticateToken, async (req, res) => {
 });
 
 // GET /api/youtube/comments/stats — aggregate stats
-router.get('/comments/stats', async (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
     const result = await query(`
       SELECT

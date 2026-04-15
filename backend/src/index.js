@@ -82,7 +82,7 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/community-comments', communityComments);
 app.use('/api/youtube', require('./routes/youtube'));
-app.use('/api/youtube', require('./routes/youtubeComments'));
+app.use('/api/youtube/comments', require('./routes/youtubeComments'));
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
