@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 <script type="text/babel">
-import { useState, useEffect } from "react";
+const { useState, useEffect } = React;
 
 const metrics = {
   original: { signalDensity: 34, transformationProof: 41, productTransferability: 56, voiceFidelity: 22, founderGravity: 38 },
@@ -211,7 +211,7 @@ function RadarChart({ data, size = 180 }) {
   );
 }
 
-export default function SovereignV6() {
+function SovereignV6() {
   const [activeSection, setActiveSection] = useState("opportunity");
   const [showOriginal, setShowOriginal] = useState(false);
   const [activeVoice, setActiveVoice] = useState(0);

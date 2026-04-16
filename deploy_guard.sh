@@ -65,3 +65,5 @@ fi
 echo ""
 echo "[DEPLOY GUARD] ALL PASS. Build + verify + restart + health + purge."
 echo "E3592DC3"
+# S66: Auto cache purge after successful deploy
+/home/travisd/cf_purge.sh
