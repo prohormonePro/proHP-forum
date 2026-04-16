@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../components/layout/BackButton';
 import useAuthStore from '../stores/auth';
 
@@ -22,7 +22,7 @@ export default function CreateThread() {
 
   useEffect(() => {
     if (!accessToken) {
-      navigate('/login');
+      navigate('/login', { state: { from: __loc } });
       return;
     }
 
@@ -41,7 +41,7 @@ export default function CreateThread() {
         if (!roomsRes.ok) {
           const errorData = await roomsRes.json().catch(() => ({}));
           if (roomsRes.status === 401) {
-            navigate('/login');
+            navigate('/login', { state: { from: __loc } });
             throw new Error('Unauthorized');
           }
           throw new Error(errorData.error || `Failed to load rooms: ${roomsRes.status}`);
@@ -49,7 +49,7 @@ export default function CreateThread() {
         if (!compoundsRes.ok) {
           const errorData = await compoundsRes.json().catch(() => ({}));
           if (compoundsRes.status === 401) {
-            navigate('/login');
+            navigate('/login', { state: { from: __loc } });
             throw new Error('Unauthorized');
           }
           throw new Error(errorData.error || `Failed to load compounds: ${compoundsRes.status}`);
@@ -122,6 +122,8 @@ export default function CreateThread() {
       setLoading(false);
     }
   };
+
+  const __loc = useLocation();
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
