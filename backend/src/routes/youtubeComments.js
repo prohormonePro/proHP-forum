@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
     }
 
     if (filter === 'question') {
-      let where = "'question' = ANY(signal_types) AND reply_count > 0 AND (is_reply = false OR is_reply IS NULL)";
+      let where = "'question' = ANY(signal_types) AND reply_count > 0 AND (is_reply = false OR is_reply IS NULL) AND LOWER(author_name) NOT IN ('@prohormonepro','@prohormone pro','prohormonepro')";
       if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
       const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
       params.push(safeLimit, safeOffset);

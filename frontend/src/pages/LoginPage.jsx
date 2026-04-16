@@ -50,14 +50,14 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 shadow-xl shadow-black/20">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} method="post" className="space-y-4" autoComplete="on">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={ic} required autoFocus autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} />
+              <label htmlFor="login-email" className="block text-xs font-medium text-slate-300 mb-1.5">Email</label>
+              <input type="email" name="email" id="login-email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={ic} required autoFocus autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} inputMode="email" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" className={ic} required autoComplete="current-password" />
+              <label htmlFor="login-password" className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
+              <input type="password" name="password" id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" className={ic} required autoComplete="current-password" />
             </div>
             {error && <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">{error}</div>}
             <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#229DD8] to-[#1b87bc] hover:from-[#1b87bc] hover:to-[#166e9c] disabled:opacity-50 text-white font-bold text-sm rounded-xl py-3.5 transition-all shadow-lg shadow-[#229DD8]/20 hover:shadow-[#229DD8]/40">
