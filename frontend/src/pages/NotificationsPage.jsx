@@ -48,7 +48,7 @@ export default function NotificationsPage() {
   if (!user) return (
     <div className="max-w-2xl mx-auto text-center py-12">
       <p className="text-sm text-slate-400 mb-3">Log in to view notifications.</p>
-      <Link to="/login" className="prohp-btn-primary text-xs">Log in</Link>
+      <Link to="/login" state={{ from: { pathname: window.location.pathname, search: window.location.search } }} className="prohp-btn-primary text-xs">Log in</Link>
     </div>
   );
 

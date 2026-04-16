@@ -252,6 +252,7 @@ function CommunityIntel() {
               <h3 className="text-lg font-extrabold text-white mb-2">The Raw Reports Are Inside</h3>
               <p className="text-sm text-slate-400 mb-5">{stats ? formatNum(stats.total_comments) : '5,800+'} real comments. {stats ? stats.linked_compounds : '23'} compounds tracked. Searchable by keyword, filterable by compound.</p>
               <Link to="/register" className="block w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl py-3 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">Unlock the Vault | $19/mo</Link>
+              <p className="text-xs text-slate-500 mt-3">Already a member? <Link to="/login" state={{ from: { pathname: window.location.pathname, search: window.location.search } }} className="text-[#229DD8] hover:text-cyan-300 font-medium">Log in</Link></p>
               <p className="text-xs text-slate-600 mt-3">Cancel anytime. Instant access.</p>
             </div>
           </div>

@@ -69,7 +69,7 @@ export default function GrepGateCTA() {
             <button onClick={handleStartHere} disabled={loading} className="inline-flex items-center justify-center rounded-xl bg-[#229DD8] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1b87bc] transition disabled:opacity-50">
               {loading ? "Securing Checkout..." : "Join Inner Circle"}
             </button>
-            <button onClick={() => nav("/login")} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition">
+            <button onClick={() => nav("/login", { state: { from: { pathname: window.location.pathname, search: window.location.search } } })} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition">
               I'm already in
             </button>
           </div>

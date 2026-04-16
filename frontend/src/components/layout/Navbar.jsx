@@ -71,7 +71,7 @@ export default function Navbar() {
             </>
           ) : (
             <div className="ml-auto">
-              <Link to="/login" className="prohp-btn-primary text-xs">Log In</Link>
+              <Link to="/login" state={{ from: { pathname: window.location.pathname, search: window.location.search } }} className="prohp-btn-primary text-xs">Log In</Link>
             </div>
           )}
         </div>
