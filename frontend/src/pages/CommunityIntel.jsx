@@ -376,18 +376,7 @@ function CommunityIntel() {
                     )}
                   </div>
                   <div className="text-sm text-slate-300 leading-relaxed" style={{lineHeight: "1.65"}}>{c.parent_text ? (<><div className="bg-slate-950/40 rounded-lg p-3 mb-2 border-l-2 border-slate-600/30"><div className="text-xs text-slate-500 mb-1">{c.parent_author || "User"}</div><div className="text-sm text-slate-400 leading-relaxed">{stripHtml(c.parent_text)}</div></div><div className="text-sm text-slate-200 leading-relaxed">{stripHtml(c.comment_text)}</div></>) : (c.signal_type === "cycle_log" ? formatComment(c.comment_text) : stripHtml(c.comment_text))}</div>
-                  <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
-                    <span className="font-medium text-slate-400">{c.author_name}</span>
-                    {c.signal_type && c.signal_type !== 'general' && (
-                      <span className={' px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold ' + (
-                        c.signal_type === 'cycle_log' ? 'bg-[#229DD8]/15 text-[#229DD8] border border-[#229DD8]/20'
-                        : c.signal_type === 'side_effect' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
-                        : c.signal_type === 'benefit' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-                        : c.signal_type === 'travis_reply' ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/20'
-                        : c.signal_type === 'question' ? 'bg-slate-500/15 text-slate-400 border border-slate-500/20'
-                        : 'bg-slate-800/50 text-slate-500'
-                      )}>{c.signal_type.replace('_', ' ')}</span>
-                    )}
+                  <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-slate-500">
                     {c.compound_slug && (
                       <button onClick={() => updateFilter('compound', c.compound_slug)}
                         className="px-2 py-0.5 rounded text-xs text-[#229DD8] bg-[#229DD8]/10 hover:bg-[#229DD8]/20 transition-colors">
@@ -396,16 +385,21 @@ function CommunityIntel() {
                     )}
                     {c.video_id && (
                       <a href={'https://youtube.com/watch?v=' + c.video_id} target="_blank" rel="noopener noreferrer"
-                        className="text-slate-500 hover:text-[#229DD8] transition-colors">
+                        className="text-slate-500 hover:text-[#229DD8] transition-colors text-xs">
                         Watch video
                       </a>
                     )}
-                    {c.published_at && <span>{new Date(c.published_at).toLocaleDateString()}</span>}
+                    {c.reply_count > 0 && (
+                      <button onClick={() => fetchReplies(c.comment_id)}
+                        className="px-2 py-0.5 rounded text-xs text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500/20 transition-colors cursor-pointer">
+                        {expandedReplies[c.comment_id] ? 'Hide replies' : c.reply_count + ' replies'}
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div className="flex-shrink-0 text-center min-w-[50px]">
                   <div className={'text-lg font-bold ' + (c.like_count > 5 ? 'text-[#229DD8]' : 'text-slate-600')}>{c.like_count || 0}</div>
-                  {c.reply_count > 0 && <button onClick={() => fetchReplies(c.comment_id)} className="text-[10px] text-[#229DD8] mt-1 hover:text-cyan-300 cursor-pointer">{expandedReplies[c.comment_id] ? "Hide" : c.reply_count + " replies"}</button>}
+
                   <div className="text-[10px] text-slate-600 uppercase tracking-widest">likes</div>
                 </div>
               </div>
