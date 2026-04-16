@@ -84,7 +84,7 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleCheckout} className="space-y-3">
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={ic} required autoFocus />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={ic} required autoFocus autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} />
             {error && <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">{error}</div>}
             <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl py-3.5 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40">
               {loading ? 'Redirecting to checkout...' : 'Join Inner Circle | $19/mo'}
