@@ -375,7 +375,7 @@ function CommunityIntel() {
                       )}>{c.signal_type.replace("_", " ")}</span>
                     )}
                   </div>
-                  <div className="text-sm text-slate-300 leading-relaxed" style={{lineHeight: "1.65"}}>{c.signal_type === "cycle_log" ? formatComment(c.comment_text) : stripHtml(c.comment_text)}</div>
+                  <div className="text-sm text-slate-300 leading-relaxed" style={{lineHeight: "1.65"}}>{c.parent_text ? (<><div className="bg-slate-950/40 rounded-lg p-3 mb-2 border-l-2 border-slate-600/30"><div className="text-xs text-slate-500 mb-1">{c.parent_author || "User"}</div><div className="text-sm text-slate-400 leading-relaxed">{stripHtml(c.parent_text)}</div></div><div className="text-sm text-slate-200 leading-relaxed">{stripHtml(c.comment_text)}</div></>) : (c.signal_type === "cycle_log" ? formatComment(c.comment_text) : stripHtml(c.comment_text))}</div>
                   <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
                     <span className="font-medium text-slate-400">{c.author_name}</span>
                     {c.signal_type && c.signal_type !== 'general' && (
