@@ -87,7 +87,7 @@ export default function ClaimAccountPage() {
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6 text-center">
               <p className="text-red-400 text-sm font-medium">{error}</p>
               {error.includes('already exists') && (
-                <Link to="/login" className="text-red-300 hover:text-red-200 text-xs mt-2 inline-block underline">Go to login →</Link>
+                <Link to="/login" state={{ from: { pathname: window.location.pathname, search: window.location.search } }} className="text-red-300 hover:text-red-200 text-xs mt-2 inline-block underline">Go to login →</Link>
               )}
             </div>
           )}

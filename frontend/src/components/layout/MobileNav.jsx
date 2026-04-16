@@ -26,6 +26,7 @@ export default function MobileNav() {
               <Link
                 key={tab.label}
                 to={tab.path}
+                state={tab.path === "/login" ? { from: { pathname: location.pathname, search: location.search } } : undefined}
                 className="relative flex flex-col items-center justify-center flex-1 h-full group"
               >
                 <div className={`flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-xl transition-all duration-200 ${active ? 'bg-[#229DD8]/25' : 'group-active:bg-white/5'}`}>
