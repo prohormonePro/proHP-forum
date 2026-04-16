@@ -3,7 +3,7 @@ const router = express.Router();
 const { query } = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
-const BASE_FIELDS = 'id, comment_id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count';
+const BASE_FIELDS = 'id, comment_id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_types, signal_score, is_reply, parent_comment_id, reply_count';
 
 router.get('/replies/:parentId', async (req, res) => {
   try {
@@ -26,7 +26,7 @@ router.get('/search', async (req, res) => {
     let where = "to_tsvector('english', comment_text) @@ plainto_tsquery('english', $1)";
     where += " AND signal_type NOT IN ('noise', 'admin_update')";
     if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
-    if (filter && filter !== 'all') { where += ' AND signal_type = $' + idx; params.push(filter); idx++; }
+    if (filter && filter !== 'all') { where += ' AND $' + idx + ' = ANY(signal_types)'; params.push(filter); idx++; }
     else { where += ' AND (is_reply = false OR is_reply IS NULL)'; }
     const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
     params.push(safeLimit, safeOffset);
@@ -71,7 +71,7 @@ router.get('/', async (req, res) => {
 
     let where = "signal_type NOT IN ('noise', 'admin_update')";
     if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
-    if (filter && filter !== 'all') { where += ' AND signal_type = $' + idx; params.push(filter); idx++; }
+    if (filter && filter !== 'all') { where += ' AND $' + idx + ' = ANY(signal_types)'; params.push(filter); idx++; }
     else { where += ' AND (is_reply = false OR is_reply IS NULL)'; }
     const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
     params.push(safeLimit, safeOffset);

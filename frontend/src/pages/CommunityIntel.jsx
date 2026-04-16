@@ -303,7 +303,7 @@ function CommunityIntel() {
           {key:'side_effect',label:'Side Effects'},
           {key:'benefit',label:'Benefits'},
           {key:'question',label:'Q&A'},
-          {key:'travis_reply',label:"Travis's Replies"},
+          {key:'travis_reply',label:"Travis's Verified Answers"},
         ].map(f => (
           <button key={f.key} onClick={() => { setFilter(f.key); setPage(0); }}
             className={' px-3 py-1.5 rounded-lg text-sm font-medium transition-all ' + (filter === f.key
@@ -364,16 +364,7 @@ function CommunityIntel() {
                   )}
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-slate-400 text-xs">{c.author_name}{c.published_at ? " " + new Date(c.published_at).toLocaleDateString() : ""}</span>
-                    {c.signal_type && c.signal_type !== "general" && (
-                      <span className={" px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold " + (
-                        c.signal_type === "cycle_log" ? "bg-[#229DD8]/15 text-[#229DD8] border border-[#229DD8]/20"
-                        : c.signal_type === "side_effect" ? "bg-amber-500/15 text-amber-400 border border-amber-500/20"
-                        : c.signal_type === "benefit" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
-                        : c.signal_type === "travis_reply" ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/20"
-                        : c.signal_type === "question" ? "bg-slate-500/15 text-slate-400 border border-slate-500/20"
-                        : "bg-slate-800/50 text-slate-500"
-                      )}>{c.signal_type.replace("_", " ")}</span>
-                    )}
+                    <div className="flex flex-wrap gap-1">{c.signal_types && c.signal_types.filter(t => t !== "general" && t !== "noise" && t !== "admin_update").map(t => (<span key={t} className={"px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold " + (t === "cycle_log" ? "bg-[#229DD8]/15 text-[#229DD8] border border-[#229DD8]/20" : t === "side_effect" ? "bg-amber-500/15 text-amber-400 border border-amber-500/20" : t === "benefit" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" : t === "travis_reply" ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/20" : t === "question" ? "bg-slate-500/15 text-slate-400 border border-slate-500/20" : t === "verified_override" ? "bg-purple-500/15 text-purple-300 border border-purple-500/30" : "bg-slate-800/50 text-slate-500")}>{t.replace("_", " ")}</span>))}</div>
                   </div>
                   <div className="text-sm text-slate-300 leading-relaxed" style={{lineHeight: "1.65"}}>{c.parent_text ? (<><div className="bg-slate-950/40 rounded-lg p-3 mb-2 border-l-2 border-slate-600/30"><div className="text-xs text-slate-500 mb-1">{c.parent_author || "User"}</div><div className="text-sm text-slate-400 leading-relaxed">{stripHtml(c.parent_text)}</div></div><div className="text-sm text-slate-200 leading-relaxed">{stripHtml(c.comment_text)}</div></>) : (c.signal_type === "cycle_log" ? formatComment(c.comment_text) : stripHtml(c.comment_text))}</div>
                   <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-slate-500">
@@ -413,7 +404,7 @@ function CommunityIntel() {
                         {r.published_at && <span className="text-[10px] text-slate-600">{new Date(r.published_at).toLocaleDateString()}</span>}
                         {r.like_count > 0 && <span className="text-[10px] text-slate-500">{r.like_count} likes</span>}
                       </div>
-                      <div className="text-sm text-slate-300 leading-relaxed">{stripHtml(r.comment_text)}</div>
+                      <div className="text-sm text-slate-300 leading-relaxed" style={{lineHeight: "1.65"}}>{r.comment_text && r.comment_text.length > 150 ? formatComment(r.comment_text) : stripHtml(r.comment_text)}</div>
                     </div>
                   ))}
                 </div>
