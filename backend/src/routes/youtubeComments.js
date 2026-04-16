@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
     }
 
     if (filter === 'question') {
-      let where = "signal_type = 'question' AND reply_count > 0";
+      let where = "'question' = ANY(signal_types) AND reply_count > 0 AND (is_reply = false OR is_reply IS NULL)";
       if (compound) { where += ' AND compound_slug = $' + idx; params.push(compound); idx++; }
       const countR = await query('SELECT count(*) FROM youtube_comments WHERE ' + where, params);
       params.push(safeLimit, safeOffset);
