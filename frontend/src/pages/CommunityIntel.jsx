@@ -352,7 +352,7 @@ function CommunityIntel() {
       ) : (
         <div className="space-y-3">
           {comments.map(c => (
-            <div key={c.id} className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 hover:border-[#229DD8]/20 transition-colors">
+            <div key={c.id}><div className="bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/10 p-4 hover:border-[#229DD8]/20 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
                   {c.video_title && (
