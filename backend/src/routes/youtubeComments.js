@@ -3,7 +3,7 @@ const router = express.Router();
 const { query } = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
-const BASE_FIELDS = 'id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count';
+const BASE_FIELDS = 'id, comment_id, video_id, video_title, author_name, comment_text, like_count, published_at, compound_slug, signal_type, signal_score, is_reply, parent_comment_id, reply_count';
 
 router.get('/replies/:parentId', async (req, res) => {
   try {

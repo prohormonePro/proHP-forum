@@ -405,14 +405,14 @@ function CommunityIntel() {
                 </div>
                 <div className="flex-shrink-0 text-center min-w-[50px]">
                   <div className={'text-lg font-bold ' + (c.like_count > 5 ? 'text-[#229DD8]' : 'text-slate-600')}>{c.like_count || 0}</div>
-                  {c.reply_count > 0 && <button onClick={() => fetchReplies(c.id)} className="text-[10px] text-[#229DD8] mt-1 hover:text-cyan-300 cursor-pointer">{expandedReplies[c.id] ? "Hide" : c.reply_count + " replies"}</button>}
+                  {c.reply_count > 0 && <button onClick={() => fetchReplies(c.comment_id)} className="text-[10px] text-[#229DD8] mt-1 hover:text-cyan-300 cursor-pointer">{expandedReplies[c.comment_id] ? "Hide" : c.reply_count + " replies"}</button>}
                   <div className="text-[10px] text-slate-600 uppercase tracking-widest">likes</div>
                 </div>
               </div>
             </div>
-              {expandedReplies[c.id] && repliesData[c.id] && (
+              {expandedReplies[c.comment_id] && repliesData[c.comment_id] && (
                 <div className="mt-2 ml-4 border-l-2 border-[#229DD8]/30 pl-3 space-y-2">
-                  {repliesData[c.id].map(r => (
+                  {repliesData[c.comment_id].map(r => (
                     <div key={r.id} className="bg-slate-950/40 rounded-lg p-3 border border-white/5">
                       <div className="flex items-center gap-2 mb-1">
                         <span className={"text-xs font-semibold " + (r.author_name && r.author_name.toLowerCase().includes("prohormonepro") ? "text-[#229DD8]" : "text-slate-400")}>{r.author_name}</span>
