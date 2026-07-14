@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useAuthStore from '../stores/auth';
 import { useParams, Link } from 'react-router-dom';
 import BackButton from '../components/layout/BackButton';
@@ -22,6 +22,13 @@ export default function UserProfile() {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ age: '', years_lifting: '', trt_hrt: false, trt_compound: '', trt_dose: '' });
   const [saving, setSaving] = useState(false);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const [membership, setMembership] = useState(null);
+  const [membershipLoading, setMembershipLoading] = useState(false);
+  const [membershipError, setMembershipError] = useState('');
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelingMembership, setCancelingMembership] = useState(false);
+  const cancelButtonRef = useRef(null);
 
   const startEdit = () => {
     setEditForm({
@@ -97,6 +104,83 @@ export default function UserProfile() {
       fetchProfile();
     }
   }, [username]);
+
+  useEffect(() => {
+    if (!isOwner || !accessToken) {
+      setMembership(null);
+      setMembershipError('');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const loadMembership = async () => {
+      setMembershipLoading(true);
+      setMembershipError('');
+      try {
+        const response = await fetch('/api/stripe/membership', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          signal: controller.signal,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Membership unavailable');
+        setMembership(data.membership);
+      } catch (err) {
+        if (err.name !== 'AbortError') setMembershipError('Membership unavailable');
+      } finally {
+        if (!controller.signal.aborted) setMembershipLoading(false);
+      }
+    };
+
+    loadMembership();
+    return () => controller.abort();
+  }, [isOwner, accessToken]);
+
+  useEffect(() => {
+    if (!cancelDialogOpen) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape' && !cancelingMembership) {
+        setCancelDialogOpen(false);
+        requestAnimationFrame(() => cancelButtonRef.current?.focus());
+      }
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [cancelDialogOpen, cancelingMembership]);
+
+  const keepMembership = () => {
+    setCancelDialogOpen(false);
+    setMembershipError('');
+    requestAnimationFrame(() => cancelButtonRef.current?.focus());
+  };
+
+  const cancelMembership = async () => {
+    if (cancelingMembership) return;
+    setCancelingMembership(true);
+    setMembershipError('');
+    try {
+      const response = await fetch('/api/stripe/cancel-membership', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Membership could not be canceled');
+      setMembership(data.membership);
+      if (data.tier) {
+        useAuthStore.setState((state) => ({
+          user: state.user ? { ...state.user, tier: data.tier } : state.user,
+        }));
+      }
+      setCancelDialogOpen(false);
+    } catch (_) {
+      setMembershipError('Membership could not be canceled. Please try again.');
+    } finally {
+      setCancelingMembership(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -239,6 +323,92 @@ export default function UserProfile() {
           </div>
         )}
       </div>
+
+      {isOwner && (
+        <section
+          aria-labelledby="profile-settings-heading"
+          className="bg-slate-900/60 backdrop-blur-xl rounded-xl border border-white/10 p-5 mb-4 shadow-lg shadow-black/20"
+        >
+          <div className="flex items-center justify-between gap-3 border-b border-white/5 pb-4 mb-4">
+            <h2 id="profile-settings-heading" className="text-lg font-bold text-white">Settings</h2>
+            {!editing && (
+              <button
+                type="button"
+                onClick={startEdit}
+                className="text-sm font-semibold text-[#229DD8] hover:text-[#69c8f2] transition-colors"
+              >
+                Edit profile
+              </button>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-slate-950/40 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h3 className="font-semibold text-slate-200">Inner Circle membership</h3>
+
+              {membershipLoading && (
+                <span className="text-sm text-slate-500" role="status">Loading…</span>
+              )}
+
+              {!membershipLoading && membership?.can_cancel && (
+                <button
+                  ref={cancelButtonRef}
+                  type="button"
+                  onClick={() => {
+                    setMembershipError('');
+                    setCancelDialogOpen(true);
+                  }}
+                  className="rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400/70 transition-colors"
+                >
+                  Cancel membership
+                </button>
+              )}
+
+              {!membershipLoading && membership?.status === 'canceled' && (
+                <span className="text-sm font-semibold text-slate-300" role="status">Membership canceled</span>
+              )}
+            </div>
+
+            {membershipError && (
+              <p className="mt-3 text-sm text-red-300" role="alert">{membershipError}</p>
+            )}
+          </div>
+
+          {cancelDialogOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="cancel-membership-title"
+                className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl"
+              >
+                <h2 id="cancel-membership-title" className="text-xl font-bold text-white">
+                  Are you sure you want to cancel your membership?
+                </h2>
+                <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={keepMembership}
+                    disabled={cancelingMembership}
+                    autoFocus
+                    className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-[#229DD8] disabled:opacity-50"
+                  >
+                    Keep membership
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelMembership}
+                    disabled={cancelingMembership}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {cancelingMembership ? 'Canceling…' : 'Yes, cancel membership'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Reputation */}
       {reputation && (
